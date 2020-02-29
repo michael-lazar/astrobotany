@@ -1,5 +1,10 @@
-garden_db.sqlite
-*.pyc
-garden_file.dat
-garden_file.json
-sqlite/
+astrobotany.sqlite
+.idea/
+__pycache__/
+certs/
+venv/
+.mypy_cache/
+astrobotany.egg-info/
+build/
+dist/
+TODO.txt

@@ -1,0 +1,51 @@
+# Astrobotany Registration Guide
+
+## Overview
+
+Astrobotany uses TLS client certificates for user authentication.
+
+Creating an account is only a few simple steps, and does not require providing an email address or any other personal information. The entire process can be done from the command line and should take under 5 minutes to complete.
+
+An overview of the sign-up flow looks like this:
+
+* 1. You create a certificate signing request (CSR) locally.
+* 2. You send your CSR to the server, and the server returns a signed client certificate.
+* 3. You use the signed client certificate to make requests to the server.
+
+These instructions assume that you have access to a unix-like shell and the openssl program. Instructions for Windows are forthcoming.
+
+## Step 1: Create a CSR
+
+First, use OpenSSL to generate a new private key and a CSR file:
+
+```
+# Generate a new private key
+openssl genrsa -out astrobotany.key 4096
+
+# Generate a certificate request
+openssl req -new -key astrobotany.key -out astrobotany.req
+```
+
+OpenSSL will prompt you to enter information about your certificate (Country Name, Email, etc.). You can leave all of these fields blank *except* for the "Common Name". The Common Name will be displayed as your username inside of astrobotany. Uniqueness is not enforced, so try to pick something short and identifiable.
+
+## Step 2: Get your CSR signed
+
+Next, send an HTTP POST request containing your CSR to the following URL. The server will respond with your newly signed certificate.
+
+```
+curl https://astrobotany.mozz.us/register -X POST -F req=@astrobotany.req > astrobotany.crt
+```
+
+At this point, the only files that you need to keep are:
+
+* astrobotany.key (your private key)
+* astrobotany.crt (your client certificate)
+
+## Step 3: Use your client certificate
+
+Now all that you need to do is present this certificate when making requests to the astrobotany gemini server. Client certificates are not widely supported by gemini clients (yet). Here's an example of how to do it in AV-98:
+
+```
+./av98.py --tls-cert astrobotany.crt --tls-key astrobotany.key gemini://astrobotany.mozz.us/
+```
+

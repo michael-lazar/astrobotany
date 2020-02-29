@@ -1,0 +1,30 @@
+name: Astrobotany
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+    - name: Install packages
+      run: |
+        pip install .
+        pip install .[test]
+    - name: Run linters
+      run: |
+        flake8 .
+        black --check .
+        isort --check-only --recursive .
+        mypy --ignore-missing-imports
+    - name: Run tests
+      run: |
+        pytest -v tests/

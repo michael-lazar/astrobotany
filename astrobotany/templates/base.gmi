@@ -1,0 +1,26 @@
+{% block title %}
+{% if request.user == plant.user %}
+# Home garden
+{% else %}
+# Visiting {{ plant.user }}'s garden
+{% endif %}
+{% endblock %}
+
+```
+{{ plant.get_ascii_art() }}
+stage : {{ plant.description }}
+age   : {{ plant.age }} days
+score : {{ plant.score }}
+water : {{ plant.water_gauge }}
+```
+
+{% block body %}{% endblock %}
+{% block menu %}
+
+=>/plant/observe 🌹 Look
+=>/plant/water 💧 Water
+{% if plant.dead or plant.stage == 5 %}
+=>/plant/harvest 💀 Harvest
+{% endif %}
+=>/ 🏡 Home
+{% endblock %}

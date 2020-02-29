@@ -1,0 +1,16 @@
+# Community Message Board
+
+=>/ 🏡 Home
+
+{% if request.user %}
+=>/message-board/post ✍️  Leave a message
+{% else %}
+(Must be logged in to comment)
+{% endif %}
+
+{% for message in messages %}
+"{{ message.text }}"
+- {{ message.user.username }}, {{ message.created_at.strftime('%Y-%m-%d') }}
+
+{% endfor %}
+🌻🌺🌷

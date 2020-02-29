@@ -1,0 +1,7 @@
+{% extends "base.gmi" %}
+
+{% block body %}
+{% if plant.watered_by %}
+Your plant was recently watered by {{ plant.watered_by.username }}.
+{% endif %}
+{% endblock %}

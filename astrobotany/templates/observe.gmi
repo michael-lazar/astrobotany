@@ -1,0 +1,7 @@
+{% extends "base.gmi" %}
+
+{% block body %}
+{{ plant.get_observation() }}
+Generation: {{ plant.generation }}
+Growth rate: {{ plant.growth_rate }}
+{% endblock %}

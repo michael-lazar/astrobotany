@@ -1,0 +1,5 @@
+{% extends "base.gmi" %}
+
+{% block body %}
+{{ info }}
+{% endblock %}
