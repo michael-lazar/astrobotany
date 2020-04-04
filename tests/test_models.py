@@ -74,6 +74,7 @@ def test_plant_get_observation(plant):
 
 @freeze_time()
 def test_plant_water(plant):
+    plant.watered_at = datetime.now() - timedelta(hours=24)
     assert plant.water_supply_percent == 0
     plant.water()
     assert plant.water_supply_percent == 100
