@@ -19,9 +19,8 @@ setup(
     keywords="gemini",
     packages=["astrobotany"],
     python_requires=">=3.7, <4",
-    install_requires=["jetforce", "peewee", "jinja2"],
+    install_requires=["jetforce", "peewee", "jinja2", "faker"],
     extras_require={
-        "dev": ["faker"],
         "test": ["pytest", "black", "isort", "mypy", "flake8", "freezegun"],
     },
     package_data={"astrobotany": ["art/*", "templates/*"]},
