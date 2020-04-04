@@ -1,8 +1,10 @@
 # Astrobotany
 
-A community garden for gemini
+![Astrobotany](https://github.com/michael-lazar/astrobotany/workflows/Astrobotany/badge.svg)
 
-**(fork of [jifunks/botany](https://github.com/jifunks/botany))**
+A community garden application written for the gemini server protocol.
+
+(this project is a fork of [jifunks/botany](https://github.com/jifunks/botany))
 
 ```
 Astrobotany
