@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+mkdir -p certs/
 openssl req \
   -nodes \
   -newkey rsa:4096 \

@@ -5,6 +5,8 @@ die () {
 }
 [ "$#" -eq 1 ] || die "Usage: generate_client_cert.sh [CLIENT_CN]"
 
+mkdir -p certs/
+
 openssl genrsa \
   -out certs/${1}.key 4096
 

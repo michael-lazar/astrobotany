@@ -19,11 +19,17 @@ jobs:
       run: |
         pip install .
         pip install .[test]
-    - name: Run linters
+    - name: Lint with flake8
       run: |
         flake8 --max-line-length=100 .
+    - name: Lint with black
+      run: |
         black --check .
+    - name: Lint with isort
+      run: |
         isort --check-only --recursive .
+    - name: Lint with mypy
+      run: |
         mypy --ignore-missing-imports
     - name: Run tests
       run: |

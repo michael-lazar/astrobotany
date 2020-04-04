@@ -2,6 +2,7 @@
 import asyncio
 
 import jetforce
+
 from astrobotany import init_db, vhost
 
 init_db("astrobotany.sqlite")
