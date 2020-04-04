@@ -30,5 +30,8 @@ Welcome to astrobotany. You've been given a seed that will grow into a beautiful
 =>/directory 📒 Garden directory
 =>/message-board 📌 Community message board
 
-Astrobotany is a fork of Botany, a terminal game for pubnix servers.
-=>https://github.com/michael-lazar/astrobotany
+Astrobotany is a fork of the original tilde.town pubnix game, Botany.
+=>https://github.com/jifunks/botany
+
+The source code for this gemini capsule can be found here.
+=> https://github.com/michael-lazar/astrobotany

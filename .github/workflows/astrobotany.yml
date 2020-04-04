@@ -21,7 +21,7 @@ jobs:
         pip install .[test]
     - name: Run linters
       run: |
-        flake8 .
+        flake8 --max-line-length=100 .
         black --check .
         isort --check-only --recursive .
         mypy --ignore-missing-imports
