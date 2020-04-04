@@ -2,6 +2,15 @@
 
 ![Astrobotany](https://github.com/michael-lazar/astrobotany/workflows/Astrobotany/badge.svg)
 
+---
+
+<p align="center">
+    <strong><a href="gemini://astrobotany.mozz.us">gemini://astrobotany.mozz.us</a></strong>
+    <a href="https://portal.mozz.us/gemini/astrobotany.mozz.us/">(http proxy)</a><br>
+</p>
+
+---
+
 A community garden application written for the gemini server protocol.
 
 (this project is a fork of [jifunks/botany](https://github.com/jifunks/botany))
