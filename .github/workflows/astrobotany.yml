@@ -25,9 +25,9 @@ jobs:
     - name: Lint with black
       run: |
         black --check .
-    - name: Lint with isort
-      run: |
-        isort --check-only --recursive .
+#    - name: Lint with isort
+#      run: |
+#        isort --check-only --recursive .
     - name: Lint with mypy
       run: |
         mypy --ignore-missing-imports
