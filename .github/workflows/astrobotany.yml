@@ -30,7 +30,7 @@ jobs:
 #        isort --check-only --recursive .
     - name: Lint with mypy
       run: |
-        mypy --ignore-missing-imports
+        mypy --ignore-missing-imports .
     - name: Run tests
       run: |
         pytest -v tests/
