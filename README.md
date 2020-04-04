@@ -1,6 +1,6 @@
 # Astrobotany
 
-A community garden for gemini servers
+A community garden for gemini
 
 **(fork of [jifunks/botany](https://github.com/jifunks/botany))**
 
