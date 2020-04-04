@@ -5,8 +5,10 @@
 ---
 
 <p align="center">
+    🛰️ • 🌷 • 🐝 • 🚀 • 🌵 • 👩‍🚀
     <strong><a href="gemini://astrobotany.mozz.us">gemini://astrobotany.mozz.us</a></strong>
-    <a href="https://portal.mozz.us/gemini/astrobotany.mozz.us/">(http proxy)</a><br>
+    <a href="https://portal.mozz.us/gemini/astrobotany.mozz.us/">(http proxy)</a>
+    🥕 • 🔭 • 🌺 • 👩‍🔬 • 🌍 • 👨‍🌾
 </p>
 
 ---
