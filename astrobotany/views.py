@@ -81,7 +81,7 @@ class AstrobotanyVirtualHost:
 
     def route(self, path, strict_trailing_slash=True, authenticated=False):
         route_pattern = jetforce.RoutePattern(
-            path, strict_trailing_slash=strict_trailing_slash
+            path, strict_trailing_slash=strict_trailing_slash, strict_hostname=False,
         )
 
         def wrap(func):
