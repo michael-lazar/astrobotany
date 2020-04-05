@@ -1,8 +1,21 @@
 # Astrobotany
 
-A community garden for gemini
+![Astrobotany](https://github.com/michael-lazar/astrobotany/workflows/Astrobotany/badge.svg)
 
-**(fork of [jifunks/botany](https://github.com/jifunks/botany))**
+---
+
+<p align="center">
+    🌱&nbsp;•&nbsp;🛰️&nbsp;•&nbsp;🌷&nbsp;•&nbsp;🐝&nbsp;•&nbsp;🚀&nbsp;•&nbsp;🌵&nbsp;•&nbsp;👩‍🚀
+    <strong><a href="gemini://astrobotany.mozz.us">gemini://astrobotany.mozz.us</a></strong>
+    <a href="https://portal.mozz.us/gemini/astrobotany.mozz.us/">(http&nbsp;proxy)</a>
+    🥕&nbsp;•&nbsp;🔭&nbsp;•&nbsp;🌺&nbsp;•&nbsp;👩‍🔬&nbsp;•&nbsp;🌍&nbsp;•&nbsp;👨‍🌾&nbsp;•&nbsp;🌧️
+</p>
+
+---
+
+A community garden application written for the gemini server protocol.
+
+(this project is a fork of [jifunks/botany](https://github.com/jifunks/botany))
 
 ```
 Astrobotany
@@ -43,4 +56,41 @@ Astrobotany is a fork of the original tilde.town pubnix game, Botany.
 
 The source code for this gemini capsule can be found here.
 [6] https://github.com/michael-lazar/astrobotany
+```
+
+## Development Quickstart
+
+Install the server:
+
+```
+git clone git@github.com:michael-lazar/astrobotany.git
+cd astrobotany
+python3 -m virtualenv venv
+
+source venv/bin/activate
+pip install -e .
+pip install .[test]
+
+# Generate a self-signed CA
+./scripts/generate_server_ca.sh
+
+# Add a handful of test users
+./scripts/add_seed_data.py 10
+```
+
+Run the server:
+
+```
+source venv/bin/activate
+python main.py
+```
+
+Connect a client:
+
+```
+# Generate a signed client certificate
+./scripts/generate_client_cert.sh test_user
+
+# Using https://tildegit.org/solderpunk/AV-98
+av98 gemini://localhost --tls-cert certs/test_user.cer --tls-key certs/test_user.key
 ```
