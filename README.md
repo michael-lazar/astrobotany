@@ -85,7 +85,7 @@ source venv/bin/activate
 python main.py
 ```
 
-Connect with a client:
+Connect a client:
 
 ```
 # Generate a signed client certificate
