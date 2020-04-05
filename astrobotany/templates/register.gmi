@@ -46,6 +46,6 @@ At this point, the only files that you need to keep are:
 Now all that you need to do is present this certificate when making requests to the astrobotany gemini server. Client certificates are not widely supported by gemini clients (yet). Here's an example of how to do it in AV-98:
 
 ```
-./av98.py --tls-cert astrobotany.crt --tls-key astrobotany.key gemini://astrobotany.mozz.us/
+av98 --tls-cert astrobotany.crt --tls-key astrobotany.key gemini://astrobotany.mozz.us/
 ```
 
