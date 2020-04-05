@@ -3,7 +3,7 @@
 =>/ 🏡 Home
 
 {% if request.user %}
-=>/message-board/post ✍️  Leave a message
+=>/message-board/post ✍️  Post a message
 {% else %}
 (Must be logged in to comment)
 {% endif %}
