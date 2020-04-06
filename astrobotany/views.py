@@ -158,6 +158,16 @@ def harvest(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
+@vhost.route("/plant/name", authenticated=True)
+def name(request):
+    if not request.query:
+        return Response(Status.INPUT, "Enter a new nickname for your plant:")
+
+    request.plant.name = request.query[:40]
+    body = render_template("name.gmi", request=request, plant=request.plant)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
 @vhost.route("/directory")
 def directory(request):
     plants = Plant.filter(Plant.user_active.is_null(False))

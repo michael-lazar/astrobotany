@@ -4,6 +4,7 @@ import random
 from datetime import date, datetime, timedelta
 from typing import List, Optional
 
+from faker import Faker
 from peewee import (
     BooleanField,
     DateTimeField,
@@ -17,6 +18,8 @@ from peewee import (
 from . import constants
 
 ART_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "art")
+
+fake = Faker()
 
 
 def init_db(filename: str = ":memory:") -> SqliteDatabase:
@@ -100,6 +103,7 @@ class Plant(Model):
     color = IntegerField(default=lambda: random.randrange(len(constants.COLORS)))
     mutation = IntegerField(null=True)
     dead = BooleanField(default=False)
+    name = TextField(default=fake.first_name)
 
     @property
     def color_str(self) -> str:

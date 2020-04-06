@@ -2,6 +2,7 @@
 
 ```
 {{ plant.get_ascii_art() }}
+name  : "{{ plant.name }}"
 stage : {{ plant.description }}
 age   : {{ plant.age }} days
 score : {{ plant.score }}
