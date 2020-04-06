@@ -2,7 +2,7 @@
 {% if request.user == plant.user %}
 # Home garden
 {% else %}
-# Visiting {{ plant.user }}'s garden
+# Visiting {{ plant.user.username }}'s garden
 {% endif %}
 {% endblock %}
 
@@ -15,12 +15,3 @@ water : {{ plant.water_gauge }}
 ```
 
 {% block body %}{% endblock %}
-{% block menu %}
-
-=>/plant/observe 🌹 Look
-=>/plant/water 💧 Water
-{% if plant.dead or plant.stage == 5 %}
-=>/plant/harvest 💀 Harvest
-{% endif %}
-=>/ 🏡 Home
-{% endblock %}

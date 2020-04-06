@@ -7,7 +7,8 @@ import random
 from datetime import datetime, timedelta
 
 import faker
-from astrobotany.astrobotany import Plant, User, init_db
+from astrobotany import init_db
+from astrobotany.models import Plant, User
 
 parser = argparse.ArgumentParser()
 parser.add_argument("count", type=int)
@@ -19,14 +20,14 @@ fake = faker.Faker()
 init_db(args.db_file)
 
 for _ in range(args.count):
-    age = random.randrange(timedelta(days=50).total_seconds())
+    age = random.randrange(int(timedelta(days=50).total_seconds()))
     user = User.create(
         user_id="".join(random.choices("0123456789ABCDEF", k=16)),
         username=fake.name().lower(),
     )
     plant = Plant(
         user=user,
-        active_user=user,
+        user_active=user,
         score=random.randrange(age // 2, age),
         created_at=datetime.now() - timedelta(seconds=age),
         watered_at=datetime.now()

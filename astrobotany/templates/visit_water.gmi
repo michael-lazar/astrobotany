@@ -3,10 +3,3 @@
 {% block body %}
 {{ info }}
 {% endblock %}
-{% block menu %}
-
-{% if request.user %}
-=>/directory/{{ plant.user.user_id }}/water 💧 Water
-{% endif %}
-=>/ 🏡 Home
-{% endblock %}

@@ -3,5 +3,12 @@
 {% block body %}
 {% if plant.watered_by %}
 Your plant was recently watered by {{ plant.watered_by.username }}.
+
 {% endif %}
+=>/plant/observe 🌹 Look
+=>/plant/water 💧 Water
+{% if plant.dead or plant.stage == 5 %}
+=>/plant/harvest 💀 Harvest
+{% endif %}
+=>/ 🏡 Home
 {% endblock %}

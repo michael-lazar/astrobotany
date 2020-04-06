@@ -306,7 +306,7 @@ class Plant(Model):
         self.watered_at = datetime.now()
         if user_id is not None:
             self.watered_by = user_id
-            info = f"You water {self.user.username}'s plant while they're away."
+            info = f"You water {self.user.username}'s plant for them."
         else:
             self.watered_by = None
             info = "You sprinkle some water over your plant."

@@ -7,8 +7,6 @@ Your next plant will grow at a speed of: {{ plant.growth_rate + 0.2 }}x
 
 {% endif %}
 If you harvest your plant you'll start over from a seed. Continue?
-{% endblock %}
-{% block menu %}
 
 =>/plant/harvest?confirm Yes, continue
 =>/plant No, go back
