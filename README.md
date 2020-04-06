@@ -69,7 +69,6 @@ python3 -m virtualenv venv
 
 source venv/bin/activate
 pip install -e .
-pip install .[test]
 
 # Generate a self-signed CA
 ./scripts/generate_server_ca.sh
@@ -85,7 +84,7 @@ source venv/bin/activate
 python main.py
 ```
 
-Connect a client:
+Connect with a client:
 
 ```
 # Generate a signed client certificate
