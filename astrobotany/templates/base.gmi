@@ -1,10 +1,4 @@
-{% block title %}
-{% if request.user == plant.user %}
-# Home garden
-{% else %}
-# Visiting {{ plant.user.username }}'s garden
-{% endif %}
-{% endblock %}
+# {{ plant.user.username }}'s garden
 
 ```
 {{ plant.get_ascii_art() }}
