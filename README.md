@@ -39,12 +39,9 @@ Astrobotany
  jgs\\|//   \\|///  \\\|//\\\|/// \|///  \\\|//  \\|//  \\\|//
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Welcome to astrobotany. You've been given a seed that will grow into a beautiful
-plant. Check in and water your plant every 24h to keep it growing. 5 days
-without water = death. Your plant depends on you and your friends to live!
+Welcome to astrobotany. You've been given a seed that will grow into a beautiful plant. Check in and water your plant every 24h to keep it growing. 5 days without water = death. Your plant depends on you and your friends to live!
 
-"We do not 'come into' this world; we come out of it, as leaves from a tree." -
-Alan Watts
+“Don't judge each day by the harvest you reap but by the seeds that you plant.” ― Robert Louis Stevenson
 
 [1] 👩‍🌾 Visit your plant
 [2] 🌱 Create an account
