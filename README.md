@@ -13,7 +13,7 @@
 
 ---
 
-A community garden application written for the gemini server protocol.
+A community garden created for the gemini server protocol.
 
 (this project is a fork of [jifunks/botany](https://github.com/jifunks/botany))
 
