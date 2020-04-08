@@ -109,7 +109,7 @@ def register(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/message-board")
+@vhost.route("/message-board", authenticated=True)
 def message_board(request):
     messages = Message.select().limit(20).order_by(Message.created_at.desc())
     body = render_template("message_board.gmi", request=request, messages=messages)

@@ -1,12 +1,6 @@
 # Community Message Board
 
-=>/ 🏡 Home
-
-{% if request.user %}
 =>/message-board/post ✍️  Post a message
-{% else %}
-(Must be logged in to comment)
-{% endif %}
 
 {% for message in messages %}
 "{{ message.text }}"
