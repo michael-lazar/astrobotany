@@ -2,6 +2,8 @@
 
 ![Astrobotany](https://github.com/michael-lazar/astrobotany/workflows/Astrobotany/badge.svg)
 
+A community garden via the [gemini](https://gemini.circumlunar.space/) server protocol. Fork of [jifunks/botany](https://github.com/jifunks/botany).
+
 ---
 
 <p align="center">
@@ -13,9 +15,6 @@
 
 ---
 
-A community garden created for the gemini server protocol.
-
-(this project is a fork of [jifunks/botany](https://github.com/jifunks/botany))
 
 ```
 Astrobotany
@@ -39,9 +38,12 @@ Astrobotany
  jgs\\|//   \\|///  \\\|//\\\|/// \|///  \\\|//  \\|//  \\\|//
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Welcome to astrobotany. You've been given a seed that will grow into a beautiful plant. Check in and water your plant every 24h to keep it growing. 5 days without water = death. Your plant depends on you and your friends to live!
+Welcome to astrobotany. You've been given a seed that will grow into a beautiful
+plant. Check in and water your plant every 24h to keep it growing. 5 days
+without water = death. Your plant depends on you and your friends to live!
 
-“Don't judge each day by the harvest you reap but by the seeds that you plant.” ― Robert Louis Stevenson
+“Don't judge each day by the harvest you reap but by the seeds that you plant.”
+― Robert Louis Stevenson
 
 [1] 👩‍🌾 Visit your plant
 [2] 🌱 Create an account
