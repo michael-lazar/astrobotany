@@ -1,9 +1,5 @@
 {% extends "base.gmi" %}
 
 {% block body %}
-{% if not request.user %}
-(login to interact)
-{% else %}
 =>/directory/{{ plant.user.user_id }}/water 💧 Water
-{% endif %}
 {% endblock %}

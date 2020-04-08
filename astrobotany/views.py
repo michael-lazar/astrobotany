@@ -168,7 +168,7 @@ def name(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/directory")
+@vhost.route("/directory", authenticated=True)
 def directory(request):
     plants = Plant.filter(Plant.user_active.is_null(False))
     plants = plants.join(User).order_by(User)
@@ -176,7 +176,7 @@ def directory(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/directory/(?P<user_id>[0-9A-F]+)")
+@vhost.route("/directory/(?P<user_id>[0-9A-F]+)", authenticated=True)
 def visit(request, user_id):
     user = User.get_or_none(user_id=user_id)
     if user is None:
@@ -191,7 +191,7 @@ def visit(request, user_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/directory/(?P<user_id>[0-9A-F]+)/water")
+@vhost.route("/directory/(?P<user_id>[0-9A-F]+)/water", authenticated=True)
 def visit_water(request, user_id):
     user = User.get_or_none(user_id=user_id)
     if user is None:

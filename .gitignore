@@ -8,3 +8,4 @@ astrobotany.egg-info/
 build/
 dist/
 TODO.txt
+.DS_Store
