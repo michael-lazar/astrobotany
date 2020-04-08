@@ -2,7 +2,7 @@
 
 ![Astrobotany](https://github.com/michael-lazar/astrobotany/workflows/Astrobotany/badge.svg)
 
-A community garden via the [gemini](https://gemini.circumlunar.space/) server protocol. Fork of [jifunks/botany](https://github.com/jifunks/botany).
+A community garden over the [gemini](https://gemini.circumlunar.space/) protocol. Fork of [jifunks/botany](https://github.com/jifunks/botany).
 
 ---
 
