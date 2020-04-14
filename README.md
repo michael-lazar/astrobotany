@@ -59,7 +59,7 @@ The source code for this gemini capsule can be found here.
 
 ## Development Quickstart
 
-### Install
+### 1. Install
 
 ```
 git clone git@github.com:michael-lazar/astrobotany.git
@@ -76,14 +76,14 @@ pip install -e .
 ./scripts/add_seed_data.py 10
 ```
 
-### Run
+### 2. Run
 
 ```
 source venv/bin/activate
 python main.py
 ```
 
-### Connect
+### 3. Connect
 
 ```
 # Generate a signed client certificate
