@@ -1,19 +1,20 @@
-## About
+## Art
 
 ### Playscii
 
-I use a forked version of the playscii ASCII art program here:
+I used a forked version of the playscii ASCII art program to generate the ``.psci`` files:
 
 https://github.com/michael-lazar/playscii
 
-The plaintext art files from botany were imported using the following settings:
+Botany's original plaintext art files were imported using the following settings:
 
-- palette: **240-ansi** (generated using [this script](art/scripts/build_palette.py))
-- charset: **dos** (which 7-bit US ASCII is a subset of)
+- palette: ``240-ansi`` (generated using [this script](art/scripts/build_palette.py))
+- charset: ``dos`` (of which 7-bit US ASCII is a subset)
 
 I intentionally excluded colors 0-15 from the palette because those colors can
 be modified by a user's terminal theme, and I wanted total control of the
-final rendered text.
+final rendered text. One could argue that I should *only* be using colors 0-15
+for that reason. I wanted to try something different.
 
 When colorizing, I maintained a few common colors between plants:
 
