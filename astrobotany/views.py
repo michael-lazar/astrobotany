@@ -52,6 +52,10 @@ class AstrobotanyVirtualHost:
         request.plant = None
 
         if "REMOTE_USER" in request.environ:
+            if not request.environ["REMOTE_USER"]:
+                msg = "Invalid certificate, the subject CommonName must be specified!"
+                return Response(Status.AUTHORISED_CERTIFICATE_REQUIRED, msg)
+
             request.user, _ = User.get_or_create(
                 user_id=request.environ["TLS_CLIENT_SERIAL_NUMBER"],
                 username=request.environ["REMOTE_USER"],
