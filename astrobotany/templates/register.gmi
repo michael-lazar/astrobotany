@@ -14,9 +14,7 @@ An overview of the sign-up flow looks like this:
 
 These instructions assume that you have access to a unix-like shell and the openssl program. Instructions for Windows are forthcoming.
 
-## Step 1: Create a CSR
-
-First, use OpenSSL to generate a new private key and a CSR file:
+## Step 1: Generate a CSR
 
 ```
 # Generate a new private key
@@ -26,26 +24,35 @@ openssl genrsa -out astrobotany.key 4096
 openssl req -new -key astrobotany.key -out astrobotany.req
 ```
 
-OpenSSL will prompt you to enter information about your certificate (Country Name, Email, etc.). You can leave all of these fields blank *except* for the "Common Name". The Common Name will be displayed as your username inside of astrobotany. Uniqueness is not enforced, so try to pick something short and identifiable.
+OpenSSL will prompt you to enter information about your certificate. You can leave everything blank *except* for this:
 
-## Step 2: Get your CSR signed
+```
+Common Name (eg, fully qualified host name) []:
+```
 
-Next, send an HTTP POST request containing your CSR to the following URL. The server will respond with your newly signed certificate.
+The Common Name will be your username inside of astrobotany. Pick something short and identifiable.
+
+## Step 2: Submit your CSR
+
+Next, send an HTTP POST request containing your CSR to the following URL:
 
 ```
 curl https://astrobotany.mozz.us/register -X POST -F req=@astrobotany.req > astrobotany.crt
 ```
 
-At this point, the only files that you need to keep are:
+At this point, the files that you need to keep are:
 
-* astrobotany.key (your private key)
 * astrobotany.crt (your client certificate)
+* astrobotany.key (your private key)
 
-## Step 3: Use your client certificate
+## Step 3: Login
 
-Now all that you need to do is present this certificate when making requests to the astrobotany gemini server. Client certificates are not widely supported by gemini clients (yet). Here's an example of how to do it in AV-98:
+Now that you have a certificate, all you need to do is include it with your gemini requests.
+
+Client certificates are not widely supported by gemini clients (yet). Here's an example of how to do it in AV-98:
 
 ```
 av98 --tls-cert astrobotany.crt --tls-key astrobotany.key gemini://astrobotany.mozz.us/
 ```
 
+Now go spread some seeds!
