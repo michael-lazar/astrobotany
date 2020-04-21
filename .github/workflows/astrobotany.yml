@@ -21,13 +21,10 @@ jobs:
         pip install .[test]
     - name: Lint with flake8
       run: |
-        flake8 --max-line-length=100 .
+        flake8 --max-line-length=100 --ignore=E203 .
     - name: Lint with black
       run: |
         black --check .
-#    - name: Lint with isort
-#      run: |
-#        isort --check-only --recursive .
     - name: Lint with mypy
       run: |
         mypy --ignore-missing-imports .
