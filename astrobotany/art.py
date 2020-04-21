@@ -120,7 +120,7 @@ class ArtFile:
         lines = []
         for character_row in self.merge_tiles(self.character_matrix):
             line = []
-            for tile in character_row[1:]:
+            for tile in character_row:
                 bg = self.substitute_background_color(tile.bg)
                 fg = self.substitute_foreground_color(tile.fg)
                 line.append(self.colorize(tile.char, fg, bg))
@@ -155,9 +155,9 @@ class ArtFile:
     @staticmethod
     def colorize(text: str, fg: ColorCode = None, bg: ColorCode = None) -> str:
         if fg is not None:
-            text = f"\033[38;5;{fg}m" + text
+            text = f"\033[38;5;{fg+15}m" + text
         if bg is not None:
-            text = f"\033[48;5;{bg}m" + text
+            text = f"\033[48;5;{bg+15}m" + text
         if fg is not None or bg is not None:
             text = text + "\033[0m"
         return text
