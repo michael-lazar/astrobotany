@@ -1,5 +1,4 @@
 import math
-import os
 import random
 from datetime import date, datetime, timedelta
 from typing import List, Optional
@@ -16,8 +15,8 @@ from peewee import (
 )
 
 from . import constants
+from .art import render_art
 
-ART_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "art")
 
 fake = Faker()
 
@@ -57,6 +56,7 @@ class User(Model):
     user_id = IntegerField(unique=True, index=True)
     username = TextField()
     created_at = DateTimeField(default=datetime.now)
+    use_color = BooleanField(default=False)
 
     @property
     def plant(self) -> "Plant":
@@ -183,30 +183,29 @@ class Plant(Model):
         bar = ("█" * (percent // 10)).ljust(10)
         return f"|{bar}| {percent}%"
 
-    def get_ascii_art(self, directory=ART_DIR) -> str:
+    def get_ascii_art(self, ansi_support=False) -> str:
         """
         Build an ascii-art picture based on the plant's generation and species.
         """
         today = date.today()
         if self.dead:
-            filename = "rip.txt"
+            filename = "rip.psci"
         elif (today.month, today.day) == (10, 31):
-            filename = "jackolantern.txt"
+            filename = "jackolantern.psci"
         elif self.stage == 0:
-            filename = "seed.txt"
+            filename = "seed.psci"
         elif self.stage == 1:
-            filename = "seedling.txt"
+            filename = "seedling.psci"
         elif self.stage == 2:
-            filename = f"{self.species_str.replace(' ', '')}1.txt"
+            filename = f"{self.species_str.replace(' ', '')}1.psci"
         elif self.stage in (3, 5):
-            filename = f"{self.species_str.replace(' ', '')}2.txt"
+            filename = f"{self.species_str.replace(' ', '')}2.psci"
         elif self.stage == 4:
-            filename = f"{self.species_str.replace(' ', '')}3.txt"
+            filename = f"{self.species_str.replace(' ', '')}3.psci"
         else:
             raise ValueError("Unknown stage")
 
-        with open(os.path.join(directory, filename)) as fp:
-            return fp.read()
+        return render_art(filename, self.color_str, ansi_support)
 
     def get_observation(self) -> str:
         """

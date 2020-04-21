@@ -4,7 +4,7 @@ import pathlib
 import itertools
 
 
-ART_DIRECTORY = pathlib.Path(__file__).parent.parent
+ART_DIRECTORY = pathlib.Path(__file__).parent.parent / "astrobotany" / "art"
 
 # Default palette values
 DEFAULT_CODE = 0
@@ -26,15 +26,7 @@ COLORS = {
     "white": (235, 239),
     "black": (224, 228),
     "gold": (163, 165),
-    "rainbow": (
-        5,  # Blue
-        145,  # Red
-        211,  # Yellow
-        193,  # Orange
-        198,  # Pink
-        30,  # Cyan
-        31,  # Green
-    ),
+    "rainbow": (5, 145, 211, 193, 30, 198, 31),
 }
 
 SPECIES = [

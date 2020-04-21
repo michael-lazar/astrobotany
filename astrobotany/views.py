@@ -6,7 +6,7 @@ from jetforce import Response, Status
 
 from .models import Message, Plant, User
 
-TEMPLATE_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates")
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
 template_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(TEMPLATE_DIR),

@@ -2,11 +2,13 @@
 Can't sleep, must write unit tests...
 """
 from datetime import datetime, timedelta
+import os
 
 import pytest
 
 from astrobotany import init_db
-from astrobotany.constants import SPECIES, STAGES
+from astrobotany.art import ArtFile
+from astrobotany.constants import SPECIES, STAGES, COLORS
 from astrobotany.models import Plant, User
 from freezegun import freeze_time
 
@@ -26,15 +28,43 @@ def plant(db, user):
     return Plant.create(user=user)
 
 
-def test_plant_load_ascii_art(plant):
-    for species in range(len(SPECIES)):
-        for stage in range(len(STAGES)):
-            plant.species = species
-            plant.stage = stage
-            assert plant.get_ascii_art()
+@pytest.mark.parametrize("filename", (os.listdir(ArtFile.ART_DIR)))
+def test_validate_art_files(filename: str):
+    art_file = ArtFile(filename)
+    for line in art_file.character_matrix:
+        for tile in line:
+            # The background color should never be set
+            assert tile.bg is None
 
+            # Non-empty tiles should always have a foreground color
+            if tile.char != " ":
+                assert tile.fg is not None
+
+            # The char should be in the printable 7-bit ASCII range
+            assert chr(32) <= tile.char < chr(128)
+
+    assert art_file.render(ansi_support=False)
+    assert art_file.render(ansi_support=True)
+
+
+def test_draw_plant_dead(plant):
     plant.dead = True
-    assert plant.get_ascii_art()
+    assert "R.I.P." in plant.get_ascii_art()
+
+
+@pytest.mark.parametrize("species", SPECIES)
+def test_draw_plant_stages(plant, species: str):
+    plant.species = SPECIES.index(species)
+    for stage in range(len(STAGES)):
+        plant.stage = stage
+        assert plant.get_ascii_art()
+
+
+@pytest.mark.parametrize("color", COLORS)
+def test_draw_plant_flowers(plant, color: str):
+    plant.stage = 4
+    plant.color = COLORS.index(color)
+    assert plant.get_ascii_art(ansi_support=True)
 
 
 @freeze_time()
