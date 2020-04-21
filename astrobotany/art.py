@@ -39,7 +39,7 @@ class ArtFile:
     FILL_CHAR = " "
 
     # Palette mapping for scene colors
-    BACKGROUND_COLOR = 219
+    BACKGROUND_COLOR = 218
     FOREGROUND_COLOR = None
     SOIL_COLOR = 80
 
@@ -92,6 +92,9 @@ class ArtFile:
                 char = chr(tile["char"]) if tile["char"] != 0 else cls.FILL_CHAR
                 bg = tile["bg"] if tile["bg"] != cls.DEFAULT_BG else None
                 fg = tile["fg"] if tile["fg"] != cls.DEFAULT_FG else None
+                if char == cls.FILL_CHAR:
+                    # Ingore the foreground color if we don't have any foreground character
+                    fg = None
                 line.append(Tile(char, bg, fg))
             data.append(line)
         return data
@@ -162,8 +165,8 @@ class ArtFile:
             text = text + "\033[0m"
         return text
 
-    @staticmethod
-    def merge_tiles(character_matrix: CharacterMatrix) -> CharacterMatrix:
+    @classmethod
+    def merge_tiles(cls, character_matrix: CharacterMatrix) -> CharacterMatrix:
         """
         Merge repeated tiles with the same styling into larger, single tiles.
 
@@ -175,7 +178,10 @@ class ArtFile:
             line = character_row[:1]
             for tile in character_row[1:]:
                 last_tile = line[-1]
-                if (tile.fg, tile.bg) == (last_tile.fg, last_tile.bg):
+                if tile.fg in (cls.DEFAULT_COLOR_PRIMARY, cls.DEFAULT_COLOR_SECONDARY):
+                    # Never merge flowers, it screws up the rainbow color generation
+                    line.append(tile)
+                elif (tile.fg, tile.bg) == (last_tile.fg, last_tile.bg):
                     new_char = last_tile.char + tile.char
                     line[-1] = Tile(new_char, tile.bg, tile.fg)
                 else:
