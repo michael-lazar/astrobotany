@@ -1,10 +1,18 @@
 # Community Message Board
 
-=>/message-board/post ✍️  Post a message
+=>/message-board/submit ✍️  Submit a message
 
-{% for message in messages %}
-"{{ message.text }}"
-- {{ message.user.username }}, {{ message.created_at.strftime('%Y-%m-%d') }}
+---
+
+{% for item in items %}
+"{{ item.text }}"
+- {{ item.user.username }}, {{ item.created_at.strftime('%Y-%m-%d') }}
 
 {% endfor %}
-🌻🌺🌷
+---
+
+(page {{ page }} of {{ page_count }})
+{% if page < page_count %}
+
+=>/message-board/{{ page + 1 }} next page
+{% endif %}

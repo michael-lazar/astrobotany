@@ -1,4 +1,5 @@
 import os
+import math
 
 import jetforce
 import jinja2
@@ -117,14 +118,29 @@ def register(request):
 
 
 @vhost.route("/message-board", authenticated=True)
-def message_board(request):
-    messages = Message.select().limit(20).order_by(Message.created_at.desc())
-    body = render_template("message_board.gmi", request=request, messages=messages)
+@vhost.route("/message-board/(?P<page>[0-9]+)", authenticated=True)
+def message_board(request, page=1):
+    page = int(page)
+    paginate_by = 10
+    page_count = int(math.ceil(Message.select().count() / paginate_by))
+    page_count = max(page_count, 1)
+    if page > page_count:
+        return Response(Status.NOT_FOUND, "Invalid page number")
+
+    items = Message.by_date().paginate(page, paginate_by)
+
+    body = render_template(
+        "message_board.gmi",
+        request=request,
+        items=items,
+        page=page,
+        page_count=page_count,
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/message-board/post", authenticated=True)
-def message_board_post(request):
+@vhost.route("/message-board/submit", authenticated=True)
+def message_board_submit(request):
     if not request.query:
         return Response(Status.INPUT, "What would you like to say? ")
 

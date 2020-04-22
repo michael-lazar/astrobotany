@@ -83,6 +83,10 @@ class Message(Model):
     created_at = DateTimeField(default=datetime.now)
     text = TextField()
 
+    @classmethod
+    def by_date(cls):
+        return cls.select().order_by(cls.created_at.desc())
+
 
 class Plant(Model):
     """
