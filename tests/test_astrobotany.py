@@ -64,7 +64,7 @@ def test_draw_plant_stages(plant, species: str):
 def test_draw_plant_flowers(plant, color: str):
     plant.stage = 4
     plant.color = COLORS.index(color)
-    assert plant.get_ascii_art(ansi_support=True)
+    assert plant.get_ascii_art(ansi_enabled=True)
 
 
 @freeze_time()
