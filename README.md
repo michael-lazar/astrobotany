@@ -119,7 +119,7 @@ When colorizing, I maintained a few common colors between plants:
 | 133 | primary flower color |
 | 199 | secondary flower color |
 
-Some plants also contain other colors for elements like roots or trunks.
+Some plants use additional colors for things like stalks and trunks.
 
 1. poppy (92 green)
 2. cactus (8 green, 37 pot, 14 spike)
