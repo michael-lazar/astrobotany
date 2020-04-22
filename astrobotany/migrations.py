@@ -3,7 +3,7 @@ import argparse
 from playhouse import migrate
 from peewee import BooleanField
 
-from astrobotany import init_db
+from .models import init_db
 
 
 def add_setting_ansi_enabled(migrator):
@@ -12,12 +12,12 @@ def add_setting_ansi_enabled(migrator):
     )
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description="Apply a named migration to the astrobotany database"
     )
-    parser.add_argument("db")
     parser.add_argument("migration")
+    parser.add_argument("--db", default="/etc/astrobotany/astrobotany.sqlite")
     args = parser.parse_args()
 
     db = init_db(args.db)
@@ -26,3 +26,7 @@ if __name__ == "__main__":
     print(f"Running migration {args.migration}...")
     locals()[args.migration](migrator)
     print(f"Success!")
+
+
+if __name__ == "__main__":
+    main()

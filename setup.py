@@ -20,6 +20,9 @@ setup(
     packages=["astrobotany"],
     python_requires=">=3.7, <4",
     install_requires=["jetforce", "peewee", "jinja2", "faker"],
+    entry_points={
+        "console_scripts": ["astrobotany-migrate=astrobotany.migrations:main"]
+    },
     extras_require={
         "test": ["pytest", "black", "isort", "mypy", "flake8", "freezegun"],
     },
