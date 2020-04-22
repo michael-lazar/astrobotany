@@ -1,9 +1,8 @@
-import os
-import json
-import itertools
 import functools
-from typing import List, Dict, Optional, Tuple, NamedTuple
-
+import itertools
+import json
+import os
+from typing import Dict, List, NamedTuple, Optional, Tuple
 
 ColorCode = Optional[int]
 

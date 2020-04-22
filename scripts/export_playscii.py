@@ -3,7 +3,6 @@ import argparse
 from astrobotany.art import ArtFile
 from astrobotany.constants import COLORS, SPECIES
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--infile")
 parser.add_argument("--species")

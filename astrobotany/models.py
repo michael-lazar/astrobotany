@@ -15,8 +15,7 @@ from peewee import (
 )
 
 from . import constants
-from .art import render_art, colorize
-
+from .art import colorize, render_art
 
 fake = Faker()
 

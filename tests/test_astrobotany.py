@@ -1,14 +1,14 @@
 """
 Can't sleep, must write unit tests...
 """
-from datetime import datetime, timedelta
 import os
+from datetime import datetime, timedelta
 
 import pytest
 
 from astrobotany import init_db
 from astrobotany.art import ArtFile
-from astrobotany.constants import SPECIES, STAGES, COLORS
+from astrobotany.constants import COLORS, SPECIES, STAGES
 from astrobotany.models import Plant, User
 from freezegun import freeze_time
 

@@ -7,6 +7,7 @@ import random
 from datetime import datetime, timedelta
 
 import faker
+
 from astrobotany import init_db
 from astrobotany.models import Plant, User
 

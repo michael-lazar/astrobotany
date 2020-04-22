@@ -1,7 +1,7 @@
 import argparse
 
-from playhouse import migrate
 from peewee import BooleanField
+from playhouse import migrate
 
 from .models import init_db
 

@@ -1,12 +1,12 @@
-import os
 import math
+import os
 
 import jetforce
 import jinja2
 from jetforce import Response, Status
 
-from .models import Message, Plant, User
 from .art import render_art
+from .models import Message, Plant, User
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
