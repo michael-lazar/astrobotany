@@ -1,12 +1,13 @@
 # {{ plant.user.username }}'s garden
 
 ```
-{{ plant.get_ascii_art() }}
+{{ plant.get_ascii_art(request.user.ansi_enabled) }}
+
 name  : "{{ plant.name }}"
 stage : {{ plant.description }}
 age   : {{ plant.age }} days
 score : {{ plant.score }}
-water : {{ plant.water_gauge }}
+water : {{ plant.get_water_gauge(request.user.ansi_enabled) }}
 ```
 
 {% block body %}{% endblock %}

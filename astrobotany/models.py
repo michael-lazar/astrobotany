@@ -15,7 +15,7 @@ from peewee import (
 )
 
 from . import constants
-from .art import render_art
+from .art import render_art, colorize
 
 
 fake = Faker()
@@ -56,7 +56,7 @@ class User(Model):
     user_id = IntegerField(unique=True, index=True)
     username = TextField()
     created_at = DateTimeField(default=datetime.now)
-    use_color = BooleanField(default=False)
+    ansi_enabled = BooleanField(default=False)
 
     @property
     def plant(self) -> "Plant":
@@ -171,8 +171,7 @@ class Plant(Model):
         remaining_water = max(0.0, 1 - (elapsed_seconds / seconds_per_day))
         return math.ceil(remaining_water * 100)
 
-    @property
-    def water_gauge(self) -> str:
+    def get_water_gauge(self, ansi_enabled=False) -> str:
         """
         Build an ascii graph that displays the plant's remaining water supply.
         """
@@ -181,9 +180,12 @@ class Plant(Model):
 
         percent = self.water_supply_percent
         bar = ("█" * (percent // 10)).ljust(10)
+        if ansi_enabled:
+            # Make the water blue
+            bar = colorize(bar, fg=12)
         return f"|{bar}| {percent}%"
 
-    def get_ascii_art(self, ansi_support=False) -> str:
+    def get_ascii_art(self, ansi_enabled=False) -> str:
         """
         Build an ascii-art picture based on the plant's generation and species.
         """
@@ -205,7 +207,7 @@ class Plant(Model):
         else:
             raise ValueError("Unknown stage")
 
-        return render_art(filename, self.color_str, ansi_support)
+        return render_art(filename, self.color_str, ansi_enabled)
 
     def get_observation(self) -> str:
         """

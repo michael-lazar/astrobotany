@@ -27,10 +27,18 @@ Welcome to astrobotany. You've been given a seed that will grow into a beautiful
 
 “Don't judge each day by the harvest you reap but by the seeds that you plant.” ― Robert Louis Stevenson
 
+---
+
+=>/register 🌱 Register a new account
+
+(links below this line require an account)
+
 =>/plant 👩‍🌾 Visit your plant
-=>/register 🌱 Create an account
 =>/directory 📒 Garden directory
 =>/message-board 📌 Community message board
+=>/settings 🐌 User settings
+
+---
 
 Astrobotany is a fork of the original tilde.town pubnix game, Botany.
 =>https://github.com/jifunks/botany

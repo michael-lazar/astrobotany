@@ -130,6 +130,36 @@ def message_board_post(request):
     return Response(Status.REDIRECT_TEMPORARY, "/message-board")
 
 
+@vhost.route("/settings", authenticated=True)
+def settings(request):
+    body = render_template("settings.gmi", request=request)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@vhost.route("/settings/update/(?P<field>[A-Za-z_]+)", authenticated=True)
+def settings_update(request, field):
+    if field not in ("ansi_enabled",):
+        return Response(Status.NOT_FOUND, "Invalid setting")
+
+    if not request.query:
+        prompt = f"Enter a new value for {field}, [T]rue/[F]alse:"
+        return Response(Status.INPUT, prompt)
+
+    answer = request.query.strip().lower()
+
+    if answer in ("t", "true"):
+        value = True
+    elif answer in ("f", "false"):
+        value = False
+    else:
+        return Response(Status.BAD_REQUEST, f"Invalid query value: {request.query}")
+
+    setattr(request.user, field, value)
+    request.user.save()
+
+    return Response(Status.REDIRECT_TEMPORARY, "/settings")
+
+
 @vhost.route("/plant", authenticated=True)
 def plant(request):
     body = render_template("plant.gmi", request=request, plant=request.plant)

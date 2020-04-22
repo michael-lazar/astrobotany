@@ -86,15 +86,15 @@ def test_plant_water_supply_percent(plant):
 
 
 @freeze_time()
-def test_plant_water_gauge(plant):
+def test_plant_get_water_gauge(plant):
     plant.watered_at = datetime.now()
-    assert plant.water_gauge == "|██████████| 100%"
+    assert plant.get_water_gauge == "|██████████| 100%"
 
     plant.watered_at = datetime.now() - timedelta(hours=12)
-    assert plant.water_gauge == "|█████     | 50%"
+    assert plant.get_water_gauge == "|█████     | 50%"
 
     plant.watered_at = datetime.now() - timedelta(hours=24)
-    assert plant.water_gauge == "|          | 0%"
+    assert plant.get_water_gauge() == "|          | 0%"
 
 
 def test_plant_get_observation(plant):

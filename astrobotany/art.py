@@ -17,6 +17,19 @@ class Tile(NamedTuple):
 CharacterMatrix = List[List[Tile]]
 
 
+def colorize(text: str, fg: ColorCode = None, bg: ColorCode = None) -> str:
+    """
+    Colorize a line of text using the ansi-240 color palette.
+    """
+    if fg is not None:
+        text = f"\033[38;5;{fg+15}m" + text
+    if bg is not None:
+        text = f"\033[48;5;{bg+15}m" + text
+    if fg is not None or bg is not None:
+        text = text + "\033[0m"
+    return text
+
+
 class ArtFile:
     """
     This class encapsulates an ASCII art file in the playscii file format.
@@ -126,7 +139,7 @@ class ArtFile:
             for tile in character_row:
                 bg = self.substitute_background_color(tile.bg)
                 fg = self.substitute_foreground_color(tile.fg)
-                line.append(self.colorize(tile.char, fg, bg))
+                line.append(colorize(tile.char, fg, bg))
             lines.append("".join(line))
         return "\n".join(lines)
 
@@ -154,16 +167,6 @@ class ArtFile:
                 return code
         else:
             return code
-
-    @staticmethod
-    def colorize(text: str, fg: ColorCode = None, bg: ColorCode = None) -> str:
-        if fg is not None:
-            text = f"\033[38;5;{fg+15}m" + text
-        if bg is not None:
-            text = f"\033[48;5;{bg+15}m" + text
-        if fg is not None or bg is not None:
-            text = text + "\033[0m"
-        return text
 
     @classmethod
     def merge_tiles(cls, character_matrix: CharacterMatrix) -> CharacterMatrix:

@@ -1,0 +1,6 @@
+# User Settings
+
+Enable support for color using ANSI escape sequences
+=>/settings/update/ansi_enabled ansi_enabled: {{ request.user.ansi_enabled }}
+
+=>/ 🏡 Home
