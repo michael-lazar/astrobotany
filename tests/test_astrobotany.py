@@ -43,8 +43,8 @@ def test_validate_art_files(filename: str):
             # The char should be in the printable 7-bit ASCII range
             assert chr(32) <= tile.char < chr(128)
 
-    assert art_file.render(ansi_support=False)
-    assert art_file.render(ansi_support=True)
+    assert art_file.render(ansi_enabled=False)
+    assert art_file.render(ansi_enabled=True)
 
 
 def test_draw_plant_dead(plant):

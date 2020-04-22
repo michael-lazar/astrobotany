@@ -112,11 +112,11 @@ class ArtFile:
             data.append(line)
         return data
 
-    def render(self, ansi_support: bool = False) -> str:
+    def render(self, ansi_enabled: bool = False) -> str:
         """
         Render the art file as a plain text string, optionally using ANSI color codes.
         """
-        if ansi_support:
+        if ansi_enabled:
             return self._render_ansi()
         else:
             return self._render_ascii()
@@ -194,5 +194,5 @@ class ArtFile:
 
 
 @functools.lru_cache(maxsize=1000)
-def render_art(filename: str, flower_color: Optional[str], ansi_support: bool) -> str:
-    return ArtFile(filename, flower_color).render(ansi_support)
+def render_art(filename: str, flower_color: Optional[str], ansi_enabled: bool) -> str:
+    return ArtFile(filename, flower_color).render(ansi_enabled)

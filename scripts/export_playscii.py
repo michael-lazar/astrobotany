@@ -42,7 +42,7 @@ for index in range(0, len(art_files), args.grid):
     for art in art_line:
         width, height = len(art.character_matrix[0]), len(art.character_matrix)
         title += art.filename.center(width)
-        text = art.render(ansi_support=True)
+        text = art.render(ansi_enabled=True)
         for i, line in enumerate(text.splitlines()):
             lines[i] += line.strip("\r\n")
         for h in range(height, max_height):

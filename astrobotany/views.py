@@ -5,6 +5,7 @@ import jinja2
 from jetforce import Response, Status
 
 from .models import Message, Plant, User
+from .art import render_art
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
@@ -103,7 +104,9 @@ vhost = AstrobotanyVirtualHost()
 
 @vhost.route("", strict_trailing_slash=False)
 def index(request):
-    body = render_template("index.gmi")
+    ansi_enabled = request.user and request.user.ansi_enabled
+    title_art = render_art("title.psci", None, ansi_enabled)
+    body = render_template("index.gmi", title_art=title_art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
