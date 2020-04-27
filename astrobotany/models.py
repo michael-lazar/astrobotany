@@ -321,7 +321,7 @@ class Plant(Model):
             Plant.watered_at >= datetime.now() - timedelta(hours=8),
         )
         if query.exists():
-            return "You've already watered a neighbors plant, try again tomorrow!"
+            return "You've already watered a friend's plant, try again tomorrow!"
 
         self.watered_at = datetime.now()
         self.watered_by = user
