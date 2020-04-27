@@ -61,6 +61,8 @@ av98 gemini://localhost --tls-cert certs/test_user.cer --tls-key certs/test_user
 
 ### Gallery
 
+**[View Plant Screenshots](GALLERY.md)**
+
 ### Playscii
 
 I use a forked version of the playscii ASCII art program to generate the ``.psci`` files:
@@ -72,11 +74,7 @@ Botany's original art files were imported using the following settings:
 - palette: ``240-ansi`` (generated using [this script](scripts/build_palette.py))
 - charset: ``dos`` (of which 7-bit US ASCII is a subset)
 
-I intentionally excluded colors 0-15 from the palette because those colors can
-be modified by a user's terminal theme, and I want total control of the
-final rendered text.
-
-When colorizing, I maintained a few common colors between plants:
+While colorizing the images, I maintained a few common colors between plants:
 
 | Color Code | Usage |
 | --- | --- |

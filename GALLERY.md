@@ -1,4 +1,4 @@
-# Art Gallery
+# Plant Gallery
 
 ### Agave
 
