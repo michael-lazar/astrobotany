@@ -297,12 +297,12 @@ class Plant(Model):
             else:
                 break
 
-    def water(self, user_id: str = None) -> str:
+    def water(self, user: User = None) -> str:
         """
         Attempt to water the plant.
 
         Args:
-            user_id: The user watering the plant, if not the plant's owner.
+            user: The user watering the plant, if not the plant's owner.
 
         Returns: A string with a description of the resulting action.
         """
@@ -311,13 +311,21 @@ class Plant(Model):
         elif self.water_supply_percent == 100:
             return "The soil is already damp."
 
-        self.watered_at = datetime.now()
-        if user_id is not None:
-            self.watered_by = user_id
-            info = f"You water {self.user.username}'s plant for them."
-        else:
+        if user is None:
+            self.watered_at = datetime.now()
             self.watered_by = None
-            info = "You sprinkle some water over your plant."
+            return "You sprinkle some water over your plant."
+
+        query = Plant.select().where(
+            Plant.watered_by == user,
+            Plant.watered_at >= datetime.now() - timedelta(hours=8),
+        )
+        if query.exists():
+            return "You've already watered a neighbors plant, try again tomorrow!"
+
+        self.watered_at = datetime.now()
+        self.watered_by = user
+        info = f"You water {self.user.username}'s plant for them."
 
         return info
 
