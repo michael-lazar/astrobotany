@@ -51,9 +51,9 @@ class ArtFile:
     FILL_CHAR = " "
 
     # Palette mapping for scene colors
-    BACKGROUND_COLOR = 218
-    FOREGROUND_COLOR = None
-    SOIL_COLOR = 80
+    BACKGROUND_COLOR: ColorCode = 218
+    FOREGROUND_COLOR: ColorCode = None
+    SOIL_COLOR: ColorCode = 80
 
     # Palette mapping for flower colors: (primary, secondary)
     FLOWER_COLORS: Dict[str, Tuple[int, int]] = {
