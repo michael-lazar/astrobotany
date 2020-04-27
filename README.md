@@ -61,6 +61,8 @@ av98 gemini://localhost --tls-cert certs/test_user.cer --tls-key certs/test_user
 
 ### Gallery
 
+**[View Plant Screenshots](GALLERY.md)**
+
 ### Playscii
 
 I use a forked version of the playscii ASCII art program to generate the ``.psci`` files:
