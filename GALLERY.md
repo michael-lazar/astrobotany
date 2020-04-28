@@ -54,7 +54,7 @@
 
 ### Moss
 
-![image](screenshots/mozz.png)
+![image](screenshots/moss.png)
 
 ### Pachypodium
 
