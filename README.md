@@ -16,11 +16,6 @@ A community garden over the [gemini](https://gemini.circumlunar.space/) protocol
 
 ---
 
-<p align="center">
-  <img alt="screen1" src="screenshots/screen1.png"/>
-  <img alt="screen2" src="screenshots/screen2.png"/>
-</p>
-
 ## Development Quickstart
 
 ### 1. Install
