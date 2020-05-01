@@ -51,7 +51,7 @@ class ArtFile:
     FILL_CHAR = " "
 
     # Palette mapping for scene colors
-    BACKGROUND_COLOR: ColorCode = 218
+    BACKGROUND_COLOR: ColorCode = None
     FOREGROUND_COLOR: ColorCode = None
     SOIL_COLOR: ColorCode = 80
 
