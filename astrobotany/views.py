@@ -207,7 +207,7 @@ def name(request):
 @app.route("/directory")
 @authenticate()
 def directory(request):
-    plants = Plant.filter(Plant.user_active.is_null(False))
+    plants = Plant.filter(Plant.user_active.is_null(False), Plant.score > 0)
     plants = plants.join(User).order_by(User)
     body = render_template("directory.gmi", request=request, plants=plants)
     return Response(Status.SUCCESS, "text/gemini", body)
