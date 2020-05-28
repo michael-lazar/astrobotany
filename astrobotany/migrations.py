@@ -1,6 +1,6 @@
 import argparse
 
-from peewee import BooleanField
+from peewee import BooleanField, TextField
 from playhouse import migrate
 
 from .models import init_db
@@ -10,6 +10,17 @@ def add_setting_ansi_enabled(migrator):
     migrate.migrate(
         migrator.add_column("user", "ansi_enabled", BooleanField(default=False))
     )
+
+
+def alter_user_id_type(migrator):
+    migrate.migrate(
+        migrator.alter_column_type(
+            "user", "user_id", TextField(unique=True, index=True)
+        )
+    )
+
+
+MIGRATIONS = locals()
 
 
 def main():
@@ -24,7 +35,7 @@ def main():
     migrator = migrate.SqliteMigrator(db)
 
     print(f"Running migration {args.migration}...")
-    locals()[args.migration](migrator)
+    MIGRATIONS[args.migration](migrator)
     print(f"Success!")
 
 

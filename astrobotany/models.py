@@ -52,7 +52,7 @@ class User(Model):
     A user account corresponding to a TLS client certificate.
     """
 
-    user_id = IntegerField(unique=True, index=True)
+    user_id = TextField(unique=True, index=True)
     username = TextField()
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)

@@ -1,9 +1,9 @@
 import math
 import os
+import typing
 
-import jetforce
 import jinja2
-from jetforce import Response, Status
+from jetforce import Request, Response, Status, JetforceApplication
 
 from .art import render_art
 from .models import Message, Plant, User
@@ -25,85 +25,58 @@ def render_template(name: str, *args, **kwargs) -> str:
     return template_env.get_template(name).render(*args, **kwargs)
 
 
-class AstrobotanyVirtualHost:
+def authenticate(allow_anonymous=False):
     """
-    An extendable "vhost" application for a jetforce gemini server.
-
-    It is designed so that it can be hooked into a existing jetforce server
-    application under a separate route, like this:
-
-    >>> from astrobotany import vhost
-    >>>
-    >>> app = StaticDirectoryApplication(...)
-    >>> app.route(hostname="astrobotany.mozz.us")(vhost)
-
-    The following features have also been added:
-        - Automatically loading the user from the environment.
-        - Automatically loading/saving the user's active plant.
-        - Adding an authenticated=True argument to the route decorator to
-          to support authenticated-only routes.
-        - Capturing regex groups in paths and passing them as arguments to
-          wrapped function.
+    View wrapper that handles user authentication via client certificates.
     """
 
-    def __init__(self):
-        self.routes: list = []
+    def wrapper(func: typing.Callable) -> typing.Callable:
+        def callback(request: Request, **kwargs):
+            request.user = None
+            request.plant = None
+            if "REMOTE_USER" in request.environ:
+                if not request.environ["REMOTE_USER"]:
+                    msg = (
+                        "Invalid certificate, the subject CommonName must be specified!"
+                    )
+                    return Response(Status.AUTHORISED_CERTIFICATE_REQUIRED, msg)
 
-    def __call__(self, request):
-        request.user = None
-        request.plant = None
+                if request.environ["TLS_CLIENT_VERIFIED"]:
+                    # Old-style verified certificate
+                    user_id = request.environ["TLS_CLIENT_SERIAL_NUMBER"]
+                    user_id = hex(user_id)[2:].upper()
+                else:
+                    # New-style self signed certificate
+                    user_id = request.environ["TLS_CLIENT_HASH"]
 
-        if "REMOTE_USER" in request.environ:
-            if not request.environ["REMOTE_USER"]:
-                msg = "Invalid certificate, the subject CommonName must be specified!"
+                request.user, _ = User.get_or_create(
+                    user_id=user_id, username=request.environ["REMOTE_USER"],
+                )
+                request.plant = request.user.plant
+
+            if not allow_anonymous and request.user is None:
+                msg = "You must have an account to view this page!"
                 return Response(Status.AUTHORISED_CERTIFICATE_REQUIRED, msg)
 
-            request.user, _ = User.get_or_create(
-                user_id=request.environ["TLS_CLIENT_SERIAL_NUMBER"],
-                username=request.environ["REMOTE_USER"],
-            )
-            request.plant = request.user.plant
+            if request.plant:
+                request.plant.refresh()
+                response = func(request, **kwargs)
+                request.plant.save()
+            else:
+                response = func(request, **kwargs)
 
-        for route_pattern, callback, authenticated in self.routes[::-1]:
-            match = route_pattern.match(request)
-            if match:
-                kwargs = match.groupdict()
-                break
-        else:
-            callback, authenticated, kwargs = self.default_callback, False, {}
+            return response
 
-        if authenticated and request.user is None:
-            msg = "You must have an account to view this page!"
-            return Response(Status.AUTHORISED_CERTIFICATE_REQUIRED, msg)
+        return callback
 
-        if request.plant:
-            request.plant.refresh()
-            response = callback(request, **kwargs)
-            request.plant.save()
-        else:
-            response = callback(request, **kwargs)
-
-        return response
-
-    def route(self, path, strict_trailing_slash=True, authenticated=False):
-        route_pattern = jetforce.RoutePattern(
-            path, strict_trailing_slash=strict_trailing_slash, strict_hostname=False,
-        )
-
-        def wrap(func):
-            self.routes.append((route_pattern, func, authenticated))
-            return func
-
-        return wrap
-
-    def default_callback(self, request, **kwargs):
-        return Response(Status.PERMANENT_FAILURE, "Not Found")
+    return wrapper
 
 
-vhost = AstrobotanyVirtualHost()
+app = JetforceApplication()
 
 
-@vhost.route("", strict_trailing_slash=False)
+@app.route("", strict_trailing_slash=False)
+@authenticate(allow_anonymous=True)
 def index(request):
     ansi_enabled = request.user and request.user.ansi_enabled
     title_art = render_art("title.psci", None, ansi_enabled)
@@ -111,14 +84,16 @@ def index(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/register")
+@app.route("/register")
+@authenticate(allow_anonymous=True)
 def register(request):
     body = render_template("register.gmi")
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/message-board", authenticated=True)
-@vhost.route("/message-board/(?P<page>[0-9]+)", authenticated=True)
+@app.route("/message-board")
+@app.route("/message-board/(?P<page>[0-9]+)")
+@authenticate()
 def message_board(request, page=1):
     page = int(page)
     paginate_by = 10
@@ -139,7 +114,8 @@ def message_board(request, page=1):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/message-board/submit", authenticated=True)
+@app.route("/message-board/submit")
+@authenticate()
 def message_board_submit(request):
     if not request.query:
         return Response(Status.INPUT, "What would you like to say? ")
@@ -149,13 +125,15 @@ def message_board_submit(request):
     return Response(Status.REDIRECT_TEMPORARY, "/message-board")
 
 
-@vhost.route("/settings", authenticated=True)
+@app.route("/settings")
+@authenticate()
 def settings(request):
     body = render_template("settings.gmi", request=request)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/settings/update/(?P<field>[A-Za-z_]+)", authenticated=True)
+@app.route("/settings/update/(?P<field>[A-Za-z_]+)")
+@authenticate()
 def settings_update(request, field):
     if field not in ("ansi_enabled",):
         return Response(Status.NOT_FOUND, "Invalid setting")
@@ -179,26 +157,30 @@ def settings_update(request, field):
     return Response(Status.REDIRECT_TEMPORARY, "/settings")
 
 
-@vhost.route("/plant", authenticated=True)
+@app.route("/plant")
+@authenticate()
 def plant(request):
     body = render_template("plant.gmi", request=request, plant=request.plant)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/plant/water", authenticated=True)
+@app.route("/plant/water")
+@authenticate()
 def water(request):
     info = request.plant.water()
     body = render_template("water.gmi", request=request, plant=request.plant, info=info)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/plant/observe", authenticated=True)
+@app.route("/plant/observe")
+@authenticate()
 def observe(request):
     body = render_template("observe.gmi", request=request, plant=request.plant)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/plant/harvest", authenticated=True)
+@app.route("/plant/harvest")
+@authenticate()
 def harvest(request):
     if not request.plant.stage == 5 and not request.plant.dead:
         return Response(Status.TEMPORARY_FAILURE, "You shouldn't be here")
@@ -211,7 +193,8 @@ def harvest(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/plant/name", authenticated=True)
+@app.route("/plant/name")
+@authenticate()
 def name(request):
     if not request.query:
         return Response(Status.INPUT, "Enter a new nickname for your plant:")
@@ -221,7 +204,8 @@ def name(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/directory", authenticated=True)
+@app.route("/directory")
+@authenticate()
 def directory(request):
     plants = Plant.filter(Plant.user_active.is_null(False))
     plants = plants.join(User).order_by(User)
@@ -229,7 +213,8 @@ def directory(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/directory/(?P<user_id>[0-9A-F]+)", authenticated=True)
+@app.route("/directory/(?P<user_id>[0-9A-F]+)")
+@authenticate()
 def visit(request, user_id):
     user = User.get_or_none(user_id=user_id)
     if user is None:
@@ -244,7 +229,8 @@ def visit(request, user_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@vhost.route("/directory/(?P<user_id>[0-9A-F]+)/water", authenticated=True)
+@app.route("/directory/(?P<user_id>[0-9A-F]+)/water")
+@authenticate()
 def visit_water(request, user_id):
     user = User.get_or_none(user_id=user_id)
     if user is None:

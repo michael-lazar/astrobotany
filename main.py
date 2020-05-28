@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
-import asyncio
-
 import jetforce
 
-from astrobotany import init_db, vhost
+from astrobotany import init_db, app
 
 init_db("astrobotany.sqlite")
 
-app = jetforce.JetforceApplication()
-app.route()(vhost)
-
-cafile = "certs/ca.cer"
-ssl_context = jetforce.make_ssl_context(cafile=cafile)
-server = jetforce.GeminiServer(app=app, ssl_context=ssl_context)
-asyncio.run(server.run())
+server = jetforce.GeminiServer(app, cafile="certs/ca.cer")
+server.run()

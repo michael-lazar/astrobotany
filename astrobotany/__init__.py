@@ -1,4 +1,4 @@
 from .models import init_db
-from .views import vhost
+from .views import app
 
-__all__ = ["init_db", "vhost"]
+__all__ = ["init_db", "app"]
