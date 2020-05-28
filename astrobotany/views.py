@@ -44,7 +44,7 @@ def authenticate(allow_anonymous=False):
                 if request.environ["TLS_CLIENT_VERIFIED"]:
                     # Old-style verified certificate
                     user_id = request.environ["TLS_CLIENT_SERIAL_NUMBER"]
-                    user_id = hex(user_id)[2:].upper()
+                    user_id = f"{user_id:32X}"  # Convert to hex
                 else:
                     # New-style self signed certificate
                     user_id = request.environ["TLS_CLIENT_HASH"]
