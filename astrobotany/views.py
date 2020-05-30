@@ -41,7 +41,7 @@ def authenticate(allow_anonymous=False):
                     )
                     return Response(Status.AUTHORISED_CERTIFICATE_REQUIRED, msg)
 
-                if request.environ["TLS_CLIENT_VERIFIED"]:
+                if request.environ["TLS_CLIENT_AUTHORISED"]:
                     # Old-style verified certificate
                     user_id = request.environ["TLS_CLIENT_SERIAL_NUMBER"]
                     user_id = f"{user_id:032X}"  # Convert to hex
