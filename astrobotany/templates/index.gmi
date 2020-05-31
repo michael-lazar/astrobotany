@@ -10,9 +10,9 @@ Welcome to astrobotany. You've been given a seed that will grow into a beautiful
 
 “Don't judge each day by the harvest you reap but by the seeds that you plant.” ― Robert Louis Stevenson
 
-To register a new account, simply present a self-signed client certificate to any of the below endpoints:
-
 ---
+
+To register a new account, present a self-signed client certificate to any of the endpoint below.
 
 =>/plant 👩‍🌾 Visit your plant
 =>/directory 📒 Garden directory
