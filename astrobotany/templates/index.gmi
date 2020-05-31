@@ -12,7 +12,7 @@ Welcome to astrobotany. You've been given a seed that will grow into a beautiful
 
 ---
 
-To register a new account, present a self-signed client certificate to any of the endpoint below.
+To register a new account, present a self-signed client certificate to any of the endpoints below.
 
 =>/plant 👩‍🌾 Visit your plant
 =>/directory 📒 Garden directory
