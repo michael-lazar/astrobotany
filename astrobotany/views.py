@@ -213,7 +213,7 @@ def directory(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/directory/(?P<user_id>[0-9A-F]+)")
+@app.route("/directory/(?P<user_id>[A-Za-z0-9_=-]+)")
 @authenticate()
 def visit(request, user_id):
     user = User.get_or_none(user_id=user_id)
@@ -229,7 +229,7 @@ def visit(request, user_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/directory/(?P<user_id>[0-9A-F]+)/water")
+@app.route("/directory/(?P<user_id>[A-Za-z0-9_=-]+)/water")
 @authenticate()
 def visit_water(request, user_id):
     user = User.get_or_none(user_id=user_id)
