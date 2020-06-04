@@ -1,6 +1,7 @@
 import math
 import os
 import typing
+from datetime import datetime, timedelta
 
 import jinja2
 from jetforce import Request, Response, Status, JetforceApplication
@@ -207,7 +208,11 @@ def name(request):
 @app.route("/directory")
 @authenticate()
 def directory(request):
-    plants = Plant.filter(Plant.user_active.is_null(False), Plant.score > 0)
+    plants = Plant.filter(
+        Plant.user_active.is_null(False),
+        Plant.score > 0,
+        Plant.watered_at >= datetime.now() - timedelta(days=8),
+    )
     plants = plants.join(User).order_by(User)
     body = render_template("directory.gmi", request=request, plants=plants)
     return Response(Status.SUCCESS, "text/gemini", body)
