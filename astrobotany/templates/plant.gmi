@@ -3,6 +3,10 @@
 {% block body %}
 {{ plant.get_observation() }}
 
+{% if plant.is_wilted %}
+Your plant is wilting, it will die soon without water!
+
+{% endif %}
 {% if plant.watered_by %}
 Your plant was recently watered by {{ plant.watered_by.username }}.
 

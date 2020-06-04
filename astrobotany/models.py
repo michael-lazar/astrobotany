@@ -165,6 +165,16 @@ class Plant(Model):
         return 1 + 0.2 * (self.generation - 1)
 
     @property
+    def is_wilted(self) -> bool:
+        """
+        Is the plant close to death?
+        """
+        if self.dead:
+            return False
+        else:
+            return self.watered_at < datetime.now() - timedelta(days=3)
+
+    @property
     def water_supply_percent(self) -> int:
         """
         The percentage of water supply remaining, as an integer from 0 to 100.
@@ -321,7 +331,7 @@ class Plant(Model):
             Plant.watered_at >= datetime.now() - timedelta(hours=8),
         )
         if query.exists():
-            return "You've already watered a friend's plant, try again tomorrow!"
+            return "Your watering can is empty, try again later!"
 
         self.watered_at = datetime.now()
         self.watered_by = user
