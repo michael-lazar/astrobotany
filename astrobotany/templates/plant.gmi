@@ -1,6 +1,8 @@
 {% extends "base.gmi" %}
 
 {% block body %}
+{{ plant.get_observation() }}
+
 {% if plant.watered_by %}
 Your plant was recently watered by {{ plant.watered_by.username }}.
 
