@@ -8,7 +8,7 @@ from jetforce import Request, Response, Status, JetforceApplication
 
 from .art import render_art
 from .models import Message, Plant, User
-from .leaderboard import HighScore
+from .leaderboard import get_daily_leaderboard
 
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -83,7 +83,7 @@ app = JetforceApplication()
 def index(request):
     ansi_enabled = request.user and request.user.ansi_enabled
     title_art = render_art("title.psci", None, ansi_enabled)
-    leaderboard = HighScore().render(ansi_enabled)
+    leaderboard = get_daily_leaderboard().render(ansi_enabled)
     body = render_template("index.gmi", title_art=title_art, leaderboard=leaderboard)
     return Response(Status.SUCCESS, "text/gemini", body)
 
