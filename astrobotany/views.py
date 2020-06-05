@@ -8,6 +8,8 @@ from jetforce import Request, Response, Status, JetforceApplication
 
 from .art import render_art
 from .models import Message, Plant, User
+from .leaderboard import HighScore
+
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
@@ -81,7 +83,8 @@ app = JetforceApplication()
 def index(request):
     ansi_enabled = request.user and request.user.ansi_enabled
     title_art = render_art("title.psci", None, ansi_enabled)
-    body = render_template("index.gmi", title_art=title_art)
+    leaderboard = HighScore().render(ansi_enabled)
+    body = render_template("index.gmi", title_art=title_art, leaderboard=leaderboard)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -208,12 +211,14 @@ def name(request):
 @app.route("/directory")
 @authenticate()
 def directory(request):
-    plants = Plant.filter(
-        Plant.user_active.is_null(False),
-        Plant.score > 0,
-        Plant.watered_at >= datetime.now() - timedelta(days=8),
+    plants = (
+        Plant.all_active()
+        .filter(
+            Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8),
+        )
+        .order_by(User)
     )
-    plants = plants.join(User).order_by(User)
+
     body = render_template("directory.gmi", request=request, plants=plants)
     return Response(Status.SUCCESS, "text/gemini", body)
 

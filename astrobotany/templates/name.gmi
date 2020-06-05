@@ -1,5 +1,5 @@
 {% extends "base.gmi" %}
 
 {% block body %}
-Your plant will henceforth be known as "{{ plant.name }}".
+This plant shall henceforth be known as "{{ plant.name }}".
 {% endblock %}

@@ -4,15 +4,17 @@
 {{ title_art }}
 ```
 
-This project is currently in beta. Feel free to stay and enjoy, but tread carefully!
+“Don't judge each day by the harvest you reap but by the seeds that you plant.”
+― Robert Louis Stevenson
+
 
 Welcome to astrobotany. You've been given a seed that will grow into a beautiful plant. Check in and water your plant every 24h to keep it growing. 5 days without water = death. Your plant depends on you and your friends to live!
 
-“Don't judge each day by the harvest you reap but by the seeds that you plant.” ― Robert Louis Stevenson
-
 ---
 
-To register a new account, present a self-signed client certificate to any of the endpoints below.
+Register a new account by sending a self-signed certificate to any of the below endpoints. Your certificate's CommonName will be your username, so pick something short and memorable!
+
+---
 
 =>/plant 👩‍🌾 Visit your plant
 =>/directory 📒 Garden directory
@@ -21,9 +23,11 @@ To register a new account, present a self-signed client certificate to any of th
 
 ---
 
-The old registration guide involves generating an authorised client certificate. This method still works, but is no longer recommended.
+{{ leaderboard }}
 
-=>/register 🌱 Astrobotany Registration Guide (old)
+---
+
+=>/register 🌱 Astrobotany Registration Guide (old CSR method)
 
 ---
 

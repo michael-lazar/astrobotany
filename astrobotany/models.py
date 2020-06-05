@@ -108,6 +108,10 @@ class Plant(Model):
     dead = BooleanField(default=False)
     name = TextField(default=fake.first_name)
 
+    @classmethod
+    def all_active(cls):
+        return cls.filter(cls.user_active.is_null(False)).join(User)
+
     @property
     def color_str(self) -> str:
         return constants.COLORS[self.color]
