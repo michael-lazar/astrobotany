@@ -23,7 +23,9 @@ Register a new account by sending a self-signed certificate to any of the below 
 
 ---
 
+```
 {{ leaderboard }}
+```
 
 ---
 
