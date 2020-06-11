@@ -1,6 +1,8 @@
-{% extends "base.gmi" %}
+# Astrobotany - Your Garden
 
-{% block body %}
+{% include 'fragments/info.gmi' %}
+
+
 {% if plant.stage == 5 %}
 Congratulations! You raised your plant to its final stage of growth.
 Your next plant will grow at a speed of: {{ plant.growth_rate + 0.2 }}x
@@ -8,6 +10,5 @@ Your next plant will grow at a speed of: {{ plant.growth_rate + 0.2 }}x
 {% endif %}
 If you harvest your plant you'll start over from a seed. Continue?
 
-=>/plant/harvest?confirm Yes, continue
-=>/plant No, go back
-{% endblock %}
+=>/app/plant/harvest/confirm 🤗 Yes, continue
+=>/app/plant 😨 No, go back

@@ -1,0 +1,8 @@
+# Astrobotany - Your Garden
+
+{% include 'fragments/info.gmi' %}
+
+
+Your plant shall henceforth be known as "{{ plant.name }}".
+
+=>/app/plant 🚶 Go back

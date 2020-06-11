@@ -1,6 +1,0 @@
-{% extends "base.gmi" %}
-
-{% block body %}
-Generation: {{ plant.generation }}
-Growth rate: {{ plant.growth_rate }}
-{% endblock %}

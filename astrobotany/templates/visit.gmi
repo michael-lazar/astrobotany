@@ -1,9 +1,8 @@
-{% extends "base.gmi" %}
+# Garden Directory
 
-{% block body %}
-{% if plant.is_wilted %}
-This plant is wilting, it will die soon without water!
+{% for plant in plants %}
+=>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
+(tended by {{ plant.user.username }})
 
-{% endif %}
-=>/directory/{{ plant.user.user_id }}/water 💧 Water
-{% endblock %}
+{% endfor %}
+=>/app 🚶 Go back

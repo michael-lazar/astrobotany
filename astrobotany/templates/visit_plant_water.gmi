@@ -1,0 +1,8 @@
+# Astrobotany - {{ plant.user.username }}'s Garden
+
+{% include 'fragments/info.gmi' %}
+
+
+{{ info }}
+
+=>/app/visit/{{ plant.user.user_id }} 🚶 Go back

@@ -3,6 +3,7 @@
 {% include 'fragments/info.gmi' %}
 
 
-{{ info }}
+Generation: {{ plant.generation }}
+Growth rate: {{ plant.growth_rate }}
 
 =>/app/plant 🚶 Go back

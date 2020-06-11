@@ -1,0 +1,48 @@
+# Astrobotany - Instructions
+
+```
+             .--'}        _   ,
+          ,<{.-'{:} -====;o`\/ }
+      __ ((  '--.}        \-`\-'----.
+      \_\ \\   __          \ |-..-'`
+      ___\_))_/_/          /\/\
+     /_/  ((               `--`
+       jgs \\
+```
+
+## Gardening Basics
+
+You've been given a seed that will grow into a beautiful plant!
+
+* Check back every 24 hours to water your plant.
+* Your score will increase as long as the soil remains damp.
+* Your plant will die after 5 days without water.
+
+## Plant Stages
+
+Your plant will continue to change and evolve over time.
+
+* seed (0 days)
+* seedling (3 day)
+* young (3 days
+* mature (10 days)
+* flowering (20 days)
+* seed-bearing (30 days)
+
+## Generations
+
+Once your plant reaches the seed-bearing stage, you will be given the option to either keep going or harvest your plant. If you chose to harvest, your score will reset and you will start over with a generation score multiplier.
+
+```
+score_multiplier = 1 + (0.2 * generation)
+```
+
+## Registration
+
+The old astrobotany registration guide used CSR's to generate authorised client certificates. This method is no longer recommended, but it still works and is linked here for historical reference.
+
+=>/register
+
+----------
+
+Now go spread some seeds!

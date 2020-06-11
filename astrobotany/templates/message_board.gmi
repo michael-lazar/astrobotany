@@ -1,18 +1,18 @@
-# Community Message Board
+# Astrobotany - Message Board
 
-=>/message-board/submit ✍️  Submit a message
+=>/app/message-board/submit ✍️  Submit a new message
 
----
+## Posts
 
 {% for item in items %}
-"{{ item.text }}"
-- {{ item.user.username }}, {{ item.created_at.strftime('%Y-%m-%d') }}
+> "{{ item.text }}"
+> - {{ item.user.username }}, {{ item.created_at.strftime('%Y-%m-%d') }}
 
 {% endfor %}
----
-
 (page {{ page }} of {{ page_count }})
 {% if page < page_count %}
 
-=>/message-board/{{ page + 1 }} next page
+=>/app/message-board/{{ page + 1 }} Next page
 {% endif %}
+
+=>/app 🚶 Go back

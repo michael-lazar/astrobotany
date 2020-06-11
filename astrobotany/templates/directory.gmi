@@ -1,7 +1,0 @@
-# Garden Directory
-
-{% for plant in plants %}
-=>/directory/{{ plant.user.user_id }} {{ plant.description }}
-(tended by {{ plant.user.username }})
-
-{% endfor %}

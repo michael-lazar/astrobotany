@@ -1,0 +1,14 @@
+# Astrobotany - {{ plant.user.username }}'s Garden
+
+{% include 'fragments/info.gmi' %}
+
+
+{% if plant.is_wilted %}
+This plant is wilting, it will die soon without water!
+
+{% endif %}
+## Plant Actions
+
+=>/app/visit/{{ plant.user.user_id }}/water 💧 Water
+
+=>/app/visit 🚶 Go back

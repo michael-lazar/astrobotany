@@ -1,7 +1,9 @@
-{% extends "base.gmi" %}
+# Astrobotany - Your Garden
 
-{% block body %}
-{{ plant.get_observation() }}
+{% include 'fragments/info.gmi' %}
+
+
+> {{ plant.get_observation() }}
 
 {% if plant.is_wilted %}
 Your plant is wilting, it will die soon without water!
@@ -11,13 +13,15 @@ Your plant is wilting, it will die soon without water!
 Your plant was recently watered by {{ plant.watered_by.username }}.
 
 {% endif %}
-=>/plant/observe 🌹 Look
-=>/plant/water 💧 Water
-{% if plant.dead %}
-=>/plant/harvest 💀 Harvest
-{% elif plant.stage == 5 %}
-=>/plant/harvest 🏆 Harvest
+## Plant Actions
+
+=>/app/plant/water 💧 Water
+=>/app/plant/inspect 🌹 Inspect
+{% if plant.stage == 5 %}
+=>/app/plant/harvest 🏆 Harvest
+{% else %}
+=>/app/plant/harvest 🌽 Harvest
 {% endif %}
-=>/plant/name 📛 Name
-=>/ 🏡 Home
-{% endblock %}
+=>/app/plant/name 📛 Rename
+
+=>/app 🚶 Go back

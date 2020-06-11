@@ -1,6 +1,8 @@
-# User Settings
+# Astrobotany - Settings
+
+## Colors
 
 Enable support for color using ANSI escape sequences
-=>/settings/update/ansi_enabled ansi_enabled: {{ request.user.ansi_enabled }}
+=>/app/settings/update/ansi_enabled ansi_enabled: {{ request.user.ansi_enabled }}
 
-=>/ 🏡 Home
+=>/app 🚶 Go back
