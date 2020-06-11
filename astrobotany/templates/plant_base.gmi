@@ -1,4 +1,4 @@
-# {{ plant.user.username }}'s garden
+# Astrobotany - {{ plant.user.username }}'s garden
 
 ```
 {{ plant.get_ascii_art(request.user.ansi_enabled) }}
