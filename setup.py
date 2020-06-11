@@ -26,5 +26,5 @@ setup(
     extras_require={
         "test": ["pytest", "black", "isort", "mypy", "flake8", "freezegun"],
     },
-    package_data={"astrobotany": ["art/*", "templates/*"]},
+    package_data={"astrobotany": ["art/*", "templates/*", "templates/fragments/*"]},
 )
