@@ -20,7 +20,7 @@ You've been given a seed that will grow into a beautiful plant!
 
 ## Plant Stages
 
-Your plant will continue to change and evolve over time.
+Your plant will continue to grow and evolve over time.
 
 * seed (0 days)
 * seedling (3 day)

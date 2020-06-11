@@ -114,7 +114,11 @@ def menu(request):
 @authenticate
 def epilog(request, page):
     page = int(page)
-    body = render_template("epilog.gmi", page=page)
+    if page in (1, 2, 3, 4):
+        art = render_art(f"epilog{page}.psci", None, request.user.ansi_enabled)
+    else:
+        art = None
+    body = render_template("epilog.gmi", page=page, art=art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
