@@ -110,6 +110,14 @@ def menu(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
+@app.route("/app/epilog/(?P<page>[0-9]+)")
+@authenticate
+def epilog(request, page):
+    page = int(page)
+    body = render_template("epilog.gmi", page=page)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
 @app.route("/app/message-board")
 @app.route("/app/message-board/(?P<page>[0-9]+)")
 @authenticate
@@ -207,7 +215,7 @@ def harvest(request):
     if request.path.endswith("/confirm"):
         if request.query.strip() == f"Goodbye {request.plant.name}":
             request.plant.harvest()
-            return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+            return Response(Status.REDIRECT_TEMPORARY, "/app/epilog/1")
         elif request.query:
             return Response(Status.REDIRECT_TEMPORARY, "/app/plant/harvest")
         else:
