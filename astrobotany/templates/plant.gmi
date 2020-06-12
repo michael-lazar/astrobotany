@@ -3,7 +3,7 @@
 {% include 'fragments/info.gmi' %}
 
 
-> {{ plant.get_observation() }}
+{{ plant.get_observation() }}
 
 {% if plant.is_wilted %}
 Your plant is wilting, it will die soon without water!
