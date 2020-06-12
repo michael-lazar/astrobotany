@@ -5,8 +5,8 @@
 ## Posts
 
 {% for item in items %}
-"{{ item.text }}"
-- {{ item.user.username }}, {{ item.created_at.strftime('%Y-%m-%d') }}
+> "{{ item.text }}"
+> - {{ item.user.username }}, {{ item.created_at.strftime('%Y-%m-%d') }}
 
 {% endfor %}
 (page {{ page }} of {{ page_count }})
