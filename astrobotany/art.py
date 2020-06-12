@@ -29,6 +29,21 @@ def colorize(text: str, fg: ColorCode = None, bg: ColorCode = None) -> str:
     return text
 
 
+def flowerize(text: str, flower_color: str):
+    """
+    Colorize a text string to match a plant's primary flower color.
+
+    Pronounced "Flower-ize", rhymes with "colorize".
+    """
+    if flower_color == "rainbow":
+        rainbow_gen = itertools.cycle(ArtFile.RAINBOW_COLORS)
+        return "".join(colorize(char, next(rainbow_gen)) for char in text)
+    elif flower_color in ArtFile.FLOWER_COLORS:
+        return colorize(text, ArtFile.FLOWER_COLORS[flower_color][0])
+    else:
+        return text
+
+
 class ArtFile:
     """
     This class encapsulates an ASCII art file in the playscii file format.

@@ -188,7 +188,7 @@ class Plant(Model):
         remaining_water = max(0.0, 1 - (elapsed_seconds / seconds_per_day))
         return math.ceil(remaining_water * 100)
 
-    def get_water_gauge(self, ansi_enabled=False) -> str:
+    def get_water_gauge(self, ansi_enabled: bool = False) -> str:
         """
         Build an ascii graph that displays the plant's remaining water supply.
         """
@@ -202,7 +202,7 @@ class Plant(Model):
             bar = colorize(bar, fg=12)
         return f"|{bar}| {percent}%"
 
-    def get_ascii_art(self, ansi_enabled=False) -> str:
+    def get_ascii_art(self, ansi_enabled: bool = False) -> str:
         """
         Build an ascii-art picture based on the plant's generation and species.
         """
@@ -226,7 +226,7 @@ class Plant(Model):
 
         return render_art(filename, self.color_str, ansi_enabled)
 
-    def get_observation(self) -> str:
+    def get_observation(self, ansi_enabled: bool = False) -> str:
         """
         A long-form description of the plant.
 
