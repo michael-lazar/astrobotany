@@ -7,6 +7,10 @@
 Congratulations! You raised your plant to its final stage of growth.
 Your next plant will grow at a speed of: {{ plant.growth_rate + 0.2 }}x
 
+{% elif not plant.dead %}
+Warning! Your plant has not yet reached the seed-bearing stage.
+If you harvest prematurely, your plant's generation will reset to 1.
+
 {% endif %}
 If you harvest your plant you'll start over from a seed. Continue?
 
