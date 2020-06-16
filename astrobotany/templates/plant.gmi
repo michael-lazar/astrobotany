@@ -17,9 +17,9 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% endif %}
 ## Plant Actions
 
-=>/app/plant 🏠 Home
+=>/app/plant 🌹 Look
 =>/app/plant/water 💧 Water
-=>/app/plant/inspect 🌹 Inspect
+=>/app/plant/inspect 👁️ Inspect
 {% if plant.stage == 5 %}
 =>/app/plant/harvest 🏆 Harvest
 {% else %}
