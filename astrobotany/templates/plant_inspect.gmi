@@ -1,9 +1,0 @@
-# Astrobotany - Your Garden
-
-{% include 'fragments/info.gmi' %}
-
-
-Generation: {{ plant.generation }}
-Growth rate: {{ plant.growth_rate }}
-
-=>/app/plant 🚶 Go back

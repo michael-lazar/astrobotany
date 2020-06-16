@@ -3,8 +3,10 @@
 {% include 'fragments/info.gmi' %}
 
 
-{{ plant.get_observation(request.user.ansi_enabled) }}
+{% if alert %}
+{{ alert }}
 
+{% endif %}
 {% if plant.is_wilted %}
 Your plant is wilting, it will die soon without water!
 
@@ -23,5 +25,4 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 =>/app/plant/harvest 🌽 Harvest
 {% endif %}
 =>/app/plant/name 📛 Rename
-
 =>/app 🚶 Go back

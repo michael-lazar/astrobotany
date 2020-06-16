@@ -3,6 +3,10 @@
 {% include 'fragments/info.gmi' %}
 
 
+{% if alert %}
+{{ alert }}
+
+{% endif %}
 {% if plant.is_wilted %}
 This plant is wilting, it will die soon without water!
 
@@ -10,5 +14,4 @@ This plant is wilting, it will die soon without water!
 ## Plant Actions
 
 =>/app/visit/{{ plant.user.user_id }}/water 💧 Water
-
 =>/app/visit 🚶 Go back

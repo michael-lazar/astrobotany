@@ -2,6 +2,7 @@ import math
 import os
 import typing
 from datetime import datetime, timedelta
+from functools import lru_cache
 
 import jinja2
 from jetforce import Request, Response, Status, JetforceApplication
@@ -20,6 +21,18 @@ template_env = jinja2.Environment(
     trim_blocks=True,
     lstrip_blocks=True,
 )
+
+
+@lru_cache(2048)
+def load_session(session_id: str):
+    """
+    A poor man's server-side session object.
+
+    Stores session data as a dict in memory that will be wiped on server
+    restart. Mutate the dictionary to update the session. This only works
+    because the server is running as a single process with shared memory.
+    """
+    return {}
 
 
 def render_template(name: str, *args, **kwargs) -> str:
@@ -54,6 +67,7 @@ def authenticate(func: typing.Callable) -> typing.Callable:
                 user_id=user_id, username=request.environ["REMOTE_USER"],
             )
             request.plant = request.user.plant
+            request.session = load_session(request.user.user_id)
 
         if request.user is None:
             if request.path != "/app":
@@ -191,25 +205,33 @@ def settings_update(request, field):
 @app.route("/app/plant")
 @authenticate
 def plant(request):
-    body = render_template("plant.gmi", request=request, plant=request.plant)
+    alert = request.session.pop("alert", None)
+    if alert is None:
+        alert = request.plant.get_observation(request.user.ansi_enabled)
+
+    body = render_template(
+        "plant.gmi", request=request, plant=request.plant, alert=alert,
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
 @app.route("/app/plant/water")
 @authenticate
 def water(request):
-    info = request.plant.water()
-    body = render_template(
-        "plant_water.gmi", request=request, plant=request.plant, info=info
-    )
-    return Response(Status.SUCCESS, "text/gemini", body)
+    request.session["alert"] = request.plant.water()
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
 @app.route("/app/plant/inspect")
 @authenticate
 def inspect(request):
-    body = render_template("plant_inspect.gmi", request=request, plant=request.plant)
-    return Response(Status.SUCCESS, "text/gemini", body)
+    request.session["alert"] = "\n".join(
+        [
+            f"Generation: {request.plant.generation}",
+            f"Growth Rate: {request.plant.growth_rate}",
+        ]
+    )
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
 @app.route("/app/plant/harvest")
@@ -237,8 +259,9 @@ def name(request):
         return Response(Status.INPUT, "Enter a new nickname for your plant:")
 
     request.plant.name = request.query[:40]
-    body = render_template("plant_name.gmi", request=request, plant=request.plant)
-    return Response(Status.SUCCESS, "text/gemini", body)
+    msg = f'Your plant shall henceforth be known as "{request.plant.name}".'
+    request.session["alert"] = msg
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
 @app.route("/app/visit")
@@ -268,7 +291,10 @@ def visit_plant(request, user_id):
     user.plant.refresh()
     user.plant.save()
 
-    body = render_template("visit_plant.gmi", request=request, plant=user.plant)
+    alert = request.session.pop("alert", None)
+    body = render_template(
+        "visit_plant.gmi", request=request, plant=user.plant, alert=alert,
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -282,10 +308,7 @@ def visit_plant_water(request, user_id):
         return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
     user.plant.refresh()
-    info = user.plant.water(request.user)
+    request.session["alert"] = user.plant.water(request.user)
     user.plant.save()
 
-    body = render_template(
-        "visit_plant_water.gmi", request=request, plant=user.plant, info=info
-    )
-    return Response(Status.SUCCESS, "text/gemini", body)
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")
