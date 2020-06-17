@@ -272,7 +272,7 @@ def visit(request):
         .filter(
             Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8),
         )
-        .order_by(User)
+        .order_by(Plant.score.desc())
     )
 
     body = render_template("visit.gmi", request=request, plants=plants)
