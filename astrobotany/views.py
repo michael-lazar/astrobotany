@@ -52,8 +52,8 @@ def authenticate(func: typing.Callable) -> typing.Callable:
         request.plant = None
         if "REMOTE_USER" in request.environ:
             if not request.environ["REMOTE_USER"]:
-                msg = "Invalid certificate, the subject CommonName must be specified!"
-                return Response(Status.AUTHORISED_CERTIFICATE_REQUIRED, msg)
+                msg = "The certificate must define a CN (Common Name) attribute."
+                return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
 
             if request.environ["TLS_CLIENT_AUTHORISED"]:
                 # Old-style verified certificate
@@ -75,11 +75,11 @@ def authenticate(func: typing.Callable) -> typing.Callable:
                 return Response(Status.REDIRECT_TEMPORARY, "/app")
             else:
                 msg = (
-                    "Use a self-signed certificate to login. The CommonName "
-                    "attribute will be your username. The certificate will be "
-                    "linked to your account, so don't lose it!"
+                    "Use a self-signed certificate to login. The CN (Common"
+                    "Name) attribute will be your username. Save this"
+                    "certificate in order to keep access to your account."
                 )
-                return Response(Status.AUTHORISED_CERTIFICATE_REQUIRED, msg)
+                return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
         if request.plant:
             request.plant.refresh()
