@@ -75,9 +75,10 @@ def authenticate(func: typing.Callable) -> typing.Callable:
                 return Response(Status.REDIRECT_TEMPORARY, "/app")
             else:
                 msg = (
-                    "Use a self-signed certificate to login. The CN (Common"
-                    "Name) attribute will be your username. Save this"
-                    "certificate in order to keep access to your account."
+                    "This application uses TOFU client certificates for "
+                    "authentication. In order to login, generate your own "
+                    "self-signed certificate (the CN attribute will be your "
+                    "username)."
                 )
                 return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
