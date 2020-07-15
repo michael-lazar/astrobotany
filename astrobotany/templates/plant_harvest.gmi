@@ -5,7 +5,7 @@
 
 {% if plant.stage == 5 %}
 Congratulations! You raised your plant to its final stage of growth.
-Your next plant will grow at a speed of: {{ plant.growth_rate + 0.2 }}x
+Your next plant will grow at a speed of: {{ (plant.growth_rate + 0.2) | round(2) }}x
 
 {% elif not plant.dead %}
 Warning! Your plant has not yet reached the seed-bearing stage.
