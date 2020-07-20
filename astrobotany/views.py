@@ -226,6 +226,13 @@ def water(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
+@app.route("/app/plant/fertilize")
+@authenticate
+def fertilize(request):
+    request.session["alert"] = request.plant.fertilize()
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
 @app.route("/app/plant/inspect")
 @authenticate
 def inspect(request):

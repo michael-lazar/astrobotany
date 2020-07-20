@@ -6,4 +6,7 @@ stage : {{ plant.description }}
 age   : {{ plant.age }} days
 score : {{ plant.score }}
 water : {{ plant.get_water_gauge(request.user.ansi_enabled) }}
+{% if plant.fertilizer_percent %}
+1.5x  : {{ plant.get_fertilizer_gauge(request.user.ansi_enabled) }}
+{% endif %}
 ```

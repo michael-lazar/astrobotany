@@ -92,6 +92,27 @@ class User(BaseModel):
         item_slot.save()
         return item_slot
 
+    def remove_item(self, item: items.Item, quantity: int = 1) -> bool:
+        """
+        Remove an item from the user's inventory.
+
+        Returns True if the item was successfully removed.
+        """
+        item_slot = ItemSlot.get_or_none(user=self, item_id=item.item_id)
+        if not item_slot:
+            return False
+
+        if item_slot.quantity < quantity:
+            return False
+
+        if item_slot.quantity == quantity:
+            item_slot.delete()
+            return True
+
+        item_slot.quantity -= quantity
+        item_slot.save()
+        return True
+
     @classmethod
     def initialize(cls, user_id: str, username: str) -> "User":
         """
@@ -100,6 +121,7 @@ class User(BaseModel):
         user = cls(user_id=user_id, username=username)
         user.save()
         user.add_item(items.paperclip)
+        user.add_item(items.fertilizer, quantity=5)
         return user
 
 
@@ -151,6 +173,7 @@ class Plant(BaseModel):
     mutation = IntegerField(null=True)
     dead = BooleanField(default=False)
     name = TextField(default=fake.first_name)
+    fertilized_at = DateTimeField(default=lambda: datetime.now() - timedelta(days=4))
 
     @classmethod
     def all_active(cls):
@@ -232,6 +255,16 @@ class Plant(BaseModel):
         remaining_water = max(0.0, 1 - (elapsed_seconds / seconds_per_day))
         return math.ceil(remaining_water * 100)
 
+    @property
+    def fertilizer_percent(self) -> int:
+        """
+        The percentage of fertilizer remaining, as an integer from 0 to 100.
+        """
+        seconds_per_day = 3 * 24 * 60 * 60
+        elapsed_seconds = (datetime.now() - self.fertilized_at).total_seconds()
+        remaining_fertilizer = max(0.0, 1 - (elapsed_seconds / seconds_per_day))
+        return math.ceil(remaining_fertilizer * 100)
+
     def get_water_gauge(self, ansi_enabled: bool = False) -> str:
         """
         Build an ascii graph that displays the plant's remaining water supply.
@@ -244,6 +277,20 @@ class Plant(BaseModel):
         if ansi_enabled:
             # Make the water blue
             bar = colorize(bar, fg=12)
+        return f"|{bar}| {percent}%"
+
+    def get_fertilizer_gauge(self, ansi_enabled: bool = False) -> str:
+        """
+        Build an ascii graph that displays the plant's remaining fertilizer.
+        """
+        if self.dead:
+            return "N/A"
+
+        percent = self.fertilizer_percent
+        bar = ("█" * (percent // 10)).ljust(10)
+        if ansi_enabled:
+            # Make the fertilizer purple
+            bar = colorize(bar, fg=40)
         return f"|{bar}| {percent}%"
 
     def get_ascii_art(self, ansi_enabled: bool = False) -> str:
@@ -386,6 +433,22 @@ class Plant(BaseModel):
         info = f"You water {self.user.username}'s plant for them."
 
         return info
+
+    def fertilize(self) -> str:
+        """
+        Attempt to fertilize the plant.
+
+        Returns: A string with a description of the resulting action.
+        """
+        if self.dead:
+            return "There's no point in fertilizing a dead plant."
+        elif self.fertilizer_percent:
+            return "The plant has already been fertilized"
+
+        if not self.user.remove_item(items.fertilizer):
+            return "You don't have any fertilizer to use"
+        self.fertilized_at = datetime.now()
+        return f"You apply a bottle of EZ-Grow Fertilizer to your plant."
 
     def harvest(self) -> "Plant":
         """

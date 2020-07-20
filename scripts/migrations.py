@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+from datetime import datetime, timedelta
 
-from peewee import BooleanField, TextField
+from peewee import BooleanField, TextField, DateTimeField
 from playhouse import migrate
 
 from astrobotany import items
@@ -34,6 +35,13 @@ def add_item_fertilizer(migrator):
         ItemSlot.get_or_create(
             user=user, item_id=items.fertilizer.item_id, defaults={"quantity": 5}
         )
+
+
+def add_plant_fertilized_at(migrator):
+    dt = datetime.now() - timedelta(days=4)
+    migrate.migrate(
+        migrator.add_column("plant", "fertilized_at", DateTimeField(default=dt))
+    )
 
 
 MIGRATIONS = locals()
