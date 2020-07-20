@@ -7,6 +7,7 @@ from functools import lru_cache
 import jinja2
 from jetforce import Request, Response, Status, JetforceApplication
 
+from . import items
 from .art import render_art
 from .models import Message, Plant, User
 from .leaderboard import get_daily_leaderboard
@@ -63,9 +64,11 @@ def authenticate(func: typing.Callable) -> typing.Callable:
                 # New-style self signed certificate
                 user_id = request.environ["TLS_CLIENT_HASH"]
 
-            request.user, _ = User.get_or_create(
-                user_id=user_id, username=request.environ["REMOTE_USER"],
-            )
+            user = User.get_or_none(user_id=user_id)
+            if user is None:
+                user = User.initialize(user_id, request.environ["REMOTE_USER"])
+
+            request.user = user
             request.plant = request.user.plant
             request.session = load_session(request.user.user_id)
 
@@ -313,3 +316,18 @@ def visit_plant_water(request, user_id):
     user.plant.save()
 
     return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")
+
+
+@app.route("/app/inventory")
+@authenticate
+def inventory(request):
+    body = render_template("inventory.gmi", request=request)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/inventory/(?P<item_id>[0-9]+)")
+@authenticate
+def view_item(request, item_id):
+    item = items.registry[int(item_id)]
+    body = render_template("item.gmi", request=request, item=item)
+    return Response(Status.SUCCESS, "text/gemini", body)

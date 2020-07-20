@@ -3,7 +3,8 @@ import argparse
 from peewee import BooleanField, TextField
 from playhouse import migrate
 
-from .models import init_db
+from . import items
+from .models import init_db, User, ItemSlot
 
 
 def add_setting_ansi_enabled(migrator):
@@ -18,6 +19,13 @@ def alter_user_id_type(migrator):
             "user", "user_id", TextField(unique=True, index=True)
         )
     )
+
+
+def add_item_paperclip(migrator):
+    for user in User.select():
+        ItemSlot.get_or_create(
+            user=user, item_id=items.paperclip.item_id, defaults={"quantity": 1}
+        )
 
 
 MIGRATIONS = locals()

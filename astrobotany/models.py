@@ -1,7 +1,7 @@
 import math
 import random
 from datetime import date, datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Type
 
 from faker import Faker
 from peewee import (
@@ -15,7 +15,9 @@ from peewee import (
 )
 
 from . import constants
+from . import items
 from .art import colorize, render_art
+
 
 fake = Faker()
 
@@ -24,10 +26,9 @@ def init_db(filename: str = ":memory:") -> SqliteDatabase:
     """
     Bind an SQLite database to the Peewee ORM models.
     """
-    models = [User, Message, Plant]
     db = SqliteDatabase(filename)
-    db.bind(models)
-    db.create_tables(models)
+    db.bind(BaseModel.model_registry)
+    db.create_tables(BaseModel.model_registry)
     return db
 
 
@@ -47,7 +48,17 @@ def _default_rarity() -> int:
         return 4
 
 
-class User(Model):
+class BaseModel(Model):
+    model_registry: List[Type["BaseModel"]] = []
+
+    @classmethod
+    def validate_model(cls):
+        if cls.__name__ != "BaseModel":
+            cls.model_registry.append(cls)
+        return super().validate_model()
+
+
+class User(BaseModel):
     """
     A user account corresponding to a TLS client certificate.
     """
@@ -72,8 +83,27 @@ class User(Model):
 
         return self._plant
 
+    def add_item(self, item: items.Item, quantity: int = 1) -> "ItemSlot":
+        """
+        Add an item to the user's inventory.
+        """
+        item_slot, _ = ItemSlot.get_or_create(user=self, item_id=item.item_id)
+        item_slot.quantity += quantity
+        item_slot.save()
+        return item_slot
 
-class Message(Model):
+    @classmethod
+    def initialize(cls, user_id: str, username: str) -> "User":
+        """
+        Register a new player.
+        """
+        user = cls(user_id=user_id, username=username)
+        user.save()
+        user.add_item(items.paperclip)
+        return user
+
+
+class Message(BaseModel):
     """
     A public message posted to the community message board.
     """
@@ -87,7 +117,21 @@ class Message(Model):
         return cls.select().order_by(cls.created_at.desc())
 
 
-class Plant(Model):
+class ItemSlot(BaseModel):
+    """
+    Mapping table between users and the items that they possess.
+    """
+
+    user = ForeignKeyField(User, backref="inventory")
+    item_id = IntegerField()
+    quantity = IntegerField(default=0)
+
+    @property
+    def item(self):
+        return items.registry[self.item_id]
+
+
+class Plant(BaseModel):
     """
     A plant, i.e. the whole purpose of this application.
     """

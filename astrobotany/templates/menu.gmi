@@ -8,6 +8,7 @@
 
 =>/app/plant 👩‍🌾 Visit your plant
 =>/app/visit 📒 Community garden
+=>/app/inventory 🎒 Inventory
 =>/app/message-board 📌 Message board
 =>/app/settings 🐌 Settings
 =>/ 🏡 Home

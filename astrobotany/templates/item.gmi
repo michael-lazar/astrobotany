@@ -1,0 +1,7 @@
+# Astrobotany - View Item
+
+## {{ item.name }}
+
+{{ item.description }}
+
+=>/app/inventory 🚶 Go back
