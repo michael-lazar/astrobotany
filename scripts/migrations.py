@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 import argparse
 
 from peewee import BooleanField, TextField
 from playhouse import migrate
 
-from . import items
-from .models import init_db, User, ItemSlot
+from astrobotany import items
+from astrobotany.models import init_db, User, ItemSlot
 
 
 def add_setting_ansi_enabled(migrator):
@@ -25,6 +26,13 @@ def add_item_paperclip(migrator):
     for user in User.select():
         ItemSlot.get_or_create(
             user=user, item_id=items.paperclip.item_id, defaults={"quantity": 1}
+        )
+
+
+def add_item_fertilizer(migrator):
+    for user in User.select():
+        ItemSlot.get_or_create(
+            user=user, item_id=items.fertilizer.item_id, defaults={"quantity": 5}
         )
 
 
