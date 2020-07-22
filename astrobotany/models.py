@@ -113,6 +113,16 @@ class User(BaseModel):
         item_slot.save()
         return True
 
+    def get_item_quantity(self, item: items.Item) -> int:
+        """
+        Return the number of items in the user's inventory.
+        """
+        item_slot = ItemSlot.get_or_none(user=self, item_id=item.item_id)
+        if item_slot:
+            return item_slot.quantity
+
+        return 0
+
     @classmethod
     def initialize(cls, user_id: str, username: str) -> "User":
         """
@@ -287,7 +297,7 @@ class Plant(BaseModel):
             return "N/A"
 
         percent = self.fertilizer_percent
-        bar = ("█" * (percent // 10)).ljust(10)
+        bar = ("▞" * (percent // 10)).ljust(10)
         if ansi_enabled:
             # Make the fertilizer purple
             bar = colorize(bar, fg=40)
@@ -385,6 +395,19 @@ class Plant(BaseModel):
         max_time = min((self.watered_at + timedelta(days=1), self.updated_at))
         ticks = max((0, (max_time - min_time).total_seconds()))
 
+        # Add a multiplier for fertilizer, up to 3 days after the last time
+        # that the plant was fertilized
+        min_time = max((self.fertilized_at, last_updated, self.watered_at))
+        max_time = min(
+            (
+                self.fertilized_at + timedelta(days=3),
+                self.watered_at + timedelta(days=1),
+                self.updated_at,
+            )
+        )
+        bonus_ticks = max((0, (max_time - min_time).total_seconds()))
+        ticks += bonus_ticks * 0.5
+
         ticks *= self.growth_rate
         ticks = int(ticks)
         self.score += ticks
@@ -441,14 +464,19 @@ class Plant(BaseModel):
         Returns: A string with a description of the resulting action.
         """
         if self.dead:
-            return "There's no point in fertilizing a dead plant."
+            return "It's time to let go."
         elif self.fertilizer_percent:
-            return "The plant has already been fertilized"
+            return "The soil is already rich with nutrients."
 
         if not self.user.remove_item(items.fertilizer):
-            return "You don't have any fertilizer to use"
+            return "You don't have any fertilizer to apply."
+
         self.fertilized_at = datetime.now()
-        return f"You apply a bottle of EZ-Grow Fertilizer to your plant."
+        return (
+            "You apply a bottle of EZ-Grow Fertilizer to your plant. "
+            "The aroma reminds you of a barn that you visited in your "
+            "childhood."
+        )
 
     def harvest(self) -> "Plant":
         """

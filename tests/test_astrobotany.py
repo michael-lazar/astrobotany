@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from astrobotany import init_db
+from astrobotany import init_db, items
 from astrobotany.art import ArtFile
 from astrobotany.constants import COLORS, SPECIES, STAGES
-from astrobotany.models import Plant, User
+from astrobotany.models import Plant, User, ItemSlot
 from freezegun import freeze_time
 
 
@@ -100,6 +100,17 @@ def test_plant_get_water_gauge(now):
     assert plant.get_water_gauge() == "|          | 0%"
 
 
+def test_plant_get_fertilizer_gauge(now):
+    plant = plant_factory(fertilized_at=now)
+    assert plant.get_fertilizer_gauge() == "|▞▞▞▞▞▞▞▞▞▞| 100%"
+
+    plant = plant_factory(fertilized_at=now - timedelta(hours=36))
+    assert plant.get_fertilizer_gauge() == "|▞▞▞▞▞     | 50%"
+
+    plant = plant_factory(fertilized_at=now - timedelta(hours=72))
+    assert plant.get_fertilizer_gauge() == "|          | 0%"
+
+
 def test_plant_get_observation():
     plant = plant_factory(score=60 * 60 * 23)
     assert "You notice your plant looks different." in plant.get_observation()
@@ -110,6 +121,36 @@ def test_plant_water(now):
     assert plant.water_supply_percent == 0
     plant.water()
     assert plant.water_supply_percent == 100
+
+
+def test_plant_fertilize(now):
+    plant = plant_factory()
+
+    plant.user.add_item(items.fertilizer)
+    assert plant.fertilizer_percent == 0
+
+    plant.fertilize()
+    assert plant.fertilizer_percent == 100
+
+
+def test_plant_fertilize_not_empty(now):
+    plant = plant_factory()
+    plant.user.add_item(items.fertilizer)
+
+    plant.fertilized_at = datetime.now() - timedelta(days=2)
+    assert plant.fertilizer_percent == 34
+
+    # This attempt should fail and not use the item
+    plant.fertilize()
+    assert plant.fertilizer_percent == 34
+
+
+def test_plant_no_fertilizer(now):
+    plant = plant_factory()
+    assert plant.fertilizer_percent == 0
+
+    plant.fertilize()
+    assert plant.fertilizer_percent == 0
 
 
 def test_plant_water_rate_limit(frozen_time, now):
@@ -170,6 +211,17 @@ def test_plant_refresh_12h(now):
     assert plant.score == 12 * 3600
 
 
+def test_plant_refresh_12h_fertilizer(now):
+    plant = plant_factory(
+        watered_at=now - timedelta(hours=12),
+        updated_at=now - timedelta(hours=12),
+        fertilized_at=now - timedelta(hours=6),
+    )
+    plant.refresh()
+    assert plant.updated_at == datetime.now()
+    assert plant.score == 12 * 3600 + 0.5 * 6 * 3600
+
+
 def test_plant_refresh_generation_2_12h(now):
     plant = plant_factory(
         watered_at=now - timedelta(hours=12),
@@ -190,6 +242,17 @@ def test_plant_refresh_18h(now):
     assert plant.score == 12 * 3600
 
 
+def test_plant_refresh_18h_fertilizer(now):
+    plant = plant_factory(
+        watered_at=now - timedelta(hours=18),
+        fertilized_at=now - timedelta(hours=18),
+        updated_at=now - timedelta(hours=12),
+    )
+    plant.refresh()
+    assert plant.updated_at == datetime.now()
+    assert plant.score == 12 * 3600 * 1.5
+
+
 def test_plant_refresh_36h(now):
     plant = plant_factory(
         watered_at=now - timedelta(hours=36), updated_at=now - timedelta(hours=24)
@@ -197,6 +260,39 @@ def test_plant_refresh_36h(now):
     plant.refresh()
     assert plant.updated_at == datetime.now()
     assert plant.score == 12 * 3600
+
+
+def test_plant_refresh_36h_fertilizer(now):
+    plant = plant_factory(
+        watered_at=now - timedelta(hours=36),
+        updated_at=now - timedelta(hours=24),
+        fertilized_at=now - timedelta(hours=30),
+    )
+    plant.refresh()
+    assert plant.updated_at == datetime.now()
+    assert plant.score == 1.5 * 12 * 3600
+
+
+def test_plant_refresh_36h_fertilizer_2(now):
+    plant = plant_factory(
+        watered_at=now - timedelta(hours=12),
+        updated_at=now - timedelta(hours=36),
+        fertilized_at=now - timedelta(hours=24),
+    )
+    plant.refresh()
+    assert plant.updated_at == datetime.now()
+    assert plant.score == 1.5 * 12 * 3600
+
+
+def test_plant_refresh_36h_fertilizer_3(now):
+    plant = plant_factory(
+        watered_at=now - timedelta(hours=12),
+        updated_at=now - timedelta(hours=36),
+        fertilized_at=now - timedelta(hours=24),
+    )
+    plant.refresh()
+    assert plant.updated_at == datetime.now()
+    assert plant.score == 1.5 * 12 * 3600
 
 
 def test_plant_refresh_evolve(now):
