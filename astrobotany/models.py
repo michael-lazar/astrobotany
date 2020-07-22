@@ -466,7 +466,7 @@ class Plant(BaseModel):
         if self.dead:
             return "It's time to let go."
         elif self.fertilizer_percent:
-            return "The soil is already rich with nutrients."
+            return "The soil is still rich with nutrients."
 
         if not self.user.remove_item(items.fertilizer):
             return "You don't have any fertilizer to apply."

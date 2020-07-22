@@ -33,10 +33,8 @@ fertilizer = Item(
     price=0,
     name="EZ-Grow Fertilizer",
     description="""
-    A single-use bottle of plant fertilizer.
+    A bottle of plant fertilizer.
     
-    When applied, will increase plant growth rate by 1.5x for a period of 3 days.
-    
-    > Way To Go, Ez-Grow™!
+    When applied, will increase plant growth rate by 1.5x for 3 days.    
     """,
 )
