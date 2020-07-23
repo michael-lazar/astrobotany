@@ -245,6 +245,16 @@ def inspect(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
+@app.route("/app/plant/petal")
+@authenticate
+def petal(request):
+    if request.plant.dead or request.plant.stage_str != "flowering":
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    request.session["alert"] = request.plant.pick_petal()
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
 @app.route("/app/plant/harvest")
 @app.route("/app/plant/harvest/confirm")
 @authenticate
@@ -320,6 +330,25 @@ def visit_plant_water(request, user_id):
 
     user.plant.refresh()
     request.session["alert"] = user.plant.water(request.user)
+    user.plant.save()
+
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")
+
+
+@app.route(f"/app/visit/(?P<user_id>{UUID_RE})/petal")
+@authenticate
+def visit_plant_petal(request, user_id):
+    user = User.get_or_none(user_id=user_id)
+    if user is None:
+        return Response(Status.NOT_FOUND, "User not found")
+    elif request.user == user:
+        return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+    if user.plant.dead or user.plant.stage_str != "flowering":
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    user.plant.refresh()
+    request.session["alert"] = user.plant.pick_petal(request.user)
     user.plant.save()
 
     return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")

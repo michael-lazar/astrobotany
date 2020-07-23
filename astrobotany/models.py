@@ -163,6 +163,19 @@ class ItemSlot(BaseModel):
         return items.registry[self.item_id]
 
 
+class Event(BaseModel):
+    """
+    Table for tracking generic events for users.
+    """
+
+    PICK_PETAL = "pick_petal"
+
+    user = ForeignKeyField(User, backref="events")
+    created_at = DateTimeField(default=datetime.now)
+    event_type = TextField(index=True)
+    target = TextField(index=True)
+
+
 class Plant(BaseModel):
     """
     A plant, i.e. the whole purpose of this application.
@@ -456,6 +469,49 @@ class Plant(BaseModel):
         info = f"You water {self.user.username}'s plant for them."
 
         return info
+
+    def pick_petal(self, user: User = None) -> str:
+        """
+        Pick a petal from a flowering plant.
+
+        Args:
+            user: The user picking the petal, if not the plant's owner.
+
+        Returns: A string with a description of the resulting action.
+        """
+        if self.dead:
+            return "You shouldn't be here!"
+        elif self.stage_str != "flowering":
+            return "You shouldn't be here!"
+
+        if user is None:
+            user = self.user
+
+        target = f"plant_{self.id}"
+
+        last_event = Event.select().where(
+            Event.user == user,
+            Event.created_at >= datetime.now() - timedelta(days=1),
+            Event.event_type == Event.PICK_PETAL,
+            Event.target == target,
+        )
+        if last_event.exists():
+            return "The ground around this plant is bare, come back tomorrow!"
+
+        Event.create(user=user, event_type=Event.PICK_PETAL, target=target)
+
+        if self.color_str == "rainbow":
+            petal_color = random.choice(constants.COLORS_PLAIN)
+        else:
+            petal_color = self.color_str
+
+        user.add_item(items.petals[petal_color])
+
+        lines = (
+            f"You find a {petal_color} petal lying on the ground nearby.",
+            "You pick it up and stick it in your backpack.",
+        )
+        return "\n".join(lines)
 
     def fertilize(self) -> str:
         """

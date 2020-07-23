@@ -1,23 +1,26 @@
 from textwrap import dedent
+from typing import Dict
 
 
-registry = {}
+from . import constants
 
 
 class Item:
-    def __init__(self, item_id: int, price: int, name: str, description: str):
-        self.item_id = item_id
+    def __init__(self, price: int, name: str, description: str):
+        self.item_id = len(registry) + 1
         self.price = price
         self.name = name
         self.description = dedent(description).strip()
 
-        registry[item_id] = self
+        registry[self.item_id] = self
+
+
+registry: Dict[int, Item] = {}
 
 
 paperclip = Item(
-    item_id=1,
     price=0,
-    name="Paper clip",
+    name="paper clip",
     description=r"""
     A length of wire bent into flat loops that is used to hold papers together.
     
@@ -29,12 +32,29 @@ paperclip = Item(
 
 
 fertilizer = Item(
-    item_id=2,
     price=0,
-    name="EZ-Grow Fertilizer",
+    name="EZ-Grow fertilizer",
     description="""
     A bottle of plant fertilizer.
     
     When applied, will increase plant growth rate by 1.5x for 3 days.    
     """,
 )
+
+
+petals: Dict[str, Item] = {}
+for color in constants.COLORS_PLAIN:
+    if color in ["orange", "indigo"]:
+        description = f"an {color}"
+    else:
+        description = f"a {color}"
+
+    petals[color] = Item(
+        price=0,
+        name=f"{color} petal",
+        description=f"""
+        A single flower petal from {description} plant.
+
+        Graceful, delicate, and reserved.
+        """,
+    )

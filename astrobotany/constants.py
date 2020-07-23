@@ -104,6 +104,8 @@ COLORS = [
     "rainbow",
 ]
 
+COLORS_PLAIN = COLORS[:-1]
+
 SPECIES = [
     "poppy",
     "cactus",
