@@ -3,13 +3,14 @@ Can't sleep, must write unit tests...
 """
 import os
 from datetime import datetime, timedelta
+import itertools
 
 import pytest
 
 from astrobotany import init_db, items
 from astrobotany.art import ArtFile
-from astrobotany.constants import COLORS, SPECIES, STAGES
-from astrobotany.models import Plant, User, ItemSlot
+from astrobotany.constants import COLORS, COLOR_MAP, SPECIES, STAGES
+from astrobotany.models import Plant, User
 from freezegun import freeze_time
 
 
@@ -29,9 +30,17 @@ def now(frozen_time):
     return datetime.now()
 
 
+user_generator = itertools.count()
+
+
+def user_factory(**kwargs):
+    user_id = str(next(user_generator))
+    return User.create(user_id=user_id, username="username" + user_id)
+
+
 def plant_factory(user=None, **kwargs):
     if user is None:
-        user, _ = User.get_or_create(user_id="123AF", username="mozz")
+        user = user_factory()
     return Plant.create(user=user, **kwargs)
 
 
@@ -157,9 +166,9 @@ def test_plant_water_rate_limit(frozen_time, now):
     """
     A user can only water one neighbor's plan every 8 hours.
     """
-    user1 = User.create(user_id="11111", username="mozz1")
-    user2 = User.create(user_id="22222", username="mozz2")
-    user3 = User.create(user_id="33333", username="mozz3")
+    user1 = user_factory()
+    user2 = user_factory()
+    user3 = user_factory()
 
     plant1 = plant_factory(user=user1, watered_at=now - timedelta(hours=24))
     plant2 = plant_factory(user=user2, watered_at=now - timedelta(hours=24))
@@ -303,3 +312,47 @@ def test_plant_refresh_evolve(now):
     )
     plant.refresh()
     assert plant.stage == 1
+
+
+def test_plant_pick_petal_dead():
+    plant = plant_factory(stage=4, dead=True, color=COLOR_MAP["red"])
+    plant.pick_petal()
+    assert plant.user.get_item_quantity(items.petals["red"]) == 0
+
+
+def test_plant_pick_petal_invalid_stage():
+    plant = plant_factory(stage=3, color=COLOR_MAP["red"])
+    plant.pick_petal()
+    assert plant.user.get_item_quantity(items.petals["red"]) == 0
+
+
+def test_plant_pick_petal():
+    plant = plant_factory(stage=4, color=COLOR_MAP["red"])
+    plant.pick_petal()
+    assert plant.user.get_item_quantity(items.petals["red"]) == 1
+
+
+def test_plant_pick_petal_twice():
+    plant = plant_factory(stage=4, color=COLOR_MAP["red"])
+    plant.pick_petal()
+    plant.pick_petal()
+    assert plant.user.get_item_quantity(items.petals["red"]) == 1
+
+
+def test_plant_pick_petal_guest():
+    plant = plant_factory(stage=4, color=COLOR_MAP["red"])
+    user = user_factory()
+    plant.pick_petal(user=user)
+
+    assert user.get_item_quantity(items.petals["red"]) == 1
+    assert plant.user.get_item_quantity(items.petals["red"]) == 0
+
+
+def test_pick_petal_cooldown(frozen_time):
+    plant = plant_factory(stage=4, color=COLOR_MAP["red"])
+    plant.pick_petal()
+    assert plant.user.get_item_quantity(items.petals["red"]) == 1
+
+    frozen_time.tick(delta=timedelta(hours=24))
+    plant.pick_petal()
+    assert plant.user.get_item_quantity(items.petals["red"]) == 2

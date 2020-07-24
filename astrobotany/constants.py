@@ -104,6 +104,8 @@ COLORS = [
     "rainbow",
 ]
 
+COLOR_MAP = {name: i for i, name in enumerate(COLORS)}
+
 COLORS_PLAIN = COLORS[:-1]
 
 SPECIES = [
