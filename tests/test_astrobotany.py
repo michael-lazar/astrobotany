@@ -353,6 +353,6 @@ def test_pick_petal_cooldown(frozen_time):
     plant.pick_petal()
     assert plant.user.get_item_quantity(items.petals["red"]) == 1
 
-    frozen_time.tick(delta=timedelta(hours=24))
+    frozen_time.tick(delta=timedelta(hours=25))
     plant.pick_petal()
     assert plant.user.get_item_quantity(items.petals["red"]) == 2
