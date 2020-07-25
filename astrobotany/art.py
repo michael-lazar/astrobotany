@@ -120,7 +120,7 @@ class ArtFile:
                 bg = tile["bg"] if tile["bg"] != cls.DEFAULT_BG else None
                 fg = tile["fg"] if tile["fg"] != cls.DEFAULT_FG else None
                 if char == cls.FILL_CHAR:
-                    # Ingore the foreground color if we don't have any foreground character
+                    # Ignore the foreground color if we don't have any foreground character
                     fg = None
                 line.append(Tile(char, bg, fg))
             data.append(line)
