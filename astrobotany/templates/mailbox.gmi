@@ -1,6 +1,21 @@
-# Astrobotany - Inbox
+# Astrobotany - Mailbox
 
-## Mailbox
+```
+            _
+           |E]
+         .-|=====-.
+         | | mail |
+      ___|________|
+             ||
+             ||
+             ||   www
+      ,;,    ||   )_(,;;;,
+      <_>  \ ||   \|/ \_/
+      \|/  \\||  \\|   |//
+ _jgs_\|//_\\|///_\V/_\|//__
+```
+
+## Messages
 
 {% for msg in messages %}
 =>/app/mailbox/{{ msg.id }} [{{ msg.date_str }}] {% if not msg.is_seen %}(unread) {% endif %}from {{ msg.user_from.username }}
@@ -10,4 +25,7 @@
 Your mailbox is empty!
 
 {% endfor %}
+
+
+
 =>/app 🚶 Go back
