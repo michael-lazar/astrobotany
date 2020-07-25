@@ -102,7 +102,7 @@ app = JetforceApplication()
 
 @app.route("", strict_trailing_slash=False)
 def index(request):
-    title_art = render_art("title.psci", None, False)
+    title_art = render_art("title.psci")
     leaderboard = get_daily_leaderboard().render(False)
     body = render_template("index.gmi", title_art=title_art, leaderboard=leaderboard)
     return Response(Status.SUCCESS, "text/gemini", body)
@@ -123,7 +123,7 @@ def register(request):
 @app.route("/app")
 @authenticate
 def menu(request):
-    title_art = render_art("title.psci", None, request.user.ansi_enabled)
+    title_art = render_art("title.psci", ansi_enabled=request.user.ansi_enabled)
     mailbox_count = request.user.inbox.where(Inbox.is_seen == False).count()
     body = render_template("menu.gmi", title_art=title_art, mailbox_count=mailbox_count)
     return Response(Status.SUCCESS, "text/gemini", body)
@@ -134,7 +134,7 @@ def menu(request):
 def epilog(request, page):
     page = int(page)
     if page in (1, 2, 3, 4):
-        art = render_art(f"epilog{page}.psci", None, request.user.ansi_enabled)
+        art = render_art(f"epilog{page}.psci", ansi_enabled=request.user.ansi_enabled)
     else:
         art = None
     body = render_template("epilog.gmi", page=page, art=art)
@@ -211,7 +211,10 @@ def settings_update(request, field):
 @authenticate
 def mailbox(request):
     messages = request.user.inbox.order_by(Inbox.id.desc())
-    body = render_template("mailbox.gmi", request=request, messages=messages)
+    mailbox_art = render_art("mailbox.psci", ansi_enabled=request.user.ansi_enabled)
+    body = render_template(
+        "mailbox.gmi", request=request, messages=messages, mailbox_art=mailbox_art
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -225,7 +228,7 @@ def mailbox_view(request, message_id):
     message.is_seen = True
     message.save()
 
-    body = render_template("mailbox_view.gmi", request=request, message=message)
+    body = render_template("mailbox_view.gmi", request=request, message=message,)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 

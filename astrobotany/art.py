@@ -208,5 +208,7 @@ class ArtFile:
 
 
 @functools.lru_cache(maxsize=1000)
-def render_art(filename: str, flower_color: Optional[str], ansi_enabled: bool) -> str:
+def render_art(
+    filename: str, flower_color: Optional[str] = None, ansi_enabled: bool = False
+) -> str:
     return ArtFile(filename, flower_color).render(ansi_enabled)
