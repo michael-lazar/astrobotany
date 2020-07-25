@@ -147,7 +147,7 @@ class User(BaseModel):
             user_from=User.admin(),
             user_to=self,
             subject=constants.WELCOME_SUBJECT,
-            body=constants.WELCOME_MESSAGE.format(number=self.id),
+            body=constants.WELCOME_MESSAGE.format(name=self.username, number=self.id),
         )
 
 
@@ -170,9 +170,9 @@ class ItemSlot(BaseModel):
     Mapping table between users and the items that they possess.
     """
 
-    user = ForeignKeyField(User, backref="inventory")
-    item_id = IntegerField()
-    quantity = IntegerField(default=0)
+    user: User = ForeignKeyField(User, backref="inventory")
+    item_id: int = IntegerField()
+    quantity: int = IntegerField(default=0)
 
     @property
     def item(self):
@@ -201,7 +201,7 @@ class Inbox(BaseModel):
 
     user_from = ForeignKeyField(User, backref="outbox")
     user_to = ForeignKeyField(User, backref="inbox")
-    created_at = DateTimeField(default=datetime.now)
+    created_at: datetime = DateTimeField(default=datetime.now)
     subject = TextField()
     body = TextField()
     is_seen = BooleanField(default=False)
@@ -548,7 +548,7 @@ class Plant(BaseModel):
         user.add_item(items.petals[petal_color])
 
         lines = (
-            f"You find a {petal_color} petal lying on the ground nearby.",
+            f"You spot a {petal_color} petal lying on the ground nearby.",
             "You pick it up and stick it in your backpack.",
         )
         return "\n".join(lines)

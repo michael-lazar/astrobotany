@@ -3,7 +3,7 @@
 ## Mailbox
 
 {% for msg in messages %}
-=>/app/mailbox/{{ msg.id }} [{{ msg.date_str }}] {% if not msg.is_seen %}(new) {% endif %}{{ msg.user_from.username }}
+=>/app/mailbox/{{ msg.id }} [{{ msg.date_str }}] {% if not msg.is_seen %}(unread) {% endif %}from {{ msg.user_from.username }}
 > {{ msg.subject }}
 
 {% else %}

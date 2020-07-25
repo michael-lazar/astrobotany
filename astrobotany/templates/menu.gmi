@@ -11,7 +11,7 @@
 =>/app/inventory 🎒 Inventory
 =>/app/message-board 📌 Message board
 {% if mailbox_count %}
-=>/app/mailbox 📬 Mailbox ({{ mailbox_count }} new messages)
+=>/app/mailbox 📬 Mailbox ({{ mailbox_count }} unread)
 {% else %}
 =>/app/mailbox 📪 Mailbox
 {% endif %}
