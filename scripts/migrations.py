@@ -44,6 +44,11 @@ def add_plant_fertilized_at(migrator):
     )
 
 
+def send_welcome_message(migrator):
+    for user in User.select():
+        user.send_welcome_message()
+
+
 MIGRATIONS = locals()
 
 

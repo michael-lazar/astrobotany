@@ -1,0 +1,18 @@
+# Astrobotany - Inbox
+
+## Viewing Message
+
+---
+
+From: {{ message.user_from.username }} [{{message.user_from.user_id}}]
+Date: {{ message.datetime_str }}
+Subject: {{ message.subject }}
+Body:
+
+{{ message.body }}
+
+---
+
+=>/app/mailbox 🚶 Go back
+
+

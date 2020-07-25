@@ -10,5 +10,10 @@
 =>/app/visit 📒 Community garden
 =>/app/inventory 🎒 Inventory
 =>/app/message-board 📌 Message board
+{% if mailbox_count %}
+=>/app/mailbox 📬 Mailbox ({{ mailbox_count }} new messages)
+{% else %}
+=>/app/mailbox 📪 Mailbox
+{% endif %}
 =>/app/settings 🐌 Settings
 =>/ 🏡 Home

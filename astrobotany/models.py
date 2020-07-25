@@ -68,6 +68,22 @@ class User(BaseModel):
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)
 
+    @classmethod
+    def admin(cls):
+        user, _ = cls.get_or_create(user_id="-1", username="admin")
+        return user
+
+    @classmethod
+    def initialize(cls, user_id: str, username: str) -> "User":
+        """
+        Register a new player.
+        """
+        user = cls(user_id=user_id, username=username)
+        user.save()
+        user.add_item(items.paperclip)
+        user.add_item(items.fertilizer, quantity=5)
+        return user
+
     @property
     def plant(self) -> "Plant":
         """
@@ -123,16 +139,16 @@ class User(BaseModel):
 
         return 0
 
-    @classmethod
-    def initialize(cls, user_id: str, username: str) -> "User":
+    def send_welcome_message(self):
         """
-        Register a new player.
+        Send an initial welcome message to the user.
         """
-        user = cls(user_id=user_id, username=username)
-        user.save()
-        user.add_item(items.paperclip)
-        user.add_item(items.fertilizer, quantity=5)
-        return user
+        Inbox.create(
+            user_from=User.admin(),
+            user_to=self,
+            subject=constants.WELCOME_SUBJECT,
+            body=constants.WELCOME_MESSAGE.format(number=self.id),
+        )
 
 
 class Message(BaseModel):
@@ -174,6 +190,30 @@ class Event(BaseModel):
     created_at = DateTimeField(default=datetime.now)
     event_type = TextField(index=True)
     target = TextField(index=True)
+
+
+class Inbox(BaseModel):
+    r"""
+    A private message sent between users.
+
+    This should probably be merged with the message table. ¯\_(ツ)_/¯
+    """
+
+    user_from = ForeignKeyField(User, backref="outbox")
+    user_to = ForeignKeyField(User, backref="inbox")
+    created_at = DateTimeField(default=datetime.now)
+    subject = TextField()
+    body = TextField()
+    is_seen = BooleanField(default=False)
+    parent = ForeignKeyField("self", null=True, backref="children")
+
+    @property
+    def date_str(self) -> str:
+        return self.created_at.strftime("%Y-%M-%d")
+
+    @property
+    def datetime_str(self) -> str:
+        return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")
 
 
 class Plant(BaseModel):

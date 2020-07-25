@@ -9,7 +9,7 @@ from jetforce import Request, Response, Status, JetforceApplication
 
 from . import items
 from .art import render_art
-from .models import Message, Plant, User
+from .models import Message, Plant, User, Inbox
 from .leaderboard import get_daily_leaderboard
 
 
@@ -124,7 +124,8 @@ def register(request):
 @authenticate
 def menu(request):
     title_art = render_art("title.psci", None, request.user.ansi_enabled)
-    body = render_template("menu.gmi", title_art=title_art)
+    mailbox_count = request.user.inbox.where(Inbox.is_seen == False).count()
+    body = render_template("menu.gmi", title_art=title_art, mailbox_count=mailbox_count)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -204,6 +205,28 @@ def settings_update(request, field):
     request.user.save()
 
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
+
+
+@app.route("/app/mailbox")
+@authenticate
+def mailbox(request):
+    messages = request.user.inbox.order_by(Inbox.id.desc())
+    body = render_template("mailbox.gmi", request=request, messages=messages)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/mailbox/(?P<message_id>[0-9]+)")
+@authenticate
+def mailbox_view(request, message_id):
+    message = Inbox.get_or_none(id=message_id, user_to=request.user)
+    if message is None:
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    message.is_seen = True
+    message.save()
+
+    body = render_template("mailbox_view.gmi", request=request, message=message)
+    return Response(Status.SUCCESS, "text/gemini", body)
 
 
 @app.route("/app/plant")
