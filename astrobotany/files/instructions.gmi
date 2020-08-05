@@ -37,11 +37,11 @@ Once your plant reaches the seed-bearing stage, you will be given the option to 
 score_multiplier = 1 + (0.2 * generation)
 ```
 
-## Registration
+## Registration (deprecated)
 
 The old astrobotany registration guide used CSR's to generate authorised client certificates. This method is no longer recommended, but it still works and is linked here for historical reference.
 
-=>/files/register.gmi
+=>/files/register_old.gmi
 
 ----------
 

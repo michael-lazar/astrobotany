@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 import pathlib
 import mimetypes
+from textwrap import dedent
 
 import jinja2
 from jetforce import Request, Response, Status, JetforceApplication
@@ -54,49 +55,42 @@ def authenticate(func: typing.Callable) -> typing.Callable:
     """
 
     def callback(request: Request, **kwargs):
-        request.user = None
-        request.plant = None
-        if "REMOTE_USER" in request.environ:
-            if not request.environ["REMOTE_USER"]:
-                msg = "The certificate must define a CN (Common Name) attribute."
-                return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
 
-            if request.environ["TLS_CLIENT_AUTHORISED"]:
-                # Old-style verified certificate
-                user_id = request.environ["TLS_CLIENT_SERIAL_NUMBER"]
-                user_id = f"{user_id:032X}"  # Convert to hex
-            else:
-                # New-style self signed certificate
-                user_id = request.environ["TLS_CLIENT_HASH"]
-
-            user = User.get_or_none(user_id=user_id)
-            if user is None:
-                user = User.initialize(user_id, request.environ["REMOTE_USER"])
-
-            request.user = user
-            request.plant = request.user.plant
-            request.session = load_session(request.user.user_id)
-
-        if request.user is None:
+        if "REMOTE_USER" not in request.environ:
             if request.path != "/app":
                 # Redirect the user to the correct "path scope" first
                 return Response(Status.REDIRECT_TEMPORARY, "/app")
             else:
-                msg = (
-                    "This application uses TOFU client certificates for "
-                    "authentication. In order to login, generate your own "
-                    "self-signed certificate (the CN attribute will be your "
-                    "username)."
-                )
+                msg = "Attach your client certificate to continue."
                 return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
-        if request.plant:
-            request.plant.refresh()
-            response = func(request, **kwargs)
-            request.plant.save()
+        if request.environ["TLS_CLIENT_AUTHORISED"]:
+            # Old-style verified certificate
+            serial_number = request.environ["TLS_CLIENT_SERIAL_NUMBER"]
+            user_id = f"{serial_number:032X}"  # Convert to hex
         else:
-            response = func(request, **kwargs)
+            # New-style self signed certificate
+            user_id = request.environ["TLS_CLIENT_HASH"]
 
+        user = User.get_or_none(user_id=user_id)
+        if user is None:
+            body = dedent(
+                """\
+                The supplied certificate was not recognized as an existing user.
+                
+                Click here to register a new user account:
+                =>/register
+                """
+            )
+            return Response(Status.SUCCESS, "text/gemini", body)
+
+        request.user = user
+        request.plant = request.user.plant
+        request.session = load_session(request.user.user_id)
+
+        request.plant.refresh()
+        response = func(request, **kwargs)
+        request.plant.save()
         return response
 
     return callback
@@ -110,6 +104,49 @@ def index(request):
     title_art = render_art("title.psci")
     leaderboard = get_daily_leaderboard().render(False)
     body = render_template("index.gmi", title_art=title_art, leaderboard=leaderboard)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/register")
+def register(request):
+    body = render_template("register.gmi")
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/register/submit")
+def register_submit(request):
+    if "REMOTE_USER" not in request.environ:
+        msg = "Attach your client certificate to continue."
+        return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
+
+    user_id = request.environ["TLS_CLIENT_HASH"]
+    username = request.environ["REMOTE_USER"]
+
+    if User.select().where(User.user_id == user_id).exists():
+        msg = "This certificate has already been linked to an account."
+        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    elif not username:
+        msg = "The certificate must define a CN (Common Name) attribute."
+        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    elif User.select().where(User.username == username).exists():
+        msg = f"Sorry, the username '{username}' is already taken."
+        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    User.initialize(user_id, username)
+
+    body = dedent(
+        f"""\
+        Your new account has been created! 🎉
+        
+        Date        : {datetime.now()} 
+        Fingerprint : {user_id}
+        Common Name : {username}
+    
+        =>/app login        
+        """
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -134,18 +171,6 @@ def files(request, path):
 
     body = filepath.read_bytes()
     return Response(Status.SUCCESS, mimetype, body)
-
-
-@app.route("/instructions")
-def instructions(request):
-    body = render_template("instructions.gmi")
-    return Response(Status.SUCCESS, "text/gemini", body)
-
-
-@app.route("/register")
-def register(request):
-    body = render_template("register.gmi")
-    return Response(Status.SUCCESS, "text/gemini", body)
 
 
 @app.route("/app")

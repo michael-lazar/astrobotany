@@ -1,0 +1,22 @@
+# Astrobotany - Registration
+
+Welcome!
+
+Astrobotany uses self-signed (TOFU) client certificates for authentication.
+
+Here are some known gemini clients with support for client certificates.
+
+=>https://tildegit.org/solderpunk/AV-98 AV-98 (TUI)
+=>gopher://thelambdalab.xyz/1/projects/elpher/ elpher (emacs)
+=>https://github.com/MasterQ32/kristall Kristall (GUI)
+=>https://github.com/pitr/gemini-ios Gemini for iOS
+
+In order to join in the fun, use your preferred gemini client to generate a new client certificate. All certificate fields can be left blank *except* for the subject CN (Common Name). This value will be your public username inside of astrobotany. Pick something unique and memorable!
+
+Access the following endpoint with your certificate to register your account:
+=>/register/submit
+
+Once your account has been created, you can go here to login:
+=>/app
+
+🚀
