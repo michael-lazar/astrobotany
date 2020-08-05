@@ -7,16 +7,11 @@
 > "Don't judge each day by the harvest you reap but by the seeds that you plant."
 >     ― Robert Louis Stevenson
 
-## Login
+## Links
 
-To get started, send a self-signed TLS certificate to the following endpoint:
-
-=>/app 🌱 Get to gardening!
-
-## Documents
-
-=>/instructions 🏫 Instructions
-=>/register 🐛 Registration Guide (old CSR method)
+=>/app 🌷 Login
+=>/register 🌱 Register
+=>/files/instructions.gmi 📚 Instructions
 
 ## Leaderboard
 
@@ -28,5 +23,8 @@ To get started, send a self-signed TLS certificate to the following endpoint:
 
 Astrobotany is a fork of the tilde.town pubnix game, botany.
 
-The source code for this gemini capsule can be found here:
+Botany by Jake Funke
+=>https://github.com/jifunks/botany
+
+Astrobotany by Michael Lazar
 =>https://github.com/michael-lazar/astrobotany

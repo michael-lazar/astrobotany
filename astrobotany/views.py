@@ -3,6 +3,8 @@ import os
 import typing
 from datetime import datetime, timedelta
 from functools import lru_cache
+import pathlib
+import mimetypes
 
 import jinja2
 from jetforce import Request, Response, Status, JetforceApplication
@@ -15,6 +17,7 @@ from .leaderboard import get_daily_leaderboard
 
 UUID_RE = "[A-Za-z0-9_=-]+"
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
+FILES_DIR = os.path.join(os.path.dirname(__file__), "files")
 
 template_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(TEMPLATE_DIR),
@@ -22,6 +25,8 @@ template_env = jinja2.Environment(
     trim_blocks=True,
     lstrip_blocks=True,
 )
+
+mimetypes.add_type("text/gemini", ".gmi")
 
 
 @lru_cache(2048)
@@ -106,6 +111,29 @@ def index(request):
     leaderboard = get_daily_leaderboard().render(False)
     body = render_template("index.gmi", title_art=title_art, leaderboard=leaderboard)
     return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/files/(?P<path>.*)")
+def files(request, path):
+    url_path = pathlib.Path(path.strip("/"))
+
+    filename = pathlib.Path(os.path.normpath(str(url_path)))
+    if filename.is_absolute() or str(filename).startswith(".."):
+        # Guard against breaking out of the directory
+        return Response(Status.NOT_FOUND, "Not Found")
+
+    filepath = FILES_DIR / filename
+    if not filepath.exists():
+        return Response(Status.NOT_FOUND, "Not Found")
+
+    mime, encoding = mimetypes.guess_type(filename)
+    if encoding:
+        mimetype = f"{mime}; charset={encoding}"
+    else:
+        mimetype = mime or "application/octet-stream"
+
+    body = filepath.read_bytes()
+    return Response(Status.SUCCESS, mimetype, body)
 
 
 @app.route("/instructions")
