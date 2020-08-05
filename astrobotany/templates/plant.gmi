@@ -20,7 +20,7 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 =>/app/plant 🌹 Look
 =>/app/plant/water 💧 Water
 {% if plant.stage == 4 %}
-=>/app/plant/petal 🌸 Petal
+=>/app/plant/search 🐜 Search
 {% endif %}
 =>/app/plant/inspect 🔬 Inspect
 =>/app/plant/fertilize 💩 Fertilize

@@ -271,9 +271,9 @@ def inspect(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/plant/petal")
+@app.route("/app/plant/search")
 @authenticate
-def petal(request):
+def search(request):
     if request.plant.dead or request.plant.stage_str != "flowering":
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
@@ -361,9 +361,9 @@ def visit_plant_water(request, user_id):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")
 
 
-@app.route(f"/app/visit/(?P<user_id>{UUID_RE})/petal")
+@app.route(f"/app/visit/(?P<user_id>{UUID_RE})/search")
 @authenticate
-def visit_plant_petal(request, user_id):
+def visit_plant_search(request, user_id):
     user = User.get_or_none(user_id=user_id)
     if user is None:
         return Response(Status.NOT_FOUND, "User not found")

@@ -15,6 +15,6 @@ This plant is wilting, it will die soon without water!
 
 =>/app/visit/{{ plant.user.user_id }}/water 💧 Water
 {% if plant.stage == 4 %}
-=>/app/visit/{{ plant.user.user_id }}/petal 🌸 Petal
+=>/app/visit/{{ plant.user.user_id }}/search 🐜 Search
 {% endif %}
 =>/app/visit 🚶 Go back
