@@ -163,7 +163,7 @@ def files(request, path):
     if not filepath.exists():
         return Response(Status.NOT_FOUND, "Not Found")
 
-    mime, encoding = mimetypes.guess_type(filename)
+    mime, encoding = mimetypes.guess_type(str(filename))
     if encoding:
         mimetype = f"{mime}; charset={encoding}"
     else:
