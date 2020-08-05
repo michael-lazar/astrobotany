@@ -82,6 +82,7 @@ class User(BaseModel):
         user.save()
         user.add_item(items.paperclip)
         user.add_item(items.fertilizer, quantity=5)
+        user.send_welcome_message()
         return user
 
     @property
