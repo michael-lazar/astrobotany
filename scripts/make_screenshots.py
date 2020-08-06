@@ -1,8 +1,7 @@
-import sys
 import subprocess
+import sys
 
 import astrobotany.constants
-
 
 for species in sorted(astrobotany.constants.SPECIES):
     cmd = (

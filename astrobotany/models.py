@@ -14,10 +14,8 @@ from peewee import (
     TextField,
 )
 
-from . import constants
-from . import items
+from . import constants, items
 from .art import colorize, render_art
-
 
 fake = Faker()
 

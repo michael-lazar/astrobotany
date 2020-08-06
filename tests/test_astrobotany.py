@@ -1,17 +1,17 @@
 """
 Can't sleep, must write unit tests...
 """
+import itertools
 import os
 from datetime import datetime, timedelta
-import itertools
 
 import pytest
+from freezegun import freeze_time
 
 from astrobotany import init_db, items
 from astrobotany.art import ArtFile
-from astrobotany.constants import COLORS, COLOR_MAP, SPECIES, STAGES
+from astrobotany.constants import COLOR_MAP, COLORS, SPECIES, STAGES
 from astrobotany.models import Plant, User
-from freezegun import freeze_time
 
 
 @pytest.fixture(autouse=True)

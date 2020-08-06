@@ -1,20 +1,19 @@
 import math
+import mimetypes
 import os
+import pathlib
 import typing
 from datetime import datetime, timedelta
 from functools import lru_cache
-import pathlib
-import mimetypes
 from textwrap import dedent
 
 import jinja2
-from jetforce import Request, Response, Status, JetforceApplication
+from jetforce import JetforceApplication, Request, Response, Status
 
 from . import items
 from .art import render_art
-from .models import Message, Plant, User, Inbox
 from .leaderboard import get_daily_leaderboard
-
+from .models import Inbox, Message, Plant, User
 
 UUID_RE = "[A-Za-z0-9_=-]+"
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")

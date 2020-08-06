@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import jetforce
 
-from astrobotany import init_db, app
+from astrobotany import app, init_db
 
 init_db("astrobotany.sqlite")
 

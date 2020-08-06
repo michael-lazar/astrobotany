@@ -2,11 +2,11 @@
 import argparse
 from datetime import datetime, timedelta
 
-from peewee import BooleanField, TextField, DateTimeField
+from peewee import BooleanField, DateTimeField, TextField
 from playhouse import migrate
 
 from astrobotany import items
-from astrobotany.models import init_db, User, ItemSlot
+from astrobotany.models import ItemSlot, User, init_db
 
 
 def add_setting_ansi_enabled(migrator):
