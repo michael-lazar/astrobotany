@@ -20,9 +20,7 @@ setup(
     packages=["astrobotany"],
     python_requires=">=3.7, <4",
     install_requires=["jetforce", "peewee", "jinja2", "faker"],
-    extras_require={
-        "test": ["pytest", "black", "isort", "mypy", "flake8", "freezegun"],
-    },
+    extras_require={"test": ["pytest", "black", "isort", "mypy", "freezegun"],},
     package_data={
         "astrobotany": ["art/*", "templates/*", "files/*", "templates/fragments/*"]
     },
