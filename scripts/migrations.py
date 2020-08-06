@@ -10,24 +10,18 @@ from astrobotany.models import ItemSlot, User, init_db
 
 
 def add_setting_ansi_enabled(migrator):
-    migrate.migrate(
-        migrator.add_column("user", "ansi_enabled", BooleanField(default=False))
-    )
+    migrate.migrate(migrator.add_column("user", "ansi_enabled", BooleanField(default=False)))
 
 
 def alter_user_id_type(migrator):
     migrate.migrate(
-        migrator.alter_column_type(
-            "user", "user_id", TextField(unique=True, index=True)
-        )
+        migrator.alter_column_type("user", "user_id", TextField(unique=True, index=True))
     )
 
 
 def add_item_paperclip(migrator):
     for user in User.select():
-        ItemSlot.get_or_create(
-            user=user, item_id=items.paperclip.item_id, defaults={"quantity": 1}
-        )
+        ItemSlot.get_or_create(user=user, item_id=items.paperclip.item_id, defaults={"quantity": 1})
 
 
 def add_item_fertilizer(migrator):
@@ -39,9 +33,7 @@ def add_item_fertilizer(migrator):
 
 def add_plant_fertilized_at(migrator):
     dt = datetime.now() - timedelta(days=4)
-    migrate.migrate(
-        migrator.add_column("plant", "fertilized_at", DateTimeField(default=dt))
-    )
+    migrate.migrate(migrator.add_column("plant", "fertilized_at", DateTimeField(default=dt)))
 
 
 def send_welcome_message(migrator):

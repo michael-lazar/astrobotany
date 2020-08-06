@@ -207,11 +207,7 @@ def message_board(request, page=1):
     items = Message.by_date().paginate(page, paginate_by)
 
     body = render_template(
-        "message_board.gmi",
-        request=request,
-        items=items,
-        page=page,
-        page_count=page_count,
+        "message_board.gmi", request=request, items=items, page=page, page_count=page_count,
     )
     return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -291,9 +287,7 @@ def plant(request):
     if alert is None:
         alert = request.plant.get_observation(request.user.ansi_enabled)
 
-    body = render_template(
-        "plant.gmi", request=request, plant=request.plant, alert=alert,
-    )
+    body = render_template("plant.gmi", request=request, plant=request.plant, alert=alert,)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -315,10 +309,7 @@ def fertilize(request):
 @authenticate
 def inspect(request):
     request.session["alert"] = "\n".join(
-        [
-            f"Generation: {request.plant.generation}",
-            f"Growth Rate: {request.plant.growth_rate}",
-        ]
+        [f"Generation: {request.plant.generation}", f"Growth Rate: {request.plant.growth_rate}",]
     )
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
@@ -368,9 +359,7 @@ def name(request):
 def visit(request):
     plants = (
         Plant.all_active()
-        .filter(
-            Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8),
-        )
+        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8),)
         .order_by(Plant.score.desc())
     )
 
@@ -391,9 +380,7 @@ def visit_plant(request, user_id):
     user.plant.save()
 
     alert = request.session.pop("alert", None)
-    body = render_template(
-        "visit_plant.gmi", request=request, plant=user.plant, alert=alert,
-    )
+    body = render_template("visit_plant.gmi", request=request, plant=user.plant, alert=alert,)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 

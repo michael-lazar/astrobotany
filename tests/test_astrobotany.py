@@ -233,9 +233,7 @@ def test_plant_refresh_12h_fertilizer(now):
 
 def test_plant_refresh_generation_2_12h(now):
     plant = plant_factory(
-        watered_at=now - timedelta(hours=12),
-        updated_at=now - timedelta(hours=12),
-        generation=2,
+        watered_at=now - timedelta(hours=12), updated_at=now - timedelta(hours=12), generation=2,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -306,9 +304,7 @@ def test_plant_refresh_36h_fertilizer_3(now):
 
 def test_plant_refresh_evolve(now):
     plant = plant_factory(
-        watered_at=now - timedelta(hours=24),
-        updated_at=now - timedelta(hours=24),
-        score=1,
+        watered_at=now - timedelta(hours=24), updated_at=now - timedelta(hours=24), score=1,
     )
     plant.refresh()
     assert plant.stage == 1

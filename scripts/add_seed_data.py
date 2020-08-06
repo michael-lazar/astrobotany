@@ -23,16 +23,14 @@ init_db(args.db_file)
 for _ in range(args.count):
     age = random.randrange(int(timedelta(days=50).total_seconds()))
     user = User.create(
-        user_id="".join(random.choices("0123456789ABCDEF", k=16)),
-        username=fake.name().lower(),
+        user_id="".join(random.choices("0123456789ABCDEF", k=16)), username=fake.name().lower(),
     )
     plant = Plant(
         user=user,
         user_active=user,
         score=random.randrange(age // 2, age),
         created_at=datetime.now() - timedelta(seconds=age),
-        watered_at=datetime.now()
-        - timedelta(seconds=random.randrange(2 * 24 * 60 * 60)),
+        watered_at=datetime.now() - timedelta(seconds=random.randrange(2 * 24 * 60 * 60)),
     )
     plant.refresh()
     plant.save()

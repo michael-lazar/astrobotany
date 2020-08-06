@@ -102,13 +102,9 @@ class ArtFile:
             playscii_data = json.load(fp)
 
         if playscii_data["palette"] != cls.PALETTE:
-            raise ValueError(
-                f"Encountered unexpected palette {playscii_data['palette']}"
-            )
+            raise ValueError(f"Encountered unexpected palette {playscii_data['palette']}")
         if playscii_data["charset"] != cls.CHARSET:
-            raise ValueError(
-                f"Encountered unexpected charset {playscii_data['charset']}"
-            )
+            raise ValueError(f"Encountered unexpected charset {playscii_data['charset']}")
 
         tiles = iter(playscii_data["frames"][0]["layers"][0]["tiles"])
         data = []
@@ -139,9 +135,7 @@ class ArtFile:
         """
         Drop all styling and render the art as plain ASCII characters.
         """
-        return "\n".join(
-            "".join(tile.char for tile in line) for line in self.character_matrix
-        )
+        return "\n".join("".join(tile.char for tile in line) for line in self.character_matrix)
 
     def _render_ansi(self) -> str:
         """
