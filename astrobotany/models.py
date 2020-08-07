@@ -179,6 +179,7 @@ class Certificate(BaseModel):
     """
 
     user = ForeignKeyField(User, backref="certificates")
+    authorised = BooleanField(default=False)
     fingerprint = TextField(unique=True, index=True)
     subject = TextField(null=True)
     not_valid_before_utc = DateTimeField(null=True)

@@ -47,7 +47,12 @@ def add_user_password_field(migrator):
 
 def migrate_certificates(migrator):
     for user in User.select():
-        Certificate.create(user=user, fingerprint=user.user_id, cn=user.username)
+        Certificate.create(
+            user=user,
+            authorised=not user.user_id.endswith("="),
+            fingerprint=user.user_id,
+            cn=user.username,
+        )
         user.user_id = gen_user_id()
         user.save()
 
