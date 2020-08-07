@@ -13,7 +13,7 @@ class Leaderboard:
         3: 115,  # Bronze
     }
 
-    def __init__(self, count: int = 10):
+    def __init__(self, count: int = 10) -> None:
         self.count = count
 
     def list_top_items(self) -> Iterable:
