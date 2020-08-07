@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import math
 import random
@@ -54,7 +56,7 @@ def gen_user_id() -> str:
 
 
 class BaseModel(Model):
-    model_registry: List[Type["BaseModel"]] = []
+    model_registry: List[Type[BaseModel]] = []
 
     @classmethod
     def validate_model(cls):
@@ -81,7 +83,7 @@ class User(BaseModel):
         return user
 
     @classmethod
-    def initialize(cls, username: str) -> "User":
+    def initialize(cls, username: str) -> User:
         """
         Register a new player.
         """
@@ -92,7 +94,7 @@ class User(BaseModel):
         return user
 
     @classmethod
-    def login(cls, fingerprint: str) -> Optional["User"]:
+    def login(cls, fingerprint: str) -> Optional[User]:
         """
         Load a user from their certificate fingerprint.
 
@@ -116,7 +118,7 @@ class User(BaseModel):
         return user
 
     @property
-    def plant(self) -> "Plant":
+    def plant(self) -> Plant:
         """
         Return the user's current "active" plant, or generate a new one.
 
@@ -130,7 +132,7 @@ class User(BaseModel):
 
         return self._plant
 
-    def add_item(self, item: items.Item, quantity: int = 1) -> "ItemSlot":
+    def add_item(self, item: items.Item, quantity: int = 1) -> ItemSlot:
         """
         Add an item to the user's inventory.
         """
@@ -209,7 +211,7 @@ class ItemSlot(BaseModel):
     quantity: int = IntegerField(default=0)
 
     @property
-    def item(self):
+    def item(self) -> items.Item:
         return items.registry[self.item_id]
 
 
@@ -619,7 +621,7 @@ class Plant(BaseModel):
             "childhood."
         )
 
-    def harvest(self) -> "Plant":
+    def harvest(self) -> Plant:
         """
         Harvest the plant and generate a new active plant for the user.
         """
