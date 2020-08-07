@@ -13,9 +13,8 @@ from jetforce import JetforceApplication, Request, Response, Status
 from . import items
 from .art import render_art
 from .leaderboard import get_daily_leaderboard
-from .models import Inbox, Message, Plant, User
+from .models import Certificate, Inbox, Message, Plant, User
 
-UUID_RE = "[A-Za-z0-9_=-]+"
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 FILES_DIR = os.path.join(os.path.dirname(__file__), "files")
 
@@ -66,12 +65,12 @@ def authenticate(func: typing.Callable) -> typing.Callable:
         if request.environ["TLS_CLIENT_AUTHORISED"]:
             # Old-style verified certificate
             serial_number = request.environ["TLS_CLIENT_SERIAL_NUMBER"]
-            user_id = f"{serial_number:032X}"  # Convert to hex
+            fingerprint = f"{serial_number:032X}"  # Convert to hex
         else:
             # New-style self signed certificate
-            user_id = request.environ["TLS_CLIENT_HASH"]
+            fingerprint = request.environ["TLS_CLIENT_HASH"]
 
-        user = User.get_or_none(user_id=user_id)
+        user = User.login(fingerprint)
         if user is None:
             body = dedent(
                 """\
@@ -118,10 +117,10 @@ def register_submit(request):
         msg = "Attach your client certificate to continue."
         return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
-    user_id = request.environ["TLS_CLIENT_HASH"]
+    fingerprint = request.environ["TLS_CLIENT_HASH"]
     username = request.environ["REMOTE_USER"]
 
-    if User.select().where(User.user_id == user_id).exists():
+    if Certificate.select().where(Certificate.fingerprint == fingerprint).exists():
         msg = "This certificate has already been linked to an account."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
 
@@ -133,15 +132,24 @@ def register_submit(request):
         msg = f"Sorry, the username '{username}' is already taken."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
 
-    User.initialize(user_id, username)
+    cert = request.environ["client_certificate"]
+
+    user = User.initialize(username)
+    Certificate.create(
+        user=user,
+        fingerprint=fingerprint,
+        subject=cert.subject.rfc4514_string(),
+        not_valid_before_utc=cert.not_valid_before,
+        not_valid_after_utc=cert.not_valid_after,
+    )
 
     body = dedent(
         f"""\
         Your new account has been created! 🎉
         
-        Date        : {datetime.now()} 
-        Fingerprint : {user_id}
-        Common Name : {username}
+        Date        : {datetime.now()}
+        Fingerprint : {fingerprint}
+        Subject CN  : {username}
     
         =>/app login        
         """
@@ -367,7 +375,7 @@ def visit(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route(f"/app/visit/(?P<user_id>{UUID_RE})")
+@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})")
 @authenticate
 def visit_plant(request, user_id):
     user = User.get_or_none(user_id=user_id)
@@ -384,7 +392,7 @@ def visit_plant(request, user_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route(f"/app/visit/(?P<user_id>{UUID_RE})/water")
+@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})/water")
 @authenticate
 def visit_plant_water(request, user_id):
     user = User.get_or_none(user_id=user_id)
@@ -400,7 +408,7 @@ def visit_plant_water(request, user_id):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")
 
 
-@app.route(f"/app/visit/(?P<user_id>{UUID_RE})/search")
+@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})/search")
 @authenticate
 def visit_plant_search(request, user_id):
     user = User.get_or_none(user_id=user_id)

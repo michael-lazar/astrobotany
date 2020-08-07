@@ -6,7 +6,7 @@ from peewee import BooleanField, DateTimeField, TextField
 from playhouse import migrate
 
 from astrobotany import items
-from astrobotany.models import ItemSlot, User, init_db
+from astrobotany.models import Certificate, Inbox, ItemSlot, User, gen_user_id, init_db
 
 
 def add_setting_ansi_enabled(migrator):
@@ -38,7 +38,18 @@ def add_plant_fertilized_at(migrator):
 
 def send_welcome_message(migrator):
     for user in User.select():
-        user.send_welcome_message()
+        Inbox.send_welcome_message(user)
+
+
+def add_user_password_field(migrator):
+    migrate.migrate(migrator.add_column("user", "password", TextField(null=True)))
+
+
+def migrate_certificates(migrator):
+    for user in User.select():
+        Certificate.create(user=user, fingerprint=user.user_id, cn=user.username)
+        user.user_id = gen_user_id()
+        user.save()
 
 
 MIGRATIONS = locals()

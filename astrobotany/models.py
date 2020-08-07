@@ -1,10 +1,13 @@
+import hashlib
 import math
 import random
+import uuid
 from datetime import date, datetime, timedelta
 from typing import List, Optional, Type
 
 from faker import Faker
 from peewee import (
+    JOIN,
     BooleanField,
     DateTimeField,
     ForeignKeyField,
@@ -46,6 +49,10 @@ def _default_rarity() -> int:
         return 4
 
 
+def gen_user_id() -> str:
+    return uuid.uuid4().hex
+
+
 class BaseModel(Model):
     model_registry: List[Type["BaseModel"]] = []
 
@@ -61,26 +68,51 @@ class User(BaseModel):
     A user account corresponding to a TLS client certificate.
     """
 
-    user_id = TextField(unique=True, index=True)
+    user_id = TextField(unique=True, index=True, default=gen_user_id)
     username = TextField()
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)
+    password = TextField(null=True)
 
     @classmethod
     def admin(cls):
-        user, _ = cls.get_or_create(user_id="-1", username="admin")
+        user_id = "00000000000000000000000000000000"
+        user, _ = cls.get_or_create(user_id=user_id, username="admin")
         return user
 
     @classmethod
-    def initialize(cls, user_id: str, username: str) -> "User":
+    def initialize(cls, username: str) -> "User":
         """
         Register a new player.
         """
-        user = cls(user_id=user_id, username=username)
-        user.save()
+        user = cls.create(username=username)
         user.add_item(items.paperclip)
         user.add_item(items.fertilizer, quantity=5)
-        user.send_welcome_message()
+        Inbox.send_welcome_message(user)
+        return user
+
+    @classmethod
+    def login(cls, fingerprint: str) -> Optional["User"]:
+        """
+        Load a user from their certificate fingerprint.
+
+        Join on the active_plant to avoid making an extra query, since we will
+        almost always access the user's plant later.
+        """
+        query = (
+            cls.select()
+            .join(Certificate, on=Certificate.user == cls.id)
+            .join(Plant, JOIN.LEFT_OUTER, on=Plant.user_active == cls.id)
+            .where(Certificate.fingerprint == fingerprint)
+        )
+
+        try:
+            user = query.get()
+        except User.DoesNotExist:
+            user = None
+        else:
+            user.certificate.update(last_seen=datetime.now())
+
         return user
 
     @property
@@ -138,16 +170,19 @@ class User(BaseModel):
 
         return 0
 
-    def send_welcome_message(self):
-        """
-        Send an initial welcome message to the user.
-        """
-        Inbox.create(
-            user_from=User.admin(),
-            user_to=self,
-            subject=constants.WELCOME_SUBJECT,
-            body=constants.WELCOME_MESSAGE.format(name=self.username, number=self.id),
-        )
+
+class Certificate(BaseModel):
+    """
+    A client certificate used for user authentication.
+    """
+
+    user = ForeignKeyField(User, backref="certificates")
+    fingerprint = TextField(unique=True, index=True)
+    subject = TextField(null=True)
+    not_valid_before_utc = DateTimeField(null=True)
+    not_valid_after_utc = DateTimeField(null=True)
+    first_seen = DateTimeField(default=datetime.now)
+    last_seen = DateTimeField(default=datetime.now)
 
 
 class Message(BaseModel):
@@ -213,6 +248,18 @@ class Inbox(BaseModel):
     @property
     def datetime_str(self) -> str:
         return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")
+
+    @classmethod
+    def send_welcome_message(cls, user: User) -> None:
+        """
+        Send an initial welcome message to a new user.
+        """
+        cls.create(
+            user_from=User.admin(),
+            user_to=user,
+            subject=constants.WELCOME_SUBJECT,
+            body=constants.WELCOME_MESSAGE.format(name=user.username, number=user.id),
+        )
 
 
 class Plant(BaseModel):
