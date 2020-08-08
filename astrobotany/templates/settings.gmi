@@ -1,8 +1,21 @@
 # Astrobotany - Settings
 
-## Colors
+## ANSI Color Support
 
-Enable support for color using ANSI escape sequences
-=>/app/settings/update/ansi_enabled ansi_enabled: {{ request.user.ansi_enabled }}
+Enable support for colored text & art using ANSI escape sequences.
+
+=>/app/settings/ansi_enabled ANSI colors enabled: "{{ request.user.ansi_enabled }}"
+
+## Secret Password
+
+An optional secret password that will be linked to your account. Setting a password is required in order to register new client certificates (see below).
+
+=>/app/settings/password Password: {{ "********" if request.user.password else "(none)" }}
+
+## Client Certificates
+
+View & remove your client certificates. In order to attach a new certificate to your account, see the instructions on the astrobotany registration page.
+
+=>/app/settings/certificates Client Certificate List
 
 =>/app 🚶 Go back

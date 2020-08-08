@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import hashlib
 import math
 import random
 import uuid
 from datetime import date, datetime, timedelta
 from typing import List, Optional, Type
 
+import bcrypt
 from faker import Faker
 from peewee import (
     JOIN,
@@ -78,8 +78,7 @@ class User(BaseModel):
 
     @classmethod
     def admin(cls):
-        user_id = "00000000000000000000000000000000"
-        user, _ = cls.get_or_create(user_id=user_id, username="admin")
+        user, _ = cls.get_or_create(user_id="0" * 32, username="admin")
         return user
 
     @classmethod
@@ -94,7 +93,7 @@ class User(BaseModel):
         return user
 
     @classmethod
-    def login(cls, fingerprint: str) -> Optional[User]:
+    def login(cls, fingerprint: str) -> Optional[Certificate]:
         """
         Load a user from their certificate fingerprint.
 
@@ -102,20 +101,20 @@ class User(BaseModel):
         almost always access the user's plant later.
         """
         query = (
-            cls.select()
-            .join(Certificate, on=Certificate.user == cls.id)
-            .join(Plant, JOIN.LEFT_OUTER, on=Plant.user_active == cls.id)
+            Certificate.select()
+            .join(User, on=Certificate.user == User.id)
+            .join(Plant, JOIN.LEFT_OUTER, on=Plant.user_active == User.id)
             .where(Certificate.fingerprint == fingerprint)
         )
 
         try:
-            user = query.get()
-        except User.DoesNotExist:
-            user = None
-        else:
-            user.certificate.update(last_seen=datetime.now())
+            cert = query.get()
+            cert.update(last_seen=datetime.now())
+            cert.save()
+        except Certificate.DoesNotExist:
+            cert = None
 
-        return user
+        return cert
 
     @property
     def plant(self) -> Plant:
@@ -131,6 +130,12 @@ class User(BaseModel):
                 self._plant = Plant.create(user=self, user_active=self)
 
         return self._plant
+
+    def set_password(self, password: str) -> None:
+        self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+    def check_password(self, password: str) -> bool:
+        return bcrypt.checkpw(password.encode(), self.password.encode())
 
     def add_item(self, item: items.Item, quantity: int = 1) -> ItemSlot:
         """

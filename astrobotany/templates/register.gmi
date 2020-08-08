@@ -11,12 +11,22 @@ Here are some known gemini clients with support for client certificates.
 =>https://github.com/MasterQ32/kristall Kristall (GUI)
 =>https://github.com/pitr/gemini-ios Gemini for iOS
 
+## New Users
+
 In order to join in the fun, use your preferred gemini client to generate a new client certificate. All certificate fields can be left blank *except* for the subject CN (Common Name). This value will be your public username inside of astrobotany. Pick something unique and memorable!
 
 Access the following endpoint with your certificate to register your account:
-=>/register/submit
+=>/register/new Register as a new user
 
 Once your account has been created, you can go here to login:
-=>/app
+=>/app Login
+
+## Existing Users
+
+If you already own an account, you can register additional certificates to login from different devices. All of your certificates and your secret password can be viewed in the astrobotany settings page.
+
+In order to add a new certificate, generate a new self-signed cert with the same subject CN as your existing account. Click the link below, and you will be prompted to enter your account's secret password.
+
+=>/register/link Link to an existing account
 
 🚀
