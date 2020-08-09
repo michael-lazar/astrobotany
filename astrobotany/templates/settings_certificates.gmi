@@ -1,0 +1,18 @@
+# Astrobotany - Certificates
+
+{% for cert in certificates %}
+### {{ loop.index }}. Certificate "{{ cert.fingerprint[:10] }}"
+```
+subject     : {{ cert.subject or "(unknown)"}}
+fingerprint : {{ cert.fingerprint }}
+registered  : {{ cert.first_seen | datetime }} (EST)
+last used   : {{ cert.last_seen | datetime }} (EST)
+```
+{% if cert == request.cert %}
+(active certificate, cannot delete)
+{% else %}
+=>/app/settings/certificates/{{ cert.id }}/delete Delete this certificate
+{% endif %}
+
+{% endfor %}
+=>/app/settings 🚶 Go back

@@ -5,7 +5,7 @@ from . import constants
 
 
 class Item:
-    def __init__(self, price: int, name: str, description: str):
+    def __init__(self, price: int, name: str, description: str) -> None:
         self.item_id = len(registry) + 1
         self.price = price
         self.name = name

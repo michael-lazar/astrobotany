@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import argparse
+from collections import defaultdict
 from datetime import datetime, timedelta
 
-from peewee import BooleanField, DateTimeField, TextField
+from peewee import BlobField, BooleanField, DateTimeField, TextField
 from playhouse import migrate
 
 from astrobotany import items
-from astrobotany.models import ItemSlot, User, init_db
+from astrobotany.models import Certificate, Inbox, ItemSlot, User, gen_user_id, init_db
 
 
 def add_setting_ansi_enabled(migrator):
@@ -38,7 +39,36 @@ def add_plant_fertilized_at(migrator):
 
 def send_welcome_message(migrator):
     for user in User.select():
-        user.send_welcome_message()
+        Inbox.send_welcome_message(user)
+
+
+def add_user_password_field(migrator):
+    migrate.migrate(migrator.add_column("user", "password", BlobField(null=True)))
+
+
+def migrate_certificates(migrator):
+    users = list(User.select())
+
+    active_users = {}
+    for user in users:
+        active_users.setdefault(user.username, user)
+        watered_at = active_users[user.username].plant.watered_at
+        if user.plant.watered_at > watered_at:
+            active_users[user.username] = user
+
+    for user in users:
+        active_user = active_users[user.username]
+        Certificate.create(
+            user=active_user,
+            authorised=not user.user_id.endswith("="),
+            fingerprint=user.user_id,
+            cn=user.username,
+        )
+        if user == active_user:
+            user.user_id = gen_user_id()
+            user.save()
+        else:
+            user.delete_instance()
 
 
 MIGRATIONS = locals()

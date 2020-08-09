@@ -39,7 +39,7 @@ score_multiplier = 1 + (0.2 * generation)
 
 ## Registration (deprecated)
 
-The old astrobotany registration guide used CSR's to generate authorised client certificates. This method is no longer recommended, but it still works and is linked here for historical reference.
+The old astrobotany registration guide used CSR's to generate authorised client certificates. This method no longer works, but is linked here for historical reference.
 
 =>/files/register_old.gmi
 

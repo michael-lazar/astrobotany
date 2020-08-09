@@ -13,9 +13,8 @@ from jetforce import JetforceApplication, Request, Response, Status
 from . import items
 from .art import render_art
 from .leaderboard import get_daily_leaderboard
-from .models import Inbox, Message, Plant, User
+from .models import Certificate, Inbox, Message, Plant, User
 
-UUID_RE = "[A-Za-z0-9_=-]+"
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 FILES_DIR = os.path.join(os.path.dirname(__file__), "files")
 
@@ -25,6 +24,14 @@ template_env = jinja2.Environment(
     trim_blocks=True,
     lstrip_blocks=True,
 )
+
+
+def datetime_format(value, fmt="%A, %B %d, %Y %-I:%M:%S %p"):
+    return value.strftime(fmt)
+
+
+template_env.filters["datetime"] = datetime_format
+
 
 mimetypes.add_type("text/gemini", ".gmi")
 
@@ -66,24 +73,25 @@ def authenticate(func: typing.Callable) -> typing.Callable:
         if request.environ["TLS_CLIENT_AUTHORISED"]:
             # Old-style verified certificate
             serial_number = request.environ["TLS_CLIENT_SERIAL_NUMBER"]
-            user_id = f"{serial_number:032X}"  # Convert to hex
+            fingerprint = f"{serial_number:032X}"  # Convert to hex
         else:
             # New-style self signed certificate
-            user_id = request.environ["TLS_CLIENT_HASH"]
+            fingerprint = request.environ["TLS_CLIENT_HASH"]
 
-        user = User.get_or_none(user_id=user_id)
-        if user is None:
+        cert = User.login(fingerprint)
+        if cert is None:
             body = dedent(
                 """\
-                The supplied certificate was not recognized as an existing user.
+                The supplied certificate was not recognized.
                 
-                Click here to register a new user account:
+                Go here to register a new user account:
                 =>/register
                 """
             )
             return Response(Status.SUCCESS, "text/gemini", body)
 
-        request.user = user
+        request.cert = cert
+        request.user = request.cert.user
         request.plant = request.user.plant
         request.session = load_session(request.user.user_id)
 
@@ -112,16 +120,74 @@ def register(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/register/submit")
-def register_submit(request):
+@app.route("/register/link")
+def register_link(request):
     if "REMOTE_USER" not in request.environ:
         msg = "Attach your client certificate to continue."
         return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
-    user_id = request.environ["TLS_CLIENT_HASH"]
+    fingerprint = request.environ["TLS_CLIENT_HASH"]
     username = request.environ["REMOTE_USER"]
 
-    if User.select().where(User.user_id == user_id).exists():
+    if Certificate.select().where(Certificate.fingerprint == fingerprint).exists():
+        msg = "This certificate has already been linked to your account."
+        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    elif not username:
+        msg = "The certificate must define a CN (Common Name) attribute."
+        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    try:
+        user = User.select().where(User.username == username).get()
+    except User.DoesNotExist:
+        msg = f"No existing user was found with the name '{username}'."
+        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    if not user.password:
+        msg = f"Unable to link because your account does not have a password."
+        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    elif not request.query:
+        msg = "Enter your secret password to link this certificate:"
+        return Response(Status.INPUT, msg)
+
+    elif not user.check_password(request.query):
+        msg = "Invalid password"
+        return Response(Status.BAD_REQUEST, msg)
+
+    cert = request.environ["client_certificate"]
+    Certificate.create(
+        user=user,
+        fingerprint=fingerprint,
+        subject=cert.subject.rfc4514_string(),
+        not_valid_before_utc=cert.not_valid_before,
+        not_valid_after_utc=cert.not_valid_after,
+    )
+
+    body = dedent(
+        f"""\
+        Your account has been linked to a new certificate! 🎉
+
+        Server Time : {datetime.now()}
+        Fingerprint : {fingerprint}
+        Subject CN  : {username}
+
+        =>/app login        
+        """
+    )
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/register/new")
+def register_new(request):
+    if "REMOTE_USER" not in request.environ:
+        msg = "Attach your client certificate to continue."
+        return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
+
+    fingerprint = request.environ["TLS_CLIENT_HASH"]
+    username = request.environ["REMOTE_USER"]
+
+    if Certificate.select().where(Certificate.fingerprint == fingerprint).exists():
         msg = "This certificate has already been linked to an account."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
 
@@ -133,15 +199,24 @@ def register_submit(request):
         msg = f"Sorry, the username '{username}' is already taken."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
 
-    User.initialize(user_id, username)
+    cert = request.environ["client_certificate"]
+
+    user = User.initialize(username)
+    Certificate.create(
+        user=user,
+        fingerprint=fingerprint,
+        subject=cert.subject.rfc4514_string(),
+        not_valid_before_utc=cert.not_valid_before,
+        not_valid_after_utc=cert.not_valid_after,
+    )
 
     body = dedent(
         f"""\
         Your new account has been created! 🎉
         
-        Date        : {datetime.now()} 
-        Fingerprint : {user_id}
-        Common Name : {username}
+        Server Time : {datetime.now()}
+        Fingerprint : {fingerprint}
+        Subject CN  : {username}
     
         =>/app login        
         """
@@ -230,29 +305,85 @@ def settings(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/settings/update/(?P<field>[A-Za-z_]+)")
+@app.route("/app/settings/password")
 @authenticate
-def settings_update(request, field):
-    if field not in ("ansi_enabled",):
-        return Response(Status.NOT_FOUND, "Invalid setting")
+def settings_password(request):
+    new_password = request.session.pop("new_password", None)
 
     if not request.query:
-        prompt = f"Enter a new value for {field}, [T]rue/[F]alse:"
+        prompt = f"Enter your new password:"
+        return Response(Status.INPUT, prompt)
+
+    if not new_password:
+        request.session["new_password"] = request.query
+        prompt = f"Confirm your new password (enter it again):"
+        return Response(Status.INPUT, prompt)
+
+    if new_password != request.query:
+        return Response(Status.BAD_REQUEST, "Passwords did not match!")
+
+    request.user.set_password(new_password)
+    request.user.save()
+
+    message = "Password successfully updated!\n\n=>/app/settings back"
+    return Response(Status.SUCCESS, "text/gemini", message)
+
+
+@app.route("/app/settings/ansi_enabled")
+@authenticate
+def settings_ansi_enabled(request):
+    if not request.query:
+        prompt = f"Enable ANSI support for colors? [T]rue / [F]alse"
         return Response(Status.INPUT, prompt)
 
     answer = request.query.strip().lower()
 
     if answer in ("t", "true"):
-        value = True
+        request.user.ansi_enabled = True
     elif answer in ("f", "false"):
-        value = False
+        request.user.ansi_enabled = False
     else:
         return Response(Status.BAD_REQUEST, f"Invalid query value: {request.query}")
 
-    setattr(request.user, field, value)
     request.user.save()
-
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
+
+
+@app.route("/app/settings/certificates")
+@authenticate
+def settings_certificates(request):
+    certificates = (
+        Certificate.select().where(Certificate.user == request.user).order_by(Certificate.last_seen)
+    )
+
+    body = render_template("settings_certificates.gmi", request=request, certificates=certificates,)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/settings/certificates/(?P<certificate_id>[0-9]+)/delete")
+@authenticate
+def settings_certificates_delete(request, certificate_id):
+    cert = Certificate.get_or_none(id=certificate_id)
+    if cert is None:
+        msg = "Certificate not found"
+        return Response(Status.BAD_REQUEST, msg)
+    elif cert.user != request.user:
+        msg = "Certificate not found"
+        return Response(Status.BAD_REQUEST, msg)
+    elif cert == request.cert:
+        msg = "You cannot delete your active certificate"
+        return Response(Status.BAD_REQUEST, msg)
+    elif not request.query:
+        msg = (
+            f"Are you sure you want to delete certificate {cert.fingerprint[:10]}? "
+            f'Type "confirm" to continue.'
+        )
+        return Response(Status.INPUT, msg)
+    elif request.query.lower() != "confirm":
+        return Response(Status.BAD_REQUEST, "Action cancelled")
+
+    cert.delete_instance()
+    return Response(Status.REDIRECT_TEMPORARY, "/app/settings/certificates")
 
 
 @app.route("/app/mailbox")
@@ -276,7 +407,7 @@ def mailbox_view(request, message_id):
     message.is_seen = True
     message.save()
 
-    body = render_template("mailbox_view.gmi", request=request, message=message,)
+    body = render_template("mailbox_view.gmi", request=request, message=message)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -287,7 +418,7 @@ def plant(request):
     if alert is None:
         alert = request.plant.get_observation(request.user.ansi_enabled)
 
-    body = render_template("plant.gmi", request=request, plant=request.plant, alert=alert,)
+    body = render_template("plant.gmi", request=request, plant=request.plant, alert=alert)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -309,7 +440,7 @@ def fertilize(request):
 @authenticate
 def inspect(request):
     request.session["alert"] = "\n".join(
-        [f"Generation: {request.plant.generation}", f"Growth Rate: {request.plant.growth_rate}",]
+        [f"Generation: {request.plant.generation}", f"Growth Rate: {request.plant.growth_rate}"]
     )
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
@@ -359,7 +490,7 @@ def name(request):
 def visit(request):
     plants = (
         Plant.all_active()
-        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8),)
+        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8))
         .order_by(Plant.score.desc())
     )
 
@@ -367,7 +498,7 @@ def visit(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route(f"/app/visit/(?P<user_id>{UUID_RE})")
+@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})")
 @authenticate
 def visit_plant(request, user_id):
     user = User.get_or_none(user_id=user_id)
@@ -380,11 +511,11 @@ def visit_plant(request, user_id):
     user.plant.save()
 
     alert = request.session.pop("alert", None)
-    body = render_template("visit_plant.gmi", request=request, plant=user.plant, alert=alert,)
+    body = render_template("visit_plant.gmi", request=request, plant=user.plant, alert=alert)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route(f"/app/visit/(?P<user_id>{UUID_RE})/water")
+@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})/water")
 @authenticate
 def visit_plant_water(request, user_id):
     user = User.get_or_none(user_id=user_id)
@@ -400,7 +531,7 @@ def visit_plant_water(request, user_id):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")
 
 
-@app.route(f"/app/visit/(?P<user_id>{UUID_RE})/search")
+@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})/search")
 @authenticate
 def visit_plant_search(request, user_id):
     user = User.get_or_none(user_id=user_id)

@@ -1,10 +1,16 @@
+from __future__ import annotations
+
 import math
 import random
+import uuid
 from datetime import date, datetime, timedelta
 from typing import List, Optional, Type
 
+import bcrypt
 from faker import Faker
 from peewee import (
+    JOIN,
+    BlobField,
     BooleanField,
     DateTimeField,
     ForeignKeyField,
@@ -46,8 +52,12 @@ def _default_rarity() -> int:
         return 4
 
 
+def gen_user_id() -> str:
+    return uuid.uuid4().hex
+
+
 class BaseModel(Model):
-    model_registry: List[Type["BaseModel"]] = []
+    model_registry: List[Type[BaseModel]] = []
 
     @classmethod
     def validate_model(cls):
@@ -61,30 +71,54 @@ class User(BaseModel):
     A user account corresponding to a TLS client certificate.
     """
 
-    user_id = TextField(unique=True, index=True)
+    user_id = TextField(unique=True, index=True, default=gen_user_id)
     username = TextField()
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)
+    password = BlobField(null=True)
 
     @classmethod
-    def admin(cls):
-        user, _ = cls.get_or_create(user_id="-1", username="admin")
+    def admin(cls) -> User:
+        user, _ = cls.get_or_create(user_id="0" * 32, username="admin")
         return user
 
     @classmethod
-    def initialize(cls, user_id: str, username: str) -> "User":
+    def initialize(cls, username: str) -> User:
         """
         Register a new player.
         """
-        user = cls(user_id=user_id, username=username)
-        user.save()
+        user = cls.create(username=username)
         user.add_item(items.paperclip)
         user.add_item(items.fertilizer, quantity=5)
-        user.send_welcome_message()
+        Inbox.send_welcome_message(user)
         return user
 
+    @classmethod
+    def login(cls, fingerprint: str) -> Optional[Certificate]:
+        """
+        Load a user from their certificate fingerprint.
+
+        Join on the active_plant to avoid making an extra query, since we will
+        almost always access the user's plant later.
+        """
+        query = (
+            Certificate.select()
+            .join(User, on=Certificate.user == User.id)
+            .join(Plant, JOIN.LEFT_OUTER, on=Plant.user_active == User.id)
+            .where(Certificate.fingerprint == fingerprint)
+        )
+
+        try:
+            cert = query.get()
+            cert.update(last_seen=datetime.now())
+            cert.save()
+        except Certificate.DoesNotExist:
+            cert = None
+
+        return cert
+
     @property
-    def plant(self) -> "Plant":
+    def plant(self) -> Plant:
         """
         Return the user's current "active" plant, or generate a new one.
 
@@ -98,7 +132,15 @@ class User(BaseModel):
 
         return self._plant
 
-    def add_item(self, item: items.Item, quantity: int = 1) -> "ItemSlot":
+    def set_password(self, password: str) -> None:
+        self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+    def check_password(self, password: str) -> bool:
+        if not self.password:
+            return False
+        return bcrypt.checkpw(password.encode(), self.password)
+
+    def add_item(self, item: items.Item, quantity: int = 1) -> ItemSlot:
         """
         Add an item to the user's inventory.
         """
@@ -138,16 +180,20 @@ class User(BaseModel):
 
         return 0
 
-    def send_welcome_message(self):
-        """
-        Send an initial welcome message to the user.
-        """
-        Inbox.create(
-            user_from=User.admin(),
-            user_to=self,
-            subject=constants.WELCOME_SUBJECT,
-            body=constants.WELCOME_MESSAGE.format(name=self.username, number=self.id),
-        )
+
+class Certificate(BaseModel):
+    """
+    A client certificate used for user authentication.
+    """
+
+    user = ForeignKeyField(User, backref="certificates")
+    authorised = BooleanField(default=False)
+    fingerprint = TextField(unique=True, index=True)
+    subject = TextField(null=True)
+    not_valid_before_utc = DateTimeField(null=True)
+    not_valid_after_utc = DateTimeField(null=True)
+    first_seen = DateTimeField(default=datetime.now)
+    last_seen = DateTimeField(default=datetime.now)
 
 
 class Message(BaseModel):
@@ -174,7 +220,7 @@ class ItemSlot(BaseModel):
     quantity: int = IntegerField(default=0)
 
     @property
-    def item(self):
+    def item(self) -> items.Item:
         return items.registry[self.item_id]
 
 
@@ -213,6 +259,18 @@ class Inbox(BaseModel):
     @property
     def datetime_str(self) -> str:
         return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")
+
+    @classmethod
+    def send_welcome_message(cls, user: User) -> None:
+        """
+        Send an initial welcome message to a new user.
+        """
+        cls.create(
+            user_from=User.admin(),
+            user_to=user,
+            subject=constants.WELCOME_SUBJECT,
+            body=constants.WELCOME_MESSAGE.format(name=user.username, number=user.id),
+        )
 
 
 class Plant(BaseModel):
@@ -572,7 +630,7 @@ class Plant(BaseModel):
             "childhood."
         )
 
-    def harvest(self) -> "Plant":
+    def harvest(self) -> Plant:
         """
         Harvest the plant and generate a new active plant for the user.
         """
