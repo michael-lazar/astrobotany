@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 from peewee import BlobField, BooleanField, DateTimeField, TextField
@@ -46,15 +47,28 @@ def add_user_password_field(migrator):
 
 
 def migrate_certificates(migrator):
-    for user in User.select():
+    users = list(User.select())
+
+    active_users = {}
+    for user in users:
+        active_users.setdefault(user.username, user)
+        watered_at = active_users[user.username].plant.watered_at
+        if user.plant.watered_at > watered_at:
+            active_users[user.username] = user
+
+    for user in users:
+        active_user = active_users[user.username]
         Certificate.create(
-            user=user,
+            user=active_user,
             authorised=not user.user_id.endswith("="),
             fingerprint=user.user_id,
             cn=user.username,
         )
-        user.user_id = gen_user_id()
-        user.save()
+        if user == active_user:
+            user.user_id = gen_user_id()
+            user.save()
+        else:
+            user.delete_instance()
 
 
 MIGRATIONS = locals()

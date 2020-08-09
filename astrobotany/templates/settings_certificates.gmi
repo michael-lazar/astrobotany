@@ -3,7 +3,7 @@
 {% for cert in certificates %}
 ### {{ loop.index }}. Certificate "{{ cert.fingerprint[:10] }}"
 ```
-subject     : {{ cert.subject }}
+subject     : {{ cert.subject or "(unknown)"}}
 fingerprint : {{ cert.fingerprint }}
 registered  : {{ cert.first_seen | datetime }} (EST)
 last used   : {{ cert.last_seen | datetime }} (EST)
