@@ -10,6 +10,7 @@ import bcrypt
 from faker import Faker
 from peewee import (
     JOIN,
+    BlobField,
     BooleanField,
     DateTimeField,
     ForeignKeyField,
@@ -74,10 +75,10 @@ class User(BaseModel):
     username = TextField()
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)
-    password = TextField(null=True)
+    password = BlobField(null=True)
 
     @classmethod
-    def admin(cls):
+    def admin(cls) -> User:
         user, _ = cls.get_or_create(user_id="0" * 32, username="admin")
         return user
 
@@ -135,7 +136,9 @@ class User(BaseModel):
         self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
     def check_password(self, password: str) -> bool:
-        return bcrypt.checkpw(password.encode(), self.password.encode())
+        if not self.password:
+            return False
+        return bcrypt.checkpw(password.encode(), self.password)
 
     def add_item(self, item: items.Item, quantity: int = 1) -> ItemSlot:
         """

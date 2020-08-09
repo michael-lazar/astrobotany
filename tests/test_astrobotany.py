@@ -1,8 +1,8 @@
 """
 Can't sleep, must write unit tests...
 """
-import itertools
 import os
+import uuid
 from datetime import datetime, timedelta
 
 import pytest
@@ -11,7 +11,7 @@ from freezegun import freeze_time
 from astrobotany import init_db, items
 from astrobotany.art import ArtFile
 from astrobotany.constants import COLOR_MAP, COLORS, SPECIES, STAGES
-from astrobotany.models import Plant, User
+from astrobotany.models import Certificate, Plant, User
 
 
 @pytest.fixture(autouse=True)
@@ -30,18 +30,31 @@ def now(frozen_time):
     return datetime.now()
 
 
-user_generator = itertools.count()
+def gen_id():
+    return uuid.uuid4().hex
 
 
 def user_factory(**kwargs):
-    user_id = str(next(user_generator))
-    return User.create(user_id=user_id, username="username" + user_id)
+    kwargs.setdefault("username", f"username_{gen_id()}")
+    return User.create(**kwargs)
 
 
 def plant_factory(user=None, **kwargs):
     if user is None:
         user = user_factory()
+
     return Plant.create(user=user, **kwargs)
+
+
+def certificate_factory(user=None, **kwargs):
+    if user is None:
+        user = user_factory()
+
+    kwargs.setdefault("fingerprint", f"fingerprint_{gen_id()}")
+    kwargs.setdefault("subject", f"CN={gen_id()}")
+    kwargs.setdefault("not_valid_before_utc", datetime.utcnow() - timedelta(days=1))
+    kwargs.setdefault("not_valid_after_utc", datetime.utcnow() + timedelta(days=1))
+    return Certificate.create(user=user, **kwargs)
 
 
 @pytest.mark.parametrize("filename", (os.listdir(ArtFile.ART_DIR)))
@@ -212,19 +225,21 @@ def test_plant_refresh_dead(now):
 
 
 def test_plant_refresh_12h(now):
-    plant = plant_factory(
-        watered_at=now - timedelta(hours=12), updated_at=now - timedelta(hours=12)
-    )
+    watered_at = now - timedelta(hours=12)
+    updated_at = now - timedelta(hours=12)
+    plant = plant_factory(watered_at=watered_at, updated_at=updated_at)
     plant.refresh()
     assert plant.updated_at == datetime.now()
     assert plant.score == 12 * 3600
 
 
 def test_plant_refresh_12h_fertilizer(now):
+    watered_at = now - timedelta(hours=12)
+    updated_at = now - timedelta(hours=12)
+    fertilized_at = now - timedelta(hours=6)
+
     plant = plant_factory(
-        watered_at=now - timedelta(hours=12),
-        updated_at=now - timedelta(hours=12),
-        fertilized_at=now - timedelta(hours=6),
+        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -232,28 +247,29 @@ def test_plant_refresh_12h_fertilizer(now):
 
 
 def test_plant_refresh_generation_2_12h(now):
-    plant = plant_factory(
-        watered_at=now - timedelta(hours=12), updated_at=now - timedelta(hours=12), generation=2,
-    )
+    watered_at = now - timedelta(hours=12)
+    updated_at = now - timedelta(hours=12)
+    plant = plant_factory(watered_at=watered_at, updated_at=updated_at, generation=2)
     plant.refresh()
     assert plant.updated_at == datetime.now()
     assert plant.score == 12 * 3600 * 1.2
 
 
 def test_plant_refresh_18h(now):
-    plant = plant_factory(
-        watered_at=now - timedelta(hours=18), updated_at=now - timedelta(hours=12),
-    )
+    watered_at = now - timedelta(hours=18)
+    updated_at = now - timedelta(hours=12)
+    plant = plant_factory(watered_at=watered_at, updated_at=updated_at)
     plant.refresh()
     assert plant.updated_at == datetime.now()
     assert plant.score == 12 * 3600
 
 
 def test_plant_refresh_18h_fertilizer(now):
+    watered_at = now - timedelta(hours=18)
+    updated_at = now - timedelta(hours=12)
+    fertilized_at = now - timedelta(hours=18)
     plant = plant_factory(
-        watered_at=now - timedelta(hours=18),
-        fertilized_at=now - timedelta(hours=18),
-        updated_at=now - timedelta(hours=12),
+        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -261,19 +277,20 @@ def test_plant_refresh_18h_fertilizer(now):
 
 
 def test_plant_refresh_36h(now):
-    plant = plant_factory(
-        watered_at=now - timedelta(hours=36), updated_at=now - timedelta(hours=24)
-    )
+    watered_at = now - timedelta(hours=36)
+    updated_at = now - timedelta(hours=24)
+    plant = plant_factory(watered_at=watered_at, updated_at=updated_at)
     plant.refresh()
     assert plant.updated_at == datetime.now()
     assert plant.score == 12 * 3600
 
 
 def test_plant_refresh_36h_fertilizer(now):
+    watered_at = now - timedelta(hours=36)
+    updated_at = now - timedelta(hours=24)
+    fertilized_at = now - timedelta(hours=30)
     plant = plant_factory(
-        watered_at=now - timedelta(hours=36),
-        updated_at=now - timedelta(hours=24),
-        fertilized_at=now - timedelta(hours=30),
+        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -281,21 +298,11 @@ def test_plant_refresh_36h_fertilizer(now):
 
 
 def test_plant_refresh_36h_fertilizer_2(now):
+    watered_at = now - timedelta(hours=12)
+    updated_at = now - timedelta(hours=36)
+    fertilized_at = now - timedelta(hours=24)
     plant = plant_factory(
-        watered_at=now - timedelta(hours=12),
-        updated_at=now - timedelta(hours=36),
-        fertilized_at=now - timedelta(hours=24),
-    )
-    plant.refresh()
-    assert plant.updated_at == datetime.now()
-    assert plant.score == 1.5 * 12 * 3600
-
-
-def test_plant_refresh_36h_fertilizer_3(now):
-    plant = plant_factory(
-        watered_at=now - timedelta(hours=12),
-        updated_at=now - timedelta(hours=36),
-        fertilized_at=now - timedelta(hours=24),
+        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -303,9 +310,9 @@ def test_plant_refresh_36h_fertilizer_3(now):
 
 
 def test_plant_refresh_evolve(now):
-    plant = plant_factory(
-        watered_at=now - timedelta(hours=24), updated_at=now - timedelta(hours=24), score=1,
-    )
+    watered_at = now - timedelta(hours=24)
+    updated_at = now - timedelta(hours=24)
+    plant = plant_factory(watered_at=watered_at, updated_at=updated_at, score=1)
     plant.refresh()
     assert plant.stage == 1
 
@@ -352,3 +359,31 @@ def test_pick_petal_cooldown(frozen_time):
     frozen_time.tick(delta=timedelta(hours=25))
     plant.pick_petal()
     assert plant.user.get_item_quantity(items.petals["red"]) == 2
+
+
+def test_user_login():
+    user = user_factory()
+    cert = certificate_factory(user=user)
+
+    assert User.login("invalid_fingerprint") is None
+    assert User.login(cert.fingerprint) == cert
+
+
+def test_user_password():
+    user = user_factory()
+    assert not user.check_password("foobar")
+
+    user.set_password("foobar")
+    user.save()
+
+    user = User.get_by_id(user.id)
+    assert not user.check_password("fizzbuzz")
+    assert user.check_password("foobar")
+
+
+def test_user_initialize():
+    username = gen_id()
+    user = User.initialize(username)
+    assert user.username == username
+    assert user.get_item_quantity(items.paperclip) == 1
+    assert user.inbox.count() == 1

@@ -2,7 +2,7 @@
 import argparse
 from datetime import datetime, timedelta
 
-from peewee import BooleanField, DateTimeField, TextField
+from peewee import BlobField, BooleanField, DateTimeField, TextField
 from playhouse import migrate
 
 from astrobotany import items
@@ -42,7 +42,7 @@ def send_welcome_message(migrator):
 
 
 def add_user_password_field(migrator):
-    migrate.migrate(migrator.add_column("user", "password", TextField(null=True)))
+    migrate.migrate(migrator.add_column("user", "password", BlobField(null=True)))
 
 
 def migrate_certificates(migrator):
