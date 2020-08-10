@@ -149,7 +149,7 @@ def register_link(request):
 
     elif not request.query:
         msg = "Enter your secret password to link this certificate:"
-        return Response(Status.INPUT, msg)
+        return Response(Status.SENSITIVE_INPUT, msg)
 
     elif not user.check_password(request.query):
         msg = "Invalid password"
@@ -312,12 +312,12 @@ def settings_password(request):
 
     if not request.query:
         prompt = f"Enter your new password:"
-        return Response(Status.INPUT, prompt)
+        return Response(Status.SENSITIVE_INPUT, prompt)
 
     if not new_password:
         request.session["new_password"] = request.query
         prompt = f"Confirm your new password (enter it again):"
-        return Response(Status.INPUT, prompt)
+        return Response(Status.SENSITIVE_INPUT, prompt)
 
     if new_password != request.query:
         return Response(Status.BAD_REQUEST, "Passwords did not match!")
