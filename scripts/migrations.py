@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-from collections import defaultdict
 from datetime import datetime, timedelta
 
 from peewee import BlobField, BooleanField, DateTimeField, TextField
@@ -69,6 +68,15 @@ def migrate_certificates(migrator):
             user.save()
         else:
             user.delete_instance()
+
+
+def move_ansi_enabled(migrator):
+    migrate.migrate(migrator.add_column("certificate", "ansi_enabled", BooleanField(default=False)))
+
+    for user in User.select():
+        for cert in user.certificates:
+            cert.ansi_enabled = user.ansi_enabled
+            cert.save()
 
 
 MIGRATIONS = locals()

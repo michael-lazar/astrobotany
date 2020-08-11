@@ -1,12 +1,12 @@
 ```
-{{ plant.get_ascii_art(request.user.ansi_enabled) }}
+{{ plant.get_ascii_art(request.cert.ansi_enabled) }}
 
 name  : "{{ plant.name }}"
 stage : {{ plant.description }}
 age   : {{ plant.age }} days
 score : {{ plant.score }}
-water : {{ plant.get_water_gauge(request.user.ansi_enabled) }}
+water : {{ plant.get_water_gauge(request.cert.ansi_enabled) }}
 {% if plant.fertilizer_percent %}
-bonus : {{ plant.get_fertilizer_gauge(request.user.ansi_enabled) }}
+bonus : {{ plant.get_fertilizer_gauge(request.cert.ansi_enabled) }}
 {% endif %}
 ```

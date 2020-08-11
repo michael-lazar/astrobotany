@@ -74,7 +74,7 @@ class User(BaseModel):
     user_id = TextField(unique=True, index=True, default=gen_user_id)
     username = TextField()
     created_at = DateTimeField(default=datetime.now)
-    ansi_enabled = BooleanField(default=False)
+    ansi_enabled = BooleanField(default=False)  # TODO: Delete this field
     password = BlobField(null=True)
 
     @classmethod
@@ -194,6 +194,7 @@ class Certificate(BaseModel):
     not_valid_after_utc = DateTimeField(null=True)
     first_seen = DateTimeField(default=datetime.now)
     last_seen = DateTimeField(default=datetime.now)
+    ansi_enabled = BooleanField(default=False)
 
 
 class Message(BaseModel):

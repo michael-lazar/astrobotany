@@ -4,7 +4,9 @@
 
 Enable support for colored text & art using ANSI escape sequences.
 
-=>/app/settings/ansi_enabled ANSI colors enabled: "{{ request.user.ansi_enabled }}"
+=>/app/settings/ansi_enabled ANSI colors enabled: "{{ request.cert.ansi_enabled }}"
+
+(This setting is attached to your client certificate. If you use multiple gemini clients, you can set different color settings for each client certificate linked to your account.)
 
 ## Secret Password
 

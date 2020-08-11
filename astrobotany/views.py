@@ -250,7 +250,7 @@ def files(request, path):
 @app.route("/app")
 @authenticate
 def menu(request):
-    title_art = render_art("title.psci", ansi_enabled=request.user.ansi_enabled)
+    title_art = render_art("title.psci", ansi_enabled=request.cert.ansi_enabled)
     mailbox_count = request.user.inbox.where(Inbox.is_seen == False).count()
     body = render_template("menu.gmi", title_art=title_art, mailbox_count=mailbox_count)
     return Response(Status.SUCCESS, "text/gemini", body)
@@ -261,7 +261,7 @@ def menu(request):
 def epilog(request, page):
     page = int(page)
     if page in (1, 2, 3, 4):
-        art = render_art(f"epilog{page}.psci", ansi_enabled=request.user.ansi_enabled)
+        art = render_art(f"epilog{page}.psci", ansi_enabled=request.cert.ansi_enabled)
     else:
         art = None
     body = render_template("epilog.gmi", page=page, art=art)
@@ -339,13 +339,14 @@ def settings_ansi_enabled(request):
     answer = request.query.strip().lower()
 
     if answer in ("t", "true"):
-        request.user.ansi_enabled = True
+        request.cert.ansi_enabled = True
+        request.cert.save()
     elif answer in ("f", "false"):
-        request.user.ansi_enabled = False
+        request.cert.ansi_enabled = False
+        request.cert.save()
     else:
         return Response(Status.BAD_REQUEST, f"Invalid query value: {request.query}")
 
-    request.user.save()
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
 
 
@@ -390,7 +391,7 @@ def settings_certificates_delete(request, certificate_id):
 @authenticate
 def mailbox(request):
     messages = request.user.inbox.order_by(Inbox.id.desc())
-    mailbox_art = render_art("mailbox.psci", ansi_enabled=request.user.ansi_enabled)
+    mailbox_art = render_art("mailbox.psci", ansi_enabled=request.cert.ansi_enabled)
     body = render_template(
         "mailbox.gmi", request=request, messages=messages, mailbox_art=mailbox_art
     )
@@ -416,7 +417,7 @@ def mailbox_view(request, message_id):
 def plant(request):
     alert = request.session.pop("alert", None)
     if alert is None:
-        alert = request.plant.get_observation(request.user.ansi_enabled)
+        alert = request.plant.get_observation(request.cert.ansi_enabled)
 
     body = render_template("plant.gmi", request=request, plant=request.plant, alert=alert)
     return Response(Status.SUCCESS, "text/gemini", body)
