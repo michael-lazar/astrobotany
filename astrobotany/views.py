@@ -37,6 +37,7 @@ mimetypes.add_type("text/gemini", ".gmi")
 
 password_failed_rate_limiter = RateLimiter("10/5m")
 new_account_rate_limiter = RateLimiter("2/4h")
+message_rate_limiter = RateLimiter("3/h")
 
 
 @lru_cache(2048)
@@ -154,9 +155,9 @@ def register_link(request):
         msg = "Enter your secret password to link this certificate:"
         return Response(Status.SENSITIVE_INPUT, msg)
 
-    resp = password_failed_rate_limiter.check(request)
-    if resp:
-        return resp
+    rate_limit_resp = password_failed_rate_limiter.check(request)
+    if rate_limit_resp:
+        return rate_limit_resp
 
     if not user.check_password(request.query):
         msg = "Invalid password"
@@ -208,9 +209,9 @@ def register_new(request):
         msg = f"Sorry, the username '{username}' is already taken."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
 
-    resp = new_account_rate_limiter.check(request)
-    if resp:
-        return resp
+    rate_limit_resp = new_account_rate_limiter.check(request)
+    if rate_limit_resp:
+        return rate_limit_resp
 
     cert = request.environ["client_certificate"]
 
@@ -305,6 +306,10 @@ def message_board(request, page=1):
 def message_board_submit(request):
     if not request.query:
         return Response(Status.INPUT, "What would you like to say? ")
+
+    rate_limit_resp = message_rate_limiter.check(request)
+    if rate_limit_resp:
+        return rate_limit_resp
 
     message = Message(user=request.user, text=request.query)
     message.save()
