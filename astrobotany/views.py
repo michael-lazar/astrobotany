@@ -9,6 +9,7 @@ from textwrap import dedent
 
 import jinja2
 from jetforce import JetforceApplication, Request, Response, Status
+from jetforce.app.base import RateLimiter
 
 from . import items
 from .art import render_art
@@ -32,8 +33,10 @@ def datetime_format(value, fmt="%A, %B %d, %Y %-I:%M:%S %p"):
 
 template_env.filters["datetime"] = datetime_format
 
-
 mimetypes.add_type("text/gemini", ".gmi")
+
+password_failed_rate_limiter = RateLimiter("10/5m")
+new_account_rate_limiter = RateLimiter("2/4h")
 
 
 @lru_cache(2048)
@@ -151,9 +154,15 @@ def register_link(request):
         msg = "Enter your secret password to link this certificate:"
         return Response(Status.SENSITIVE_INPUT, msg)
 
-    elif not user.check_password(request.query):
+    resp = password_failed_rate_limiter.check(request)
+    if resp:
+        return resp
+
+    if not user.check_password(request.query):
         msg = "Invalid password"
         return Response(Status.BAD_REQUEST, msg)
+
+    password_failed_rate_limiter.reset()
 
     cert = request.environ["client_certificate"]
     Certificate.create(
@@ -198,6 +207,10 @@ def register_new(request):
     elif User.select().where(User.username == username).exists():
         msg = f"Sorry, the username '{username}' is already taken."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    resp = new_account_rate_limiter.check(request)
+    if resp:
+        return resp
 
     cert = request.environ["client_certificate"]
 
