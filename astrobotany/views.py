@@ -478,6 +478,9 @@ def search(request):
 @app.route("/app/plant/harvest/confirm")
 @authenticate
 def harvest(request):
+    if not request.plant.dead or request.plant.stage_str != "seed-bearing":
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
     if request.path.endswith("/confirm"):
         if request.query.strip() == f"Goodbye {request.plant.name}":
             request.plant.harvest()

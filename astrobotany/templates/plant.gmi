@@ -24,9 +24,7 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% endif %}
 =>/app/plant/inspect 🔬 Inspect
 =>/app/plant/fertilize 💩 Fertilize
-{% if plant.stage == 5 %}
-=>/app/plant/harvest 🏆 Harvest
-{% else %}
+{% if plant.stage == 5 or plant.dead %}
 =>/app/plant/harvest 🌽 Harvest
 {% endif %}
 =>/app/plant/name 📛 Rename
