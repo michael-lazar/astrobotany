@@ -455,9 +455,9 @@ def fertilize(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/plant/inspect")
+@app.route("/app/plant/info")
 @authenticate
-def inspect(request):
+def info(request):
     request.session["alert"] = "\n".join(
         [f"Generation: {request.plant.generation}", f"Growth Rate: {request.plant.growth_rate}"]
     )
@@ -467,10 +467,20 @@ def inspect(request):
 @app.route("/app/plant/search")
 @authenticate
 def search(request):
-    if request.plant.dead or request.plant.stage_str != "flowering":
+    if request.plant.dead or request.plant.stage != 4:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     request.session["alert"] = request.plant.pick_petal()
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
+@app.route("/app/plant/shake")
+@authenticate
+def shake(request):
+    if request.plant.dead:
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    request.session["alert"] = request.plant.shake()
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
@@ -478,7 +488,7 @@ def search(request):
 @app.route("/app/plant/harvest/confirm")
 @authenticate
 def harvest(request):
-    if not request.plant.dead or request.plant.stage_str != "seed-bearing":
+    if not request.plant.dead or request.plant.stage != 5:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     if request.path.endswith("/confirm"):

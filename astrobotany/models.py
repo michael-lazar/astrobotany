@@ -295,6 +295,7 @@ class Plant(BaseModel):
     dead = BooleanField(default=False)
     name = TextField(default=fake.first_name)
     fertilized_at = DateTimeField(default=lambda: datetime.now() - timedelta(days=4))
+    shaken_at = IntegerField(default=0)
 
     @classmethod
     def all_active(cls):
@@ -609,6 +610,41 @@ class Plant(BaseModel):
             "You pick it up and stick it in your backpack.",
         )
         return "\n".join(lines)
+
+    def shake(self) -> str:
+        """
+        Shake the user's own plant to get money.
+
+        Coins are accumulated at a rate of 1 coin per 3600 points, which is
+        equal to 1 un-adjusted hour of watered plant time.
+        """
+        multiplier = 2
+
+        coins = (self.score - self.shaken_at) // multiplier
+
+        # Leave fractional coins unclaimed
+        self.shaken_at += coins * multiplier
+
+        # Hard-cap to encourage users to shake every once and a while
+        coins = min(coins, 100)
+
+        if coins:
+            self.user.add_item(items.coin, quantity=coins)
+
+        if coins < 1:
+            msg = "nothing happens."
+        elif coins < 2:
+            msg = "you hear the plink of a single coin hitting the ground."
+        elif coins < 5:
+            msg = "a few coins come loose."
+        elif coins < 25:
+            msg = "a handful of coins sprinkle down."
+        elif coins < 99:
+            msg = "its leaves shower coins all around you."
+        else:
+            msg = "a golden nugget clonks you on the head."
+
+        return f"You shake your plant, and {msg}\n(+{coins} coins)"
 
     def fertilize(self) -> str:
         """
