@@ -586,7 +586,8 @@ def visit_plant_search(request, user_id):
 @app.route("/app/inventory")
 @authenticate
 def inventory(request):
-    body = render_template("inventory.gmi", request=request)
+    inventory = sorted(request.user.inventory, key=lambda x: x.item.name)
+    body = render_template("inventory.gmi", request=request, inventory=inventory)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 

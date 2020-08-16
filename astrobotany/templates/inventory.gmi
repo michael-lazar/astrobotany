@@ -2,7 +2,7 @@
 
 ## Your Backpack
 
-{% for item_slot in request.user.inventory %}
+{% for item_slot in inventory %}
 =>/app/inventory/{{ item_slot.item_id }} {{ item_slot.item.name }}
 (quantity: x{{ item_slot.quantity }})
 

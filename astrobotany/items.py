@@ -50,7 +50,7 @@ for color in constants.COLORS_PLAIN:
 
     petals[color] = Item(
         price=0,
-        name=f"{color} petal",
+        name=f"flower petal [{color}]",
         description=f"""
         A single flower petal from {description} plant.
 

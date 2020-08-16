@@ -606,7 +606,7 @@ class Plant(BaseModel):
         user.add_item(items.petals[petal_color])
 
         lines = (
-            f"You spot a {petal_color} petal lying on the ground nearby.",
+            f"You spot a [{petal_color} petal] lying on the ground nearby.",
             "You pick it up and stick it in your backpack.",
         )
         return "\n".join(lines)
