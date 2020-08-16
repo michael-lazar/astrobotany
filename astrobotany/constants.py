@@ -184,28 +184,3 @@ MUTATIONS = [
     "gnu/linux",
     "abraxan",  # rip dear friend
 ]
-
-WELCOME_SUBJECT = "Welcome to Astrobotany!"
-
-WELCOME_MESSAGE = r"""
-Greetings {name},
-
-Welcome to astrobotany! You are visitor number {number}.
-
-Please enjoy poking around this little app as a demonstration of what gemini:// is capable of.
-
-Remember, YOU are what makes this community special. Always be true to yourself.
-
-You can report any bugs that you encounter on the project issue tracker:
-=>https://github.com/michael-lazar/astrobotany/issues
-
-```
-                  .' '.            __
-         .        .   .           (__\_
-          .         .         . -{{_(|8)
-  jgs       ' .  . ' ' .  . '     (__/`
-```
-
-Your garden awaits,
-admin
-""".strip()

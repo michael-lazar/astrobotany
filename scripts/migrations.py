@@ -44,11 +44,6 @@ def add_plant_fertilized_at(migrator):
     migrate.migrate(migrator.add_column("plant", "fertilized_at", DateTimeField(default=dt)))
 
 
-def send_welcome_message(migrator):
-    for user in User.select():
-        Inbox.send_welcome_message(user)
-
-
 def add_user_password_field(migrator):
     migrate.migrate(migrator.add_column("user", "password", BlobField(null=True)))
 
