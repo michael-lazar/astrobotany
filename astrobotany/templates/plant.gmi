@@ -24,8 +24,10 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% if plant.stage == 4 and not plant.dead %}
 =>/app/plant/search 🌹 Pick a petal
 {% endif %}
-{% if plant.stage == 5 or plant.dead %}
-=>/app/plant/harvest 🌽 Harvest
+{% if plant.stage == 5 %}
+=>/app/plant/harvest 🏆 Harvest
+{% elif plant.dead %}
+=>/app/plant/harvest 💀 Harvest
 {% endif %}
 =>/app/plant/fertilize 🍄 Fertilize
 =>/app/plant/info 🔬 Plant info
