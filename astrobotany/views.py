@@ -274,10 +274,11 @@ def menu(request):
 @authenticate
 def epilog(request, page):
     page = int(page)
-    if page in (1, 2, 3, 4):
-        art = render_art(f"epilog{page}.psci", ansi_enabled=request.cert.ansi_enabled)
+    if page == 5:
+        art_number = 4
     else:
-        art = None
+        art_number = page
+    art = render_art(f"epilog{art_number}.psci", ansi_enabled=request.cert.ansi_enabled)
     body = render_template("epilog.gmi", page=page, art=art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -488,7 +489,7 @@ def shake(request):
 @app.route("/app/plant/harvest/confirm")
 @authenticate
 def harvest(request):
-    if not request.plant.dead or request.plant.stage != 5:
+    if not (request.plant.dead or request.plant.stage == 5):
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     if request.path.endswith("/confirm"):

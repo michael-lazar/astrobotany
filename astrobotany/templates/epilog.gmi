@@ -1,43 +1,20 @@
+```
+{{ art }}
+```
+
 {% if page == 1 %}
-
-```
-{{ art }}
-```
-
 =>/app/epilog/2 next
-
 {% elif page == 2 %}
-
-```
-{{ art }}
-```
-
 =>/app/epilog/3 next
-
 {% elif page == 3 %}
-
-```
-{{ art }}
-```
-
 =>/app/epilog/4 next
-
 {% elif page == 4 %}
-
-```
-{{ art }}
-```
-
 =>/app/epilog/5 next
-
 {% elif page == 5 %}
-
 > "It is the secret of the world that all things subsist and do not die, but retire a little from sight and afterwards return again."
 > — Ralph Waldo Emerson, Essays: Second Series
 
 =>/app/plant 🏡 Home
-
 {% else %}
 You shouldn't be here!
-
 {% endif %}
