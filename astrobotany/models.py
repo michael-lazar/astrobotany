@@ -618,7 +618,7 @@ class Plant(BaseModel):
         Coins are accumulated at a rate of 1 coin per 3600 points, which is
         equal to 1 un-adjusted hour of watered plant time.
         """
-        multiplier = 2
+        multiplier = 3600
 
         coins = (self.score - self.shaken_at) // multiplier
 
@@ -632,19 +632,19 @@ class Plant(BaseModel):
             self.user.add_item(items.coin, quantity=coins)
 
         if coins < 1:
-            msg = "nothing happens."
+            msg = "but nothing happens."
         elif coins < 2:
-            msg = "you hear the plink of a single coin hitting the ground."
+            msg = "and you hear the plink of a single coin."
         elif coins < 5:
-            msg = "a few coins come loose."
+            msg = "and a few coins come loose from the leaves."
         elif coins < 25:
-            msg = "a handful of coins sprinkle down."
+            msg = "and a handful of coins sprinkle down."
         elif coins < 99:
-            msg = "its leaves shower coins all around you."
+            msg = "and coins shower down all around."
         else:
-            msg = "a golden nugget clonks you on the head."
+            msg = "and a golden nugget clonks you on the head."
 
-        return f"You shake your plant, and {msg}\n(+{coins} coins)"
+        return f"You shake your plant, {msg}\n(+{coins} coins)"
 
     def fertilize(self) -> str:
         """
@@ -661,11 +661,7 @@ class Plant(BaseModel):
             return "You don't have any fertilizer to apply."
 
         self.fertilized_at = datetime.now()
-        return (
-            "You apply a bottle of EZ-Grow Fertilizer to your plant. "
-            "The aroma reminds you of a barn that you visited in your "
-            "childhood."
-        )
+        return "You apply a bottle of fertilizer to your plant."
 
     def harvest(self) -> Plant:
         """
