@@ -1,7 +1,7 @@
 Welcome to Astrobotany!
-Greetings {name},
+Greetings {user.username},
 
-Welcome to astrobotany! You are visitor number {number}.
+Welcome to astrobotany! You are visitor number {user.id}.
 
 Please enjoy poking around this little app as a demonstration of what gemini:// is capable of.
 

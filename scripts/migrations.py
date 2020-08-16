@@ -6,15 +6,7 @@ from peewee import BlobField, BooleanField, DateTimeField, IntegerField, TextFie
 from playhouse import migrate
 
 from astrobotany import items
-from astrobotany.models import (
-    Certificate,
-    Inbox,
-    ItemSlot,
-    Plant,
-    User,
-    gen_user_id,
-    init_db,
-)
+from astrobotany.models import Certificate, ItemSlot, Plant, User, gen_user_id, init_db
 
 
 def add_setting_ansi_enabled(migrator):

@@ -96,7 +96,7 @@ class User(BaseModel):
         user.add_item(items.fertilizer, quantity=5)
 
         subject, body = Inbox.load_mail_file("welcome.txt")
-        body = body.format(name=user.username, number=user.id)
+        body = body.format(user=user)
         Inbox.create(
             user_from=User.admin(), user_to=user, subject=subject, body=body,
         )
