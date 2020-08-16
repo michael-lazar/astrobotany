@@ -295,6 +295,7 @@ class Plant(BaseModel):
     dead = BooleanField(default=False)
     name = TextField(default=fake.first_name)
     fertilized_at = DateTimeField(default=lambda: datetime.now() - timedelta(days=4))
+    shaken_at = IntegerField(default=0)
 
     @classmethod
     def all_active(cls):
@@ -610,6 +611,41 @@ class Plant(BaseModel):
         )
         return "\n".join(lines)
 
+    def shake(self) -> str:
+        """
+        Shake the user's own plant to get money.
+
+        Coins are accumulated at a rate of 1 coin per 3600 points, which is
+        equal to 1 un-adjusted hour of watered plant time.
+        """
+        multiplier = 3600
+
+        coins = (self.score - self.shaken_at) // multiplier
+
+        # Leave fractional coins unclaimed
+        self.shaken_at += coins * multiplier
+
+        # Hard-cap to encourage users to shake every once and a while
+        coins = min(coins, 100)
+
+        if coins:
+            self.user.add_item(items.coin, quantity=coins)
+
+        if coins < 1:
+            msg = "but nothing happens."
+        elif coins < 2:
+            msg = "and you hear the plink of a single coin."
+        elif coins < 5:
+            msg = "and a few coins come loose from the leaves."
+        elif coins < 25:
+            msg = "and a handful of coins sprinkle down."
+        elif coins < 99:
+            msg = "and coins shower down all around."
+        else:
+            msg = "and a golden nugget clonks you on the head."
+
+        return f"You shake your plant, {msg}\n(+{coins} coins)"
+
     def fertilize(self) -> str:
         """
         Attempt to fertilize the plant.
@@ -625,11 +661,7 @@ class Plant(BaseModel):
             return "You don't have any fertilizer to apply."
 
         self.fertilized_at = datetime.now()
-        return (
-            "You apply a bottle of EZ-Grow Fertilizer to your plant. "
-            "The aroma reminds you of a barn that you visited in your "
-            "childhood."
-        )
+        return "You apply a bottle of fertilizer to your plant."
 
     def harvest(self) -> Plant:
         """

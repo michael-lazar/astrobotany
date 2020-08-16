@@ -17,15 +17,18 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% endif %}
 ## Plant Actions
 
-=>/app/plant 🌹 Look
 =>/app/plant/water 💧 Water
-{% if plant.stage == 4 %}
-=>/app/plant/search 🐜 Search
+{% if not plant.dead %}
+=>/app/plant/shake 💰 Shake
 {% endif %}
-=>/app/plant/inspect 🔬 Inspect
-=>/app/plant/fertilize 💩 Fertilize
+{% if plant.stage == 4 and not plant.dead %}
+=>/app/plant/search 🌹 Pick a petal
+{% endif %}
 {% if plant.stage == 5 or plant.dead %}
 =>/app/plant/harvest 🌽 Harvest
 {% endif %}
-=>/app/plant/name 📛 Rename
+=>/app/plant/fertilize 🍄 Fertilize
+=>/app/plant/info 🔬 Plant info
+=>/app/plant/name 📛 Plant name
+
 =>/app 🚶 Go back

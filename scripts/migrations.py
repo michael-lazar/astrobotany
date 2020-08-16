@@ -2,11 +2,19 @@
 import argparse
 from datetime import datetime, timedelta
 
-from peewee import BlobField, BooleanField, DateTimeField, TextField
+from peewee import BlobField, BooleanField, DateTimeField, IntegerField, TextField
 from playhouse import migrate
 
 from astrobotany import items
-from astrobotany.models import Certificate, Inbox, ItemSlot, User, gen_user_id, init_db
+from astrobotany.models import (
+    Certificate,
+    Inbox,
+    ItemSlot,
+    Plant,
+    User,
+    gen_user_id,
+    init_db,
+)
 
 
 def add_setting_ansi_enabled(migrator):
@@ -77,6 +85,14 @@ def move_ansi_enabled(migrator):
         for cert in user.certificates:
             cert.ansi_enabled = user.ansi_enabled
             cert.save()
+
+
+def add_shaken_at(migrator):
+    migrate.migrate(migrator.add_column("plant", "shaken_at", IntegerField(default=False)))
+
+    for plant in Plant.select():
+        plant.shaken_at = plant.score
+        plant.save()
 
 
 MIGRATIONS = locals()

@@ -387,3 +387,42 @@ def test_user_initialize():
     assert user.username == username
     assert user.get_item_quantity(items.paperclip) == 1
     assert user.inbox.count() == 1
+
+
+def test_shake_plant_empty():
+    user = user_factory()
+    assert user.get_item_quantity(items.coin) == 0
+
+    user.plant.shake()
+    assert user.get_item_quantity(items.coin) == 0
+
+
+def test_shake_plant_20():
+    user = user_factory()
+
+    user.plant.shaken_at = 10000
+    user.plant.score = 10000 + 3600 * 20
+
+    user.plant.shake()
+    assert user.plant.shaken_at == user.plant.score
+    assert user.get_item_quantity(items.coin) == 20
+
+
+def test_shake_plant_max():
+    user = user_factory()
+
+    user.plant.score = 3600 * 500
+
+    user.plant.shake()
+    assert user.plant.shaken_at == user.plant.score
+    assert user.get_item_quantity(items.coin) == 100
+
+
+def test_shake_plant_fractional():
+    user = user_factory()
+
+    user.plant.score = 3600 * 1.5
+
+    user.plant.shake()
+    assert user.get_item_quantity(items.coin) == 1
+    assert user.plant.shaken_at == 3600
