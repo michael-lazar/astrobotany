@@ -6,15 +6,7 @@ from peewee import BlobField, BooleanField, DateTimeField, IntegerField, TextFie
 from playhouse import migrate
 
 from astrobotany import items
-from astrobotany.models import (
-    Certificate,
-    Inbox,
-    ItemSlot,
-    Plant,
-    User,
-    gen_user_id,
-    init_db,
-)
+from astrobotany.models import Certificate, ItemSlot, Plant, User, gen_user_id, init_db
 
 
 def add_setting_ansi_enabled(migrator):
@@ -42,11 +34,6 @@ def add_item_fertilizer(migrator):
 def add_plant_fertilized_at(migrator):
     dt = datetime.now() - timedelta(days=4)
     migrate.migrate(migrator.add_column("plant", "fertilized_at", DateTimeField(default=dt)))
-
-
-def send_welcome_message(migrator):
-    for user in User.select():
-        Inbox.send_welcome_message(user)
 
 
 def add_user_password_field(migrator):

@@ -1,0 +1,21 @@
+Welcome to Astrobotany!
+Greetings {user.username},
+
+Welcome to astrobotany! You are visitor number {user.id}.
+
+Please enjoy poking around this little app as a demonstration of what gemini:// is capable of.
+
+You can report any bugs that you encounter on the project issue tracker:
+=>https://github.com/michael-lazar/astrobotany/issues
+
+Thank you for being a part of this wonderful community.
+
+```
+                  .' '.            __
+         .        .   .           (__\_
+          .         .         . -{{_(|8)
+  jgs       ' .  . ' ' .  . '     (__/`
+```
+
+Your garden awaits,
+admin

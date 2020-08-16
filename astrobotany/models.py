@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import math
+import os
 import random
 import uuid
 from datetime import date, datetime, timedelta
-from typing import List, Optional, Type
+from typing import List, Optional, Tuple, Type
 
 import bcrypt
 from faker import Faker
@@ -24,6 +25,9 @@ from . import constants, items
 from .art import colorize, render_art
 
 fake = Faker()
+
+
+MAIL_DIR = os.path.join(os.path.dirname(__file__), "mail")
 
 
 def init_db(filename: str = ":memory:") -> SqliteDatabase:
@@ -90,7 +94,12 @@ class User(BaseModel):
         user = cls.create(username=username)
         user.add_item(items.paperclip)
         user.add_item(items.fertilizer, quantity=5)
-        Inbox.send_welcome_message(user)
+
+        subject, body = Inbox.load_mail_file("welcome.txt")
+        body = body.format(user=user)
+        Inbox.create(
+            user_from=User.admin(), user_to=user, subject=subject, body=body,
+        )
         return user
 
     @classmethod
@@ -262,16 +271,11 @@ class Inbox(BaseModel):
         return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")
 
     @classmethod
-    def send_welcome_message(cls, user: User) -> None:
-        """
-        Send an initial welcome message to a new user.
-        """
-        cls.create(
-            user_from=User.admin(),
-            user_to=user,
-            subject=constants.WELCOME_SUBJECT,
-            body=constants.WELCOME_MESSAGE.format(name=user.username, number=user.id),
-        )
+    def load_mail_file(cls, filename: str) -> Tuple[str, str]:
+        with open(os.path.join(MAIL_DIR, filename)) as fp:
+            subject = fp.readline().strip()
+            body = fp.read().strip()
+        return subject, body
 
 
 class Plant(BaseModel):

@@ -21,5 +21,7 @@ setup(
     python_requires=">=3.7, <4",
     install_requires=["jetforce", "peewee", "jinja2", "faker", "bcrypt"],
     extras_require={"test": ["pytest", "black", "isort", "mypy", "freezegun"],},
-    package_data={"astrobotany": ["art/*", "templates/*", "files/*", "templates/fragments/*"]},
+    package_data={
+        "astrobotany": ["art/*", "templates/*", "files/*", "mail/*", "templates/fragments/*"]
+    },
 )
