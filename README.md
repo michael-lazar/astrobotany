@@ -22,7 +22,7 @@ A community garden over the [gemini](https://gemini.circumlunar.space/) protocol
 
 (requires python 3.7+)
 
-```
+```bash
 # Setup a fresh virtual environment
 git clone git@github.com:michael-lazar/astrobotany.git
 cd astrobotany
