@@ -4,7 +4,11 @@
 {{ title_art }}
 ```
 
-## Options
+Welcome, {{ request.user.username }}!
+
+The current time is {{ now | datetime }}.
+
+## Links
 
 =>/app/plant 🌻 Visit your plant
 =>/app/visit ⛲ Community garden

@@ -89,13 +89,11 @@ def authenticate(func: typing.Callable) -> typing.Callable:
 
         cert = User.login(fingerprint)
         if cert is None:
-            body = dedent(
-                """\
-                The supplied certificate was not recognized.
-                
-                Go here to register a new user account:
-                =>/register
-                """
+            body = render_template(
+                "register.gmi",
+                request=request,
+                fingerprint=fingerprint,
+                cert=request.environ["client_certificate"],
             )
             return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -123,96 +121,33 @@ def index(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/register")
-def register(request):
-    body = render_template("register.gmi")
-    return Response(Status.SUCCESS, "text/gemini", body)
-
-
-@app.route("/register/link")
-def register_link(request):
-    if "REMOTE_USER" not in request.environ:
-        msg = "Attach your client certificate to continue."
-        return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
-
-    fingerprint = request.environ["TLS_CLIENT_HASH"]
-    username = request.environ["REMOTE_USER"]
-
-    if Certificate.select().where(Certificate.fingerprint == fingerprint).exists():
-        msg = "This certificate has already been linked to your account."
-        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
-
-    elif not username:
-        msg = "The certificate must define a CN (Common Name) attribute."
-        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
-
-    try:
-        user = User.select().where(User.username == username).get()
-    except User.DoesNotExist:
-        msg = f"No existing user was found with the name '{username}'."
-        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
-
-    if not user.password:
-        msg = f"Unable to link because your account does not have a password."
-        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
-
-    elif not request.query:
-        msg = "Enter your secret password to link this certificate:"
-        return Response(Status.SENSITIVE_INPUT, msg)
-
-    rate_limit_resp = password_failed_rate_limiter.check(request)
-    if rate_limit_resp:
-        return rate_limit_resp
-
-    if not user.check_password(request.query):
-        msg = "Invalid password"
-        return Response(Status.BAD_REQUEST, msg)
-
-    password_failed_rate_limiter.reset()
-
-    cert = request.environ["client_certificate"]
-    Certificate.create(
-        user=user,
-        fingerprint=fingerprint,
-        subject=cert.subject.rfc4514_string(),
-        not_valid_before_utc=cert.not_valid_before,
-        not_valid_after_utc=cert.not_valid_after,
-    )
-
-    body = dedent(
-        f"""\
-        Your account has been linked to a new certificate! 🎉
-
-        Server Time : {datetime.now()}
-        Fingerprint : {fingerprint}
-        Subject CN  : {username}
-
-        =>/app login        
-        """
-    )
-    return Response(Status.SUCCESS, "text/gemini", body)
-
-
-@app.route("/register/new")
+@app.route("/app/register-new")
 def register_new(request):
     if "REMOTE_USER" not in request.environ:
         msg = "Attach your client certificate to continue."
         return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
     fingerprint = request.environ["TLS_CLIENT_HASH"]
-    username = request.environ["REMOTE_USER"]
-
     if Certificate.select().where(Certificate.fingerprint == fingerprint).exists():
         msg = "This certificate has already been linked to an account."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
 
-    elif not username:
-        msg = "The certificate must define a CN (Common Name) attribute."
-        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+    username = request.query
+    if not username:
+        msg = "Enter your desired username (US-ASCII characters only)"
+        return Response(Status.INPUT, msg)
 
-    elif User.select().where(User.username == username).exists():
-        msg = f"Sorry, the username '{username}' is already taken."
-        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+    if not username.isascii():
+        msg = f"The username '{username}' contains invalid characters, try again"
+        return Response(Status.INPUT, msg)
+
+    if len(username) > 30:
+        msg = f"The username '{username}' is too long, try again"
+        return Response(Status.INPUT, msg)
+
+    if User.select().where(User.username == username).exists():
+        msg = f"the username '{username}' is already taken, try again"
+        return Response(Status.INPUT, msg)
 
     rate_limit_resp = new_account_rate_limiter.check(request)
     if rate_limit_resp:
@@ -229,18 +164,63 @@ def register_new(request):
         not_valid_after_utc=cert.not_valid_after,
     )
 
-    body = dedent(
-        f"""\
-        Your new account has been created! 🎉
-        
-        Server Time : {datetime.now()}
-        Fingerprint : {fingerprint}
-        Subject CN  : {username}
-    
-        =>/app login        
-        """
+    return Response(Status.REDIRECT_TEMPORARY, "/app")
+
+
+@app.route("/app/register-existing")
+@app.route("/app/register-existing/(?P<user_id>[0-9]+)")
+def register_existing(request, user_id=None):
+    if "REMOTE_USER" not in request.environ:
+        msg = "Attach your client certificate to continue."
+        return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
+
+    fingerprint = request.environ["TLS_CLIENT_HASH"]
+    if Certificate.select().where(Certificate.fingerprint == fingerprint).exists():
+        msg = "This certificate has already been linked to an account."
+        return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
+
+    if user_id is None:
+        username = request.query
+        if not username:
+            msg = "Enter your existing username"
+            return Response(Status.INPUT, msg)
+
+        try:
+            user = User.select().where(User.username == username).get()
+        except User.DoesNotExist:
+            msg = f"No existing user was found with the name '{username}'."
+            return Response(Status.BAD_REQUEST, msg)
+
+        return Response(Status.REDIRECT_TEMPORARY, f"/app/register-existing/{user.id}")
+
+    user = User.get_by_id(int(user_id))
+    if not user.password:
+        msg = "Unable to add a certificate because this account does not have a password set."
+        return Response(Status.BAD_REQUEST, msg)
+
+    password = request.query
+    if not password:
+        msg = "Enter your password"
+        return Response(Status.SENSITIVE_INPUT, msg)
+
+    rate_limit_resp = password_failed_rate_limiter.check(request)
+    if rate_limit_resp:
+        return rate_limit_resp
+
+    if not user.check_password(password):
+        msg = "Invalid password, try again"
+        return Response(Status.SENSITIVE_INPUT, msg)
+
+    cert = request.environ["client_certificate"]
+    Certificate.create(
+        user=user,
+        fingerprint=fingerprint,
+        subject=cert.subject.rfc4514_string(),
+        not_valid_before_utc=cert.not_valid_before,
+        not_valid_after_utc=cert.not_valid_after,
     )
-    return Response(Status.SUCCESS, "text/gemini", body)
+
+    return Response(Status.REDIRECT_TEMPORARY, "/app")
 
 
 @app.route("/files/(?P<path>.*)")
@@ -271,7 +251,10 @@ def files(request, path):
 def menu(request):
     title_art = render_art("title.psci", ansi_enabled=request.cert.ansi_enabled)
     mailbox_count = request.user.inbox.where(Inbox.is_seen == False).count()
-    body = render_template("menu.gmi", title_art=title_art, mailbox_count=mailbox_count)
+    now = datetime.now()
+    body = render_template(
+        "menu.gmi", request=request, title_art=title_art, mailbox_count=mailbox_count, now=now
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
