@@ -10,7 +10,6 @@
 ## Links
 
 =>/app 🌷 Login
-=>/register 🌱 Register
 =>/files/instructions.gmi 📚 Instructions
 
 ## Leaderboard

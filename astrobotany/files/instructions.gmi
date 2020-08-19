@@ -37,6 +37,21 @@ Once your plant reaches the seed-bearing stage, you will be given the option to 
 score_multiplier = 1 + (0.2 * generation)
 ```
 
+## Registration
+
+Astrobotany uses self-signed (TOFU) client certificates for authentication. In order to join in the fun, use your preferred gemini client to generate a new certificate. The subject fields in the certificate (name, location, email, CN, ...) don't matter. You can either leave them blank, or you can enter in values for your own records.
+
+Once you have generated your certificate, attempt to login and you will be guided through the process of creating an account.
+
+### Client Software
+
+Here are some gemini clients that support client certificates:
+
+=>https://tildegit.org/solderpunk/AV-98 AV-98 (TUI)
+=>gopher://thelambdalab.xyz/1/projects/elpher/ elpher (emacs)
+=>https://github.com/MasterQ32/kristall Kristall (GUI)
+=>https://github.com/pitr/gemini-ios Gemini for iOS
+
 ## Registration (deprecated)
 
 The old astrobotany registration guide used CSR's to generate authorised client certificates. This method no longer works, but is linked here for historical reference.
