@@ -18,18 +18,21 @@ A community garden over the [gemini](https://gemini.circumlunar.space/) protocol
 
 ---
 
-## Development Quickstart
+## Getting Started
+
+(requires python 3.7+)
 
 ```
 # Setup a fresh virtual environment
 git clone git@github.com:michael-lazar/astrobotany.git
 cd astrobotany
-python3 -m virtualenv venv
+python -m virtualenv venv
+source venv/bin/activate
 
-# Install the package
+# Install astrobotany in "edit" mode
 pip install -e .
 
-# Launch the server
+# Launch the gemini server
 python main.py
 ```
 
