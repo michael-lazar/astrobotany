@@ -20,38 +20,17 @@ A community garden over the [gemini](https://gemini.circumlunar.space/) protocol
 
 ## Development Quickstart
 
-### 1. Install
-
 ```
+# Setup a fresh virtual environment
 git clone git@github.com:michael-lazar/astrobotany.git
 cd astrobotany
 python3 -m virtualenv venv
 
-source venv/bin/activate
+# Install the package
 pip install -e .
 
-# Generate a self-signed CA
-./scripts/generate_server_ca.sh
-
-# Add a handful of test users
-./scripts/add_seed_data.py 10
-```
-
-### 2. Run
-
-```
-source venv/bin/activate
+# Launch the server
 python main.py
-```
-
-### 3. Connect
-
-```
-# Generate a signed client certificate
-./scripts/generate_client_cert.sh test_user
-
-# Using https://tildegit.org/solderpunk/AV-98
-av98 gemini://localhost --tls-cert certs/test_user.cer --tls-key certs/test_user.key
 ```
 
 ## Art
