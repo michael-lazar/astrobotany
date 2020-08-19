@@ -1,0 +1,19 @@
+# Astrobotany - Store
+
+> Buy something!
+
+## Your Money
+
+You have {{ coins | number }} coins.
+
+=>/app/inventory (your inventory)
+
+## For Sale
+
+{% for item in for_sale %}
+### {{ item.name }}
+
+=>/app/items/{{ item.item_id }} {{ item.name }} - Description
+=>/app/store/purchase/{{ item.item_id }} {{ item.name }} - Purchase ({{ item.price }} coins)
+
+{% endfor %}

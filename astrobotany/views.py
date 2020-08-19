@@ -31,7 +31,12 @@ def datetime_format(value, fmt="%A, %B %d, %Y %-I:%M:%S %p"):
     return value.strftime(fmt)
 
 
+def number_format(value):
+    return "{:,}".format(value)
+
+
 template_env.filters["datetime"] = datetime_format
+template_env.filters["number"] = number_format
 
 mimetypes.add_type("text/gemini", ".gmi")
 
@@ -406,6 +411,15 @@ def settings_certificates_delete(request, certificate_id):
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings/certificates")
 
 
+@app.route("/app/store")
+@authenticate
+def store(request):
+    coins = request.user.get_item_quantity(items.coin)
+    for_sale = items.for_sale()
+    body = render_template("store.gmi", request=request, coins=coins, for_sale=for_sale)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
 @app.route("/app/mailbox")
 @authenticate
 def mailbox(request):
@@ -591,7 +605,7 @@ def inventory(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/inventory/(?P<item_id>[0-9]+)")
+@app.route("/app/items/(?P<item_id>[0-9]+)")
 @authenticate
 def view_item(request, item_id):
     item = items.registry[int(item_id)]

@@ -3,5 +3,3 @@
 ## {{ item.name }}
 
 {{ item.description }}
-
-=>/app/inventory 🚶 Go back
