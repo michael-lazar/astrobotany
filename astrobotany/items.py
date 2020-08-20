@@ -32,7 +32,7 @@ paperclip = Item(
 
 
 fertilizer = Item(
-    price=35,
+    price=75,
     name="EZ-Grow fertilizer",
     description="""
     A bottle of plant fertilizer.

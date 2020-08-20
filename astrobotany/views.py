@@ -414,7 +414,7 @@ def store_purchase(request, item_id):
         return Response(Status.BAD_REQUEST, "Item is not for sale")
 
     if not request.query:
-        msg = f"Confirm: purchase 1 [{item.name}] for {item.price} coins. [Y]es/[N]o."
+        msg = f"Confirm: purchase 1 {item.name} for {item.price} coins. [Y]es/[N]o."
         return Response(Status.INPUT, msg)
 
     if request.query.strip().lower() in ("y", "yes"):
