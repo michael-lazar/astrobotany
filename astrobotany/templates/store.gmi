@@ -1,19 +1,22 @@
 # Astrobotany - Store
 
-> Buy something!
+> No refunds!
 
-## Your Money
+## Your Stuff
 
 You have {{ coins | number }} coins.
 
-=>/app/inventory (your inventory)
+=>/app/inventory (go to inventory)
 
 ## For Sale
 
-{% for item in for_sale %}
-### {{ item.name }}
+{% for item_slot in for_sale %}
+### {{ loop.index }}. {{ item_slot.item.name }}
 
-=>/app/items/{{ item.item_id }} {{ item.name }} - Description
-=>/app/store/purchase/{{ item.item_id }} {{ item.name }} - Purchase ({{ item.price }} coins)
+Price : {{ item_slot.item.price }} coins
+Owned : {{ item_slot.quantity | number }}
+
+=>/app/items/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] More Info
+=>/app/store/purchase/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] Purchase
 
 {% endfor %}

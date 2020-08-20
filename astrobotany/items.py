@@ -4,10 +4,6 @@ from typing import Dict
 from . import constants
 
 
-def for_sale():
-    return sorted((i for i in registry.values() if i.for_sale), key=lambda i: i.price)
-
-
 class Item:
     def __init__(self, price: int, name: str, description: str, for_sale: bool = False) -> None:
         self.item_id = len(registry) + 1

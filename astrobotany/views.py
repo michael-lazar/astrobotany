@@ -5,7 +5,6 @@ import pathlib
 import typing
 from datetime import datetime, timedelta
 from functools import lru_cache
-from textwrap import dedent
 
 import jinja2
 from jetforce import JetforceApplication, Request, Response, Status
@@ -14,7 +13,7 @@ from jetforce.app.base import RateLimiter
 from . import items
 from .art import render_art
 from .leaderboard import get_daily_leaderboard
-from .models import Certificate, Inbox, Message, Plant, User
+from .models import Certificate, Inbox, ItemSlot, Message, Plant, User
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 FILES_DIR = os.path.join(os.path.dirname(__file__), "files")
@@ -398,9 +397,33 @@ def settings_certificates_delete(request, certificate_id):
 @authenticate
 def store(request):
     coins = request.user.get_item_quantity(items.coin)
-    for_sale = items.for_sale()
+    for_sale = ItemSlot.store_view(request.user)
     body = render_template("store.gmi", request=request, coins=coins, for_sale=for_sale)
     return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/store/purchase/(?P<item_id>[0-9]+)")
+@authenticate
+def store_purchase(request, item_id):
+    item_id = int(item_id)
+    item = items.registry.get(item_id)
+    if item is None:
+        return Response(Status.BAD_REQUEST, "Item was not found")
+
+    if not item.for_sale:
+        return Response(Status.BAD_REQUEST, "Item is not for sale")
+
+    if not request.query:
+        msg = f"Confirm: purchase 1 [{item.name}] for {item.price} coins. [Y]es/[N]o."
+        return Response(Status.INPUT, msg)
+
+    if request.query.strip().lower() in ("y", "yes"):
+        if request.user.remove_item(items.coin, quantity=item.price):
+            request.user.add_item(item)
+        else:
+            return Response(Status.BAD_REQUEST, "Insufficient funds")
+
+    return Response(Status.REDIRECT_TEMPORARY, "/app/store")
 
 
 @app.route("/app/mailbox")

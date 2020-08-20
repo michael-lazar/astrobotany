@@ -5,7 +5,7 @@ import os
 import random
 import uuid
 from datetime import date, datetime, timedelta
-from typing import List, Optional, Tuple, Type
+from typing import Iterable, List, Optional, Tuple, Type
 
 import bcrypt
 from faker import Faker
@@ -172,7 +172,7 @@ class User(BaseModel):
             return False
 
         if item_slot.quantity == quantity:
-            item_slot.delete()
+            item_slot.delete_instance()
             return True
 
         item_slot.quantity -= quantity
@@ -232,6 +232,16 @@ class ItemSlot(BaseModel):
     @property
     def item(self) -> items.Item:
         return items.registry[self.item_id]
+
+    @classmethod
+    def store_view(cls, user: User) -> Iterable[ItemSlot]:
+        item_slots = {item_slot.item_id: item_slot for item_slot in user.inventory}
+        for item_id, item in items.registry.items():
+            if item.for_sale:
+                item_slot = item_slots.get(item_id)
+                if not item_slot:
+                    item_slot = ItemSlot(user=user, item_id=item_id)
+                yield item_slot
 
 
 class Event(BaseModel):
