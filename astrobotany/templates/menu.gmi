@@ -11,8 +11,9 @@ The current time is {{ now | datetime }}.
 ## Links
 
 =>/app/plant 🌻 Visit your plant
-=>/app/visit 📒 Community garden
+=>/app/visit ⛲ Community garden
 =>/app/inventory 🎒 Inventory
+=>/app/store 💳 Store
 =>/app/message-board 📌 Message board
 {% if mailbox_count %}
 =>/app/mailbox 📬 Mailbox ({{ mailbox_count }} unread)
@@ -20,4 +21,3 @@ The current time is {{ now | datetime }}.
 =>/app/mailbox 📪 Mailbox
 {% endif %}
 =>/app/settings 🐌 Settings
-=>/ 🏡 Home
