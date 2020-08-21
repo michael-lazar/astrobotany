@@ -93,7 +93,7 @@ class User(BaseModel):
         """
         user = cls.create(username=username)
         user.add_item(items.paperclip)
-        user.add_item(items.fertilizer, quantity=5)
+        user.add_item(items.fertilizer, quantity=1)
 
         subject, body = Inbox.load_mail_file("welcome.txt")
         body = body.format(user=user)
@@ -400,6 +400,19 @@ class Plant(BaseModel):
         elapsed_seconds = (datetime.now() - self.fertilized_at).total_seconds()
         remaining_fertilizer = max(0.0, 1 - (elapsed_seconds / seconds_per_day))
         return math.ceil(remaining_fertilizer * 100)
+
+    def can_fertilize(self) -> bool:
+        """
+        Return if the user can apply fertilizer to the plant.
+        """
+        if self.dead:
+            return False
+        elif self.fertilizer_percent:
+            return False
+        elif not self.user_active.get_item_quantity(items.fertilizer):
+            return False
+        else:
+            return True
 
     def get_water_gauge(self, ansi_enabled: bool = False) -> str:
         """

@@ -29,7 +29,9 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% elif plant.dead %}
 =>/app/plant/harvest 💀 Harvest
 {% endif %}
+{% if plant.can_fertilize() %}
 =>/app/plant/fertilize 🍄 Fertilize
+{% endif %}
 =>/app/plant/info 🔬 Plant info
 =>/app/plant/name 📛 Plant name
 
