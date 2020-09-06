@@ -177,7 +177,7 @@ def test_plant_no_fertilizer(now):
 
 def test_plant_water_rate_limit(frozen_time, now):
     """
-    A user can only water one neighbor's plan every 8 hours.
+    A user can only water one neighbor's plant every 8 hours.
     """
     user1 = user_factory()
     user2 = user_factory()
@@ -196,7 +196,13 @@ def test_plant_water_rate_limit(frozen_time, now):
     assert plant2.water_supply_percent == 0
     assert plant2.watered_by is None
 
-    frozen_time.tick(delta=timedelta(hours=12))
+    frozen_time.tick(delta=timedelta(hours=7.5))
+    plant2.water(user3)
+    plant2.save()
+    assert plant2.water_supply_percent == 0
+    assert plant2.watered_by is None
+
+    frozen_time.tick(delta=timedelta(hours=0.6))
     plant2.water(user3)
     plant2.save()
     assert plant2.water_supply_percent == 100
