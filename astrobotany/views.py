@@ -84,7 +84,7 @@ def authenticate(func: typing.Callable) -> typing.Callable:
             fingerprint = f"{serial_number:032X}"  # Convert to hex
         else:
             # New-style self signed certificate
-            fingerprint = request.environ["TLS_CLIENT_HASH"]
+            fingerprint = request.environ["TLS_CLIENT_HASH_B64"]
 
         cert = User.login(fingerprint)
         if cert is None:
@@ -126,7 +126,7 @@ def register_new(request):
         msg = "Attach your client certificate to continue."
         return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
-    fingerprint = request.environ["TLS_CLIENT_HASH"]
+    fingerprint = request.environ["TLS_CLIENT_HASH_B64"]
     if Certificate.select().where(Certificate.fingerprint == fingerprint).exists():
         msg = "This certificate has already been linked to an account."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
@@ -173,7 +173,7 @@ def register_existing(request, user_id=None):
         msg = "Attach your client certificate to continue."
         return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
-    fingerprint = request.environ["TLS_CLIENT_HASH"]
+    fingerprint = request.environ["TLS_CLIENT_HASH_B64"]
     if Certificate.select().where(Certificate.fingerprint == fingerprint).exists():
         msg = "This certificate has already been linked to an account."
         return Response(Status.CERTIFICATE_NOT_AUTHORISED, msg)
