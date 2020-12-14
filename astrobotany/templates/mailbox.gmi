@@ -4,14 +4,22 @@
 {{ mailbox_art }}
 ```
 
+## Compose a letter
+
+=>/app/mailbox/outgoing Send a letter to someone special
+
 ## Messages
 
 {% for msg in messages %}
+{% if msg.user_to == request.user %}
 =>/app/mailbox/{{ msg.id }} [{{ msg.date_str }}] {% if not msg.is_seen %}(unread) {% endif %}from {{ msg.user_from.username }}
+{% else %}
+=>/app/mailbox/{{ msg.id }} [{{ msg.date_str }}] to {{ msg.user_to.username }}
+{% endif %}
 > {{ msg.subject }}
 
 {% else %}
-Your mailbox is empty!
+Your mailbox is empty.
 
 {% endfor %}
 =>/app 🚶 Go back

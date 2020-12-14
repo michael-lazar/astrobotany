@@ -1,5 +1,5 @@
 from textwrap import dedent
-from typing import Dict
+from typing import Dict, List
 
 from . import constants
 
@@ -87,4 +87,68 @@ coin = Item(
          ██████▓▓░░▓▓████░
     ```     
     """,
+)
+
+
+class Postcard(Item):
+
+    postcards: List["Postcard"] = []
+
+    def __init__(self, border, **kwargs):
+        super().__init__(**kwargs)
+        self.border = border
+
+        sample_letter = self.format_message(
+            "I think that I shall never see",
+            "A poem lovely as a tree.",
+            "A tree whose hungry mouth is prest",
+            "Against the earth’s sweet flowing breast;",
+        )
+        self.description += "\n\nExample:\n\n" + sample_letter
+
+        self.postcards.append(self)
+
+    def format_message(self, *lines):
+        message = [self.border[0], *(f"> {line}" for line in lines), self.border[1]]
+        return "\n".join(message)
+
+
+plain_postcard = Postcard(
+    price=50,
+    name="Plain Postcard",
+    border=constants.BORDERS["plain"],
+    description="""
+    A blank postcard that can be mailed to another user.
+    """,
+    for_sale=True,
+)
+
+fancy_postcard = Postcard(
+    price=125,
+    name="Fancy Postcard",
+    border=constants.BORDERS["fancy"],
+    description="""
+    A fancy postcard with an intricate design.
+    """,
+    for_sale=True,
+)
+
+cool_postcard = Postcard(
+    price=125,
+    name="Cool Postcard",
+    border=constants.BORDERS["cool"],
+    description="""
+    A rad postcard with a picture of a bird on it.
+    """,
+    for_sale=True,
+)
+
+romantic = Postcard(
+    price=125,
+    name="Romantic Postcard",
+    border=constants.BORDERS["romantic"],
+    description="""
+    A romantic postcard with sparkling hearts on it.
+    """,
+    for_sale=True,
 )

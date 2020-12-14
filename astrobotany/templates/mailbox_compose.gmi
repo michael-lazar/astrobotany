@@ -1,0 +1,20 @@
+# Astrobotany - Compose Letter
+
+Postcard type selected : {{ postcard.name }}
+
+## Details
+
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/to To: {{ data.user.username | default("<empty>") }}
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/subject Subject: {{ data.subject | default("<empty>", true) }}
+
+{% for line in data.lines %}
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/line/{{ loop.index }} line {{ loop.index }}: {{ line }}
+{% endfor %}
+
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/clear Clear all
+
+## Actions
+
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/preview Preview and send
+
+=>/app/mailbox/outgoing 🚶 Go back

@@ -1,0 +1,19 @@
+# Astrobotany - Outgoing Mail
+
+Send a private message to a fellow gardener.
+
+## Available postcards
+
+{% for item, count in postcards %}
+=>/app/mailbox/outgoing/{{ item.item_id }} ✉️  Use a {{ item.name }} (you have {{ count }})
+{% else %}
+(Your inventory is empty)
+{% endfor %}
+
+## Buy a postcard
+
+=>/app/store Go to the store
+
+=>/app/mailbox 🚶 Go back
+
+

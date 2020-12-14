@@ -1,0 +1,16 @@
+# Astrobotany - Preview Letter
+
+## Preview
+
+To: {{ data.user.username }}
+Subject: {{ data.subject }}
+
+{{ postcard.format_message(*data.lines) }}
+
+## Actions
+
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/send 📤 Looks good, send it!
+
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/ 🚶 Go back
+
+

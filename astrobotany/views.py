@@ -109,6 +109,21 @@ def authenticate(func: typing.Callable) -> typing.Callable:
     return callback
 
 
+class PostcardData:
+    def __init__(self):
+        self.user = None
+        self.subject = None
+        self.lines = ["", "", "", ""]
+
+    @classmethod
+    def from_request(cls, request):
+        return request.session.setdefault("postcard", cls())
+
+    @classmethod
+    def delete(cls, request):
+        request.session.pop("postcard", None)
+
+
 app = JetforceApplication()
 
 
@@ -429,7 +444,11 @@ def store_purchase(request, item_id):
 @app.route("/app/mailbox")
 @authenticate
 def mailbox(request):
-    messages = request.user.inbox.order_by(Inbox.id.desc())
+    messages = (
+        Inbox.select()
+        .where((Inbox.user_to == request.user) | (Inbox.user_from == request.user))
+        .order_by(Inbox.id.desc())
+    )
     mailbox_art = render_art("mailbox.psci", ansi_enabled=request.cert.ansi_enabled)
     body = render_template(
         "mailbox.gmi", request=request, messages=messages, mailbox_art=mailbox_art
@@ -437,15 +456,136 @@ def mailbox(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
+@app.route("/app/mailbox/outgoing")
+@authenticate
+def mailbox_outgoing(request):
+    postcards = []
+    for item in items.Postcard.postcards:
+        quantity = request.user.get_item_quantity(item)
+        if quantity:
+            postcards.append((item, quantity))
+
+    body = render_template("mailbox_outgoing.gmi", request=request, postcards=postcards)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)")
+@authenticate
+def mailbox_compose(request, postcard_id):
+    postcard = items.registry[int(postcard_id)]
+    data = PostcardData.from_request(request)
+    body = render_template("mailbox_compose.gmi", request=request, postcard=postcard, data=data)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/to")
+@authenticate
+def mailbox_compose_to(request, postcard_id):
+    username = request.query
+    if not username:
+        return Response(
+            Status.INPUT, "Enter a username to address this letter to (case sensitive):"
+        )
+
+    try:
+        user = User.select().where(User.username == username).get()
+    except User.DoesNotExist:
+        msg = f"No user was found with the name '{username}'."
+        return Response(Status.BAD_REQUEST, msg)
+
+    data = PostcardData.from_request(request)
+    data.user = user
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
+
+
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/subject")
+@authenticate
+def mailbox_compose_subject(request, postcard_id):
+    subject = request.query
+    if not subject:
+        return Response(Status.INPUT, f"Enter subject:")
+
+    data = PostcardData.from_request(request)
+    data.subject = subject
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
+
+
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/line/(?P<line_number>[0-9]+)")
+@authenticate
+def mailbox_compose_line(request, postcard_id, line_number):
+    line = request.query
+    if not line:
+        return Response(
+            Status.INPUT, f"Enter message line {line_number} (or submit a blank space to erase):"
+        )
+
+    data = PostcardData.from_request(request)
+    data.lines[int(line_number) - 1] = line.rstrip()
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
+
+
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/clear")
+@authenticate
+def mailbox_compose_clear(request, postcard_id):
+    PostcardData.delete(request)
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
+
+
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/preview")
+@authenticate
+def mailbox_preview(request, postcard_id):
+    postcard = items.registry[int(postcard_id)]
+    if not isinstance(postcard, items.Postcard):
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    data = PostcardData.from_request(request)
+    if data.user is None:
+        return Response(Status.BAD_REQUEST, "Cannot proceed without a user defined")
+    if not data.subject:
+        return Response(Status.BAD_REQUEST, "Cannot proceed without a subject defined")
+
+    body = render_template("mailbox_preview.gmi", request=request, postcard=postcard, data=data)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/send")
+@authenticate
+def mailbox_send(request, postcard_id):
+    postcard = items.registry[int(postcard_id)]
+    if not isinstance(postcard, items.Postcard):
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    data = PostcardData.from_request(request)
+    if data.user is None:
+        return Response(Status.BAD_REQUEST, "Can't proceed without adding a recipient")
+    if not data.subject:
+        return Response(Status.BAD_REQUEST, "Cannot proceed without a subject defined")
+
+    if not request.user.remove_item(postcard):
+        return Response(Status.BAD_REQUEST, "Whoops, it looks like you're all out of postcards!")
+
+    body = postcard.format_message(*data.lines)
+    Inbox.create(user_from=request.user, user_to=data.user, subject=data.subject, body=body)
+    PostcardData.delete(request)
+
+    body = render_template("mailbox_send.gmi", request=request)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
 @app.route("/app/mailbox/(?P<message_id>[0-9]+)")
 @authenticate
 def mailbox_view(request, message_id):
-    message = Inbox.get_or_none(id=message_id, user_to=request.user)
+    message = Inbox.get_or_none(id=message_id)
     if message is None:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
-    message.is_seen = True
-    message.save()
+    if message.user_to == request.user:
+        message.is_seen = True
+        message.save()
+    elif message.user_from == request.user:
+        pass
+    else:
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     body = render_template("mailbox_view.gmi", request=request, message=message)
     return Response(Status.SUCCESS, "text/gemini", body)

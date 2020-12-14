@@ -20,3 +20,4 @@ Owned : {{ item_slot.quantity | number }}
 =>/app/store/purchase/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] Purchase
 
 {% endfor %}
+=>/app 🚶 Go back

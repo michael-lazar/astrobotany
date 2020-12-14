@@ -1,0 +1,19 @@
+# Astrobotany - Letter Sent
+
+```
+      _________
+    .`.        `.
+   /   \ .======.\
+   |   | |______||
+   |   |   _____ |
+   |   |  /    / |
+   |   | /____/  |
+   | _ |         |
+   |/ \|.-"```"-.|
+   `` |||      |||
+jgs   `"`      `"
+```
+
+Your letter has been dropped in the postbox!
+
+=>/app/mailbox Back to your mailbox
