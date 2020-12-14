@@ -561,6 +561,13 @@ def mailbox_send(request, postcard_id):
     if not data.subject:
         return Response(Status.BAD_REQUEST, "Cannot proceed without a subject defined")
 
+    if not request.query:
+        msg = f"Confirm: send postcard to {data.user.username}. [Y]es/[N]o."
+        return Response(Status.INPUT, msg)
+
+    if request.query.strip().lower() not in ("y", "yes"):
+        return Response(Status.SUCCESS, "text/gemini", "Action cancelled.")
+
     if not request.user.remove_item(postcard):
         return Response(Status.BAD_REQUEST, "Whoops, it looks like you're all out of postcards!")
 

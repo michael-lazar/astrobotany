@@ -4,8 +4,8 @@
 
 ---
 
-To: {{ message.user_to.username }}
 From: {{ message.user_from.username }}
+To: {{ message.user_to.username }}
 Date: {{ message.datetime_str }}
 Subject: {{ message.subject }}
 Body:
@@ -15,5 +15,3 @@ Body:
 ---
 
 =>/app/mailbox 🚶 Go back
-
-
