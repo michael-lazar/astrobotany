@@ -32,6 +32,9 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% if plant.can_fertilize() %}
 =>/app/plant/fertilize 🍄 Fertilize
 {% endif %}
+{% if plant.can_use_christmas_cheer() %}
+=>/app/plant/xmas 🎅 Use Christmas Cheer
+{% endif %}
 =>/app/plant/info 🔬 Plant info
 =>/app/plant/name 📛 Plant name
 

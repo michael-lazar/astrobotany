@@ -152,3 +152,18 @@ romantic = Postcard(
     """,
     for_sale=True,
 )
+
+christmas_cheer = Item(
+    price=0,
+    name="Christmas Cheer",
+    description="""
+    A sealed bottle of distilled christmas cheer.
+    
+    An inscription on the back reads...
+    
+    > Instructions: Single use application only.
+    > To activate, mix with water and sprinkle over plant.
+    > For best results, hum along to the tune of "O Christmas Tree".
+    """,
+    for_sale=False,
+)

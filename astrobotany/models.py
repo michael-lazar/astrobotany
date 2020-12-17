@@ -189,6 +189,29 @@ class User(BaseModel):
 
         return 0
 
+    @property
+    def christmas_mode(self) -> bool:
+        """
+        Return if the user is in "christmas" mode.
+
+        Cache the results because this is a relatively expensive query that
+        will be checked multiple times per request.
+        """
+        christmas_mode = getattr(self, "_christmas_mode", None)
+        if christmas_mode is None:
+            christmas_mode = (
+                Event.select()
+                .where(
+                    Event.user == self,
+                    Event.created_at >= datetime.now() - timedelta(days=2),
+                    Event.event_type == Event.ENABLE_CHRISTMAS,
+                )
+                .exists()
+            )
+            setattr(self, "_christmas_mode", christmas_mode)
+
+        return christmas_mode
+
 
 class Certificate(BaseModel):
     """
@@ -250,6 +273,7 @@ class Event(BaseModel):
     """
 
     PICK_PETAL = "pick_petal"
+    ENABLE_CHRISTMAS = "enable_christmas"
 
     user = ForeignKeyField(User, backref="events")
     created_at = DateTimeField(default=datetime.now)
@@ -343,6 +367,9 @@ class Plant(BaseModel):
         """
         A single-line description of the plant and all of its attributes.
         """
+        if self.user.christmas_mode:
+            return "christmas tree"
+
         words: List[str] = []
         if self.stage > 2:
             words.append(self.rarity_str)
@@ -409,10 +436,20 @@ class Plant(BaseModel):
             return False
         elif self.fertilizer_percent:
             return False
-        elif not self.user_active.get_item_quantity(items.fertilizer):
+        elif not self.user.get_item_quantity(items.fertilizer):
             return False
         else:
             return True
+
+    def can_use_christmas_cheer(self) -> bool:
+        """
+        Return if the user can apply christmas cheer to the plant.
+        """
+        if self.dead:
+            return False
+        if self.user.christmas_mode:
+            return False
+        return self.user.get_item_quantity(items.christmas_cheer)
 
     def get_water_gauge(self, ansi_enabled: bool = False) -> str:
         """
@@ -422,7 +459,13 @@ class Plant(BaseModel):
             return "N/A"
 
         percent = self.water_supply_percent
-        bar = ("█" * (percent // 10)).ljust(10)
+
+        if self.user.christmas_mode:
+            bar_char = "🎁"
+        else:
+            bar_char = "█"
+
+        bar = (bar_char * (percent // 10)).ljust(10)
         if ansi_enabled:
             # Make the water blue
             bar = colorize(bar, fg=12)
@@ -449,6 +492,8 @@ class Plant(BaseModel):
         today = date.today()
         if self.dead:
             filename = "rip.psci"
+        elif self.user.christmas_mode:
+            filename = "christmas.psci"
         elif (today.month, today.day) == (10, 31):
             filename = "jackolantern.psci"
         elif self.stage == 0:
@@ -476,6 +521,9 @@ class Plant(BaseModel):
         observation = []
 
         stage = 99 if self.dead else self.stage
+
+        if self.user.christmas_mode:
+            return constants.STAGE_DESCRIPTIONS["christmas"][0]
 
         desc = random.choice(constants.STAGE_DESCRIPTIONS[stage])
         desc = desc.format(color=self.color_str, species=self.species_str)
@@ -689,6 +737,18 @@ class Plant(BaseModel):
 
         self.fertilized_at = datetime.now()
         return "You apply a bottle of fertilizer to your plant."
+
+    def use_christmas_cheer(self) -> str:
+        if self.dead:
+            return "It's time to let go."
+        elif self.user.christmas_mode:
+            return "Nothing happened."
+
+        if not self.user.remove_item(items.christmas_cheer):
+            return "You don't have any christmas cheer to apply."
+
+        Event.create(user=self.user, event_type=Event.ENABLE_CHRISTMAS, target="self")
+        return "✨ POP ✨"
 
     def harvest(self) -> Plant:
         """

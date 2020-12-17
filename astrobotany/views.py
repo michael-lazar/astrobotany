@@ -623,6 +623,13 @@ def fertilize(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
+@app.route("/app/plant/xmas")
+@authenticate
+def xmas(request):
+    request.session["alert"] = request.plant.use_christmas_cheer()
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
 @app.route("/app/plant/info")
 @authenticate
 def info(request):
