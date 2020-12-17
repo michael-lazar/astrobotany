@@ -33,9 +33,9 @@ paperclip = Item(
 
 fertilizer = Item(
     price=75,
-    name="EZ-Grow fertilizer",
+    name="ez-grow fertilizer",
     description="""
-    A bottle of plant fertilizer.
+    A bottle of EZ-Grow™ premium plant fertilizer.
     
     When applied, will increase plant growth rate by 1.5x for 3 days.    
     """,
@@ -64,28 +64,9 @@ coin = Item(
     price=1,
     name="coin",
     description="""
-    A copper coin.
-     
-    Can be used to purchase items at the shop.
+    A copper coin with a portrait of a long-dead cosmonaut on it.
     
-    ```
-                 ██████████          
-         ██████      ███████      
-       ████    ░░░░░░░░░░████      
-       ██  ░░░░      ██░░░░████  ░░
-     ████  ░░░░  ░░░░██░░░░████    
-     ██  ░░░░░░  ░░░░██░░░░░░████  
-     ██  ░░░░░░  ░░░░██░░░░░░████  
-     ██  ░░░░░░  ░░░░██░░░░░░████  
-     ██  ░░░░░░  ░░░░██░░░░░░████  
-     ██  ░░░░░░  ░░░░██░░░░░░████  
-     ██  ░░░░░░  ░░░░██░░░░░░████  
-     ████  ░░░░  ░░░░██░░░░████  ░░
-       ██  ░░░░████████░░░░████    
-       ████  ░░░░░░░░░░░░████      
-         ██████░░░░░░████████      
-         ██████▓▓░░▓▓████░
-    ```     
+    Go buy yourself something shiny with it.
     """,
 )
 
@@ -115,7 +96,7 @@ class Postcard(Item):
 
 plain_postcard = Postcard(
     price=50,
-    name="Plain Postcard",
+    name="plain postcard",
     border=constants.BORDERS["plain"],
     description="""
     A blank postcard that can be mailed to another user.
@@ -125,7 +106,7 @@ plain_postcard = Postcard(
 
 fancy_postcard = Postcard(
     price=125,
-    name="Fancy Postcard",
+    name="fancy postcard",
     border=constants.BORDERS["fancy"],
     description="""
     A fancy postcard with an intricate design.
@@ -135,7 +116,7 @@ fancy_postcard = Postcard(
 
 cool_postcard = Postcard(
     price=125,
-    name="Cool Postcard",
+    name="cool postcard",
     border=constants.BORDERS["cool"],
     description="""
     A rad postcard with a picture of a bird on it.
@@ -145,7 +126,7 @@ cool_postcard = Postcard(
 
 romantic = Postcard(
     price=125,
-    name="Romantic Postcard",
+    name="romantic postcard",
     border=constants.BORDERS["romantic"],
     description="""
     A romantic postcard with sparkling hearts on it.
@@ -155,9 +136,9 @@ romantic = Postcard(
 
 christmas_cheer = Item(
     price=0,
-    name="Christmas Cheer",
+    name="bottle of christmas cheer",
     description="""
-    A sealed bottle of distilled christmas cheer.
+    A bottle of distilled christmas cheer.
     
     An inscription on the back reads...
     
