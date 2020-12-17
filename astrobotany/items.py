@@ -66,7 +66,7 @@ coin = Item(
     description="""
     A copper coin with a portrait of a long-dead cosmonaut on it.
     
-    Go buy yourself something shiny with it.
+    Go buy yourself something shiny.
     """,
 )
 

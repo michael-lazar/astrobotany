@@ -411,16 +411,36 @@ def settings_certificates_delete(request, certificate_id):
 @app.route("/app/store")
 @authenticate
 def store(request):
-    coins = request.user.get_item_quantity(items.coin)
     for_sale = ItemSlot.store_view(request.user)
-    body = render_template("store.gmi", request=request, coins=coins, for_sale=for_sale)
+    body = render_template("store.gmi", request=request, for_sale=for_sale)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/store/purchase/(?P<item_id>[0-9]+)")
+@app.route("/app/store/(?P<item_id>[0-9]+)")
 @authenticate
-def store_purchase(request, item_id):
+def store_view(request, item_id):
     item_id = int(item_id)
+    item = items.registry.get(item_id)
+    if item is None:
+        return Response(Status.NOT_FOUND, "Item was not found")
+    if not item.for_sale:
+        return Response(Status.NOT_FOUND, "Item was not found")
+
+    try:
+        item_slot = request.user.inventory.where(ItemSlot.item_id == item_id).get()
+    except ItemSlot.DoesNotExist:
+        item_slot = ItemSlot(user=request.user, item_id=item_id)
+
+    coins = request.user.get_item_quantity(items.coin)
+    body = render_template("store_view.gmi", request=request, item_slot=item_slot, coins=coins)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/store/(?P<item_id>[0-9]+)/purchase/(?P<amount>[0-9]+)")
+@authenticate
+def store_purchase(request, item_id, amount):
+    item_id = int(item_id)
+    amount = int(amount)
     item = items.registry.get(item_id)
     if item is None:
         return Response(Status.BAD_REQUEST, "Item was not found")
@@ -428,13 +448,14 @@ def store_purchase(request, item_id):
     if not item.for_sale:
         return Response(Status.BAD_REQUEST, "Item is not for sale")
 
+    price = item.price * amount
     if not request.query:
-        msg = f"Confirm: purchase 1 {item.name} for {item.price} coins. [Y]es/[N]o."
+        msg = f"Confirm: purchase {amount} {item.name} for {price} coins. [Y]es/[N]o."
         return Response(Status.INPUT, msg)
 
     if request.query.strip().lower() in ("y", "yes"):
-        if request.user.remove_item(items.coin, quantity=item.price):
-            request.user.add_item(item)
+        if request.user.remove_item(items.coin, quantity=price):
+            request.user.add_item(item, quantity=amount)
         else:
             return Response(Status.BAD_REQUEST, "Insufficient funds")
 
@@ -765,9 +786,17 @@ def inventory(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/items/(?P<item_id>[0-9]+)")
+@app.route("/app/inventory/(?P<item_slot_id>[0-9]+)")
 @authenticate
-def view_item(request, item_id):
-    item = items.registry[int(item_id)]
-    body = render_template("item.gmi", request=request, item=item)
+def inventory_view(request, item_slot_id):
+    item_slot_id = int(item_slot_id)
+    try:
+        item_slot = ItemSlot.get_by_id(item_slot_id)
+    except ItemSlot.DoesNotExist:
+        return Response(Status.NOT_FOUND, "Not Found")
+
+    if not item_slot.user == request.user:
+        return Response(Status.NOT_FOUND, "Not Found")
+
+    body = render_template("inventory_view.gmi", request=request, item_slot=item_slot)
     return Response(Status.SUCCESS, "text/gemini", body)

@@ -2,22 +2,15 @@
 
 > No refunds!
 
-## Your Stuff
-
-You have {{ coins | number }} coins.
-
-=>/app/inventory (go to inventory)
-
 ## For Sale
 
 {% for item_slot in for_sale %}
-### {{ loop.index }}. {{ item_slot.item.name }}
+### {{ item_slot.item.name }}
 
-Price : {{ item_slot.item.price }} coins
+Price : {{ item_slot.item.price | number }} coins
 Owned : {{ item_slot.quantity | number }}
 
-=>/app/items/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] More Info
-=>/app/store/purchase/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] Purchase
+=>/app/store/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] View Details
 
 {% endfor %}
 =>/app 🚶 Go back

@@ -3,7 +3,7 @@
 ## Your Backpack
 
 {% for item_slot in inventory %}
-=>/app/items/{{ item_slot.item_id }} {{ item_slot.item.name }}
+=>/app/inventory/{{ item_slot.id }} {{ item_slot.item.name }}
 (quantity: x{{ item_slot.quantity | number }})
 
 {% else %}
