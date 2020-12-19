@@ -5,12 +5,20 @@ from . import constants
 
 
 class Item:
-    def __init__(self, price: int, name: str, description: str, for_sale: bool = False) -> None:
+    def __init__(
+        self,
+        price: int,
+        name: str,
+        description: str,
+        for_sale: bool = False,
+        can_trade: bool = False,
+    ) -> None:
         self.item_id = len(registry) + 1
         self.price = price
         self.name = name
         self.description = dedent(description).strip()
         self.for_sale = for_sale
+        self.can_trade = can_trade
 
         registry[self.item_id] = self
 
@@ -40,6 +48,7 @@ fertilizer = Item(
     When applied, will increase plant growth rate by 1.5x for 3 days.    
     """,
     for_sale=True,
+    can_trade=True,
 )
 
 
@@ -58,6 +67,7 @@ for color in constants.COLORS_PLAIN:
 
         Graceful, delicate, and reserved.
         """,
+        can_trade=True,
     )
 
 coin = Item(
@@ -124,7 +134,7 @@ cool_postcard = Postcard(
     for_sale=True,
 )
 
-romantic = Postcard(
+romantic_postcard = Postcard(
     price=125,
     name="romantic postcard",
     border=constants.BORDERS["romantic"],
@@ -146,5 +156,4 @@ christmas_cheer = Item(
     > To activate, mix with water and sprinkle over plant.
     > For best results, hum along to the tune of "O Christmas Tree".
     """,
-    for_sale=False,
 )

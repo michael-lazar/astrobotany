@@ -1,0 +1,15 @@
+# Astrobotany - Mailbox - Item
+
+Select a gift to include with your postcard.
+
+(Sending an item will remove it from your inventory)
+
+## Available Items
+
+{% for slot in item_slots %}
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/item/{{ slot.item_id }} Attach {{ slot.item.name }} (You have {{ slot.quantity }})
+{% else %}
+You have nothing in your inventory that can be used.
+{% endfor %}
+
+=>/app/mailbox/outgoing/{{ postcard.item_id }} 🚶 Go back

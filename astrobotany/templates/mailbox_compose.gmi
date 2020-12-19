@@ -1,4 +1,4 @@
-# Astrobotany - Compose Letter
+# Astrobotany - Mailbox - Compose Letter
 
 Postcard type selected : {{ postcard.name }}
 
@@ -10,6 +10,8 @@ Postcard type selected : {{ postcard.name }}
 {% for line in data.lines %}
 =>/app/mailbox/outgoing/{{ postcard.item_id }}/line/{{ loop.index }} line {{ loop.index }}: {{ line }}
 {% endfor %}
+
+=>/app/mailbox/outgoing/{{ postcard.item_id }}/item Attach a gift (optional): {{ data.item.name | default("<empty>", true) }}
 
 =>/app/mailbox/outgoing/{{ postcard.item_id }}/clear Clear all
 

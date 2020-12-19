@@ -1,4 +1,4 @@
-# Astrobotany - Outgoing Mail
+# Astrobotany - Mailbox - Outgoing Mail
 
 Send a private message to a fellow gardener.
 

@@ -1,4 +1,4 @@
-# Astrobotany - Preview Letter
+# Astrobotany - Mailbox - Preview Letter
 
 ## Preview
 
@@ -7,10 +7,12 @@ Subject: {{ data.subject }}
 
 {{ postcard.format_message(*data.lines) }}
 
+{% if data.item %}
+Attached Gift: 🎁 {{ data.item.name }}
+{% endif %}
+
 ## Actions
 
 =>/app/mailbox/outgoing/{{ postcard.item_id }}/send 📤 Looks good, send it!
 
 =>/app/mailbox/outgoing/{{ postcard.item_id }}/ 🚶 Go back
-
-

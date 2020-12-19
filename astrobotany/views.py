@@ -113,6 +113,7 @@ class PostcardData:
     def __init__(self):
         self.user = None
         self.subject = None
+        self.item = None
         self.lines = ["", "", "", ""]
 
     @classmethod
@@ -545,6 +546,27 @@ def mailbox_compose_line(request, postcard_id, line_number):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
 
 
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/item")
+@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/item/(?P<item_id>[0-9]+)")
+@authenticate
+def mailbox_compose_item(request, postcard_id, item_id=None):
+    postcard = items.registry[int(postcard_id)]
+    if not isinstance(postcard, items.Postcard):
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    if item_id is None:
+        item_slots = [slot for slot in request.user.inventory if slot.item.can_trade]
+        item_slots.sort(key=lambda x: x.item.name)
+        body = render_template(
+            "mailbox_item.gmi", request=request, postcard=postcard, item_slots=item_slots
+        )
+        return Response(Status.SUCCESS, "text/gemini", body)
+
+    data = PostcardData.from_request(request)
+    data.item = items.registry[int(item_id)]
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
+
+
 @app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/clear")
 @authenticate
 def mailbox_compose_clear(request, postcard_id):
@@ -589,11 +611,23 @@ def mailbox_send(request, postcard_id):
     if request.query.strip().lower() not in ("y", "yes"):
         return Response(Status.SUCCESS, "text/gemini", "Action cancelled.")
 
+    if data.item:
+        if not data.item.can_trade:
+            return Response(Status.BAD_REQUEST, "Whoops, it looks like you can't send that item!")
+        elif not request.user.get_item_quantity(data.item):
+            return Response(Status.BAD_REQUEST, "Whoops, it looks like you can't send that item!")
+
     if not request.user.remove_item(postcard):
         return Response(Status.BAD_REQUEST, "Whoops, it looks like you're all out of postcards!")
 
+    if data.item:
+        request.user.remove_item(data.item)
+
     body = postcard.format_message(*data.lines)
-    Inbox.create(user_from=request.user, user_to=data.user, subject=data.subject, body=body)
+    item_id = data.item.item_id if data.item else None
+    Inbox.create(
+        user_from=request.user, user_to=data.user, subject=data.subject, body=body, item_id=item_id
+    )
     PostcardData.delete(request)
 
     body = render_template("mailbox_send.gmi", request=request)
@@ -607,15 +641,21 @@ def mailbox_view(request, message_id):
     if message is None:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
+    new_item_slot = None
     if message.user_to == request.user:
-        message.is_seen = True
-        message.save()
+        if not message.is_seen:
+            if message.item:
+                new_item_slot = request.user.add_item(message.item, quantity=1)
+            message.is_seen = True
+            message.save()
     elif message.user_from == request.user:
         pass
     else:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
-    body = render_template("mailbox_view.gmi", request=request, message=message)
+    body = render_template(
+        "mailbox_view.gmi", request=request, message=message, new_item_slot=new_item_slot
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 

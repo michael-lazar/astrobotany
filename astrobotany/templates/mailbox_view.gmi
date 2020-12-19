@@ -1,8 +1,6 @@
-# Astrobotany - Inbox
+# Astrobotany - Mailbox - View Message
 
-## Viewing Message
-
----
+## Message Details
 
 From: {{ message.user_from.username }}
 To: {{ message.user_to.username }}
@@ -12,6 +10,13 @@ Body:
 
 {{ message.body }}
 
----
+{% if message.item %}
+Attached Gift: 🎁 {{ message.item.name }}
+{% endif %}
+
+{% if new_item_slot %}
+✨ {{ message.item.name}} has been added to your inventory ✨
+=>/app/inventory/{{ new_item_slot.id }} View item details
+{% endif %}
 
 =>/app/mailbox 🚶 Go back

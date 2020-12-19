@@ -82,6 +82,10 @@ def add_shaken_at(migrator):
         plant.save()
 
 
+def add_inbox_item(migrator):
+    migrate.migrate(migrator.add_column("inbox", "item_id", IntegerField(null=True, default=None)))
+
+
 MIGRATIONS = locals()
 
 

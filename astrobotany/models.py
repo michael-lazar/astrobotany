@@ -295,6 +295,7 @@ class Inbox(BaseModel):
     body = TextField()
     is_seen = BooleanField(default=False)
     parent = ForeignKeyField("self", null=True, backref="children")
+    item_id: Optional[int] = IntegerField(null=True, default=None)
 
     @property
     def date_str(self) -> str:
@@ -303,6 +304,10 @@ class Inbox(BaseModel):
     @property
     def datetime_str(self) -> str:
         return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")
+
+    @property
+    def item(self) -> Optional[items.Item]:
+        return items.registry[self.item_id] if self.item_id else None
 
     @classmethod
     def load_mail_file(cls, filename: str) -> Tuple[str, str]:
