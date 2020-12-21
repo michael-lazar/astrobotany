@@ -254,17 +254,20 @@ class ItemSlot(BaseModel):
 
     @property
     def item(self) -> items.Item:
-        return items.registry[self.item_id]
+        item = items.Item.lookup(self.item_id)
+        if item is None:
+            raise ValueError("Invalid item ID")
+
+        return item
 
     @classmethod
     def store_view(cls, user: User) -> Iterable[ItemSlot]:
         item_slots = {item_slot.item_id: item_slot for item_slot in user.inventory}
-        for item_id, item in items.registry.items():
-            if item.for_sale:
-                item_slot = item_slots.get(item_id)
-                if not item_slot:
-                    item_slot = ItemSlot(user=user, item_id=item_id)
-                yield item_slot
+        for item in items.get_store_items(user):
+            try:
+                yield item_slots[item.item_id]
+            except KeyError:
+                yield ItemSlot(user=user, item_id=item.item_id)
 
 
 class Event(BaseModel):
@@ -307,7 +310,10 @@ class Inbox(BaseModel):
 
     @property
     def item(self) -> Optional[items.Item]:
-        return items.registry[self.item_id] if self.item_id else None
+        if self.item_id is not None:
+            return items.Item.lookup(self.item_id)
+        else:
+            return None
 
     @classmethod
     def load_mail_file(cls, filename: str) -> Tuple[str, str]:
@@ -683,10 +689,10 @@ class Plant(BaseModel):
         else:
             petal_color = self.color_str
 
-        user.add_item(items.petals[petal_color])
+        user.add_item(items.Petal.petals[petal_color])
 
         lines = (
-            f"You spot a [{petal_color} petal] lying on the ground nearby.",
+            f"You spot a {petal_color} petal lying on the ground nearby.",
             "You pick it up and stick it in your backpack.",
         )
         return "\n".join(lines)

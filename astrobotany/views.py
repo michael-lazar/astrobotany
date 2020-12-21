@@ -420,34 +420,35 @@ def store(request):
 @app.route("/app/store/(?P<item_id>[0-9]+)")
 @authenticate
 def store_view(request, item_id):
-    item_id = int(item_id)
-    item = items.registry.get(item_id)
+    item = items.Item.lookup(item_id)
     if item is None:
         return Response(Status.NOT_FOUND, "Item was not found")
-    if not item.for_sale:
-        return Response(Status.NOT_FOUND, "Item was not found")
+    if not item.can_sell(request.user):
+        return Response(Status.NOT_FOUND, "Item is not for sale")
 
     try:
-        item_slot = request.user.inventory.where(ItemSlot.item_id == item_id).get()
+        item_slot = request.user.inventory.where(ItemSlot.item_id == item.item_id).get()
     except ItemSlot.DoesNotExist:
-        item_slot = ItemSlot(user=request.user, item_id=item_id)
+        item_slot = ItemSlot(user=request.user, item_id=item.item_id)
 
+    description = item_slot.item.get_store_description(request.user)
     coins = request.user.get_item_quantity(items.coin)
-    body = render_template("store_view.gmi", request=request, item_slot=item_slot, coins=coins)
+    body = render_template(
+        "store_view.gmi", request=request, item_slot=item_slot, coins=coins, description=description
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
 @app.route("/app/store/(?P<item_id>[0-9]+)/purchase/(?P<amount>[0-9]+)")
 @authenticate
 def store_purchase(request, item_id, amount):
-    item_id = int(item_id)
     amount = int(amount)
-    item = items.registry.get(item_id)
-    if item is None:
-        return Response(Status.BAD_REQUEST, "Item was not found")
 
-    if not item.for_sale:
-        return Response(Status.BAD_REQUEST, "Item is not for sale")
+    item = items.Item.lookup(item_id)
+    if item is None:
+        return Response(Status.NOT_FOUND, "Item was not found")
+    if not item.can_sell(request.user):
+        return Response(Status.NOT_FOUND, "Item is not for sale")
 
     price = item.price * amount
     if not request.query:
@@ -482,10 +483,10 @@ def mailbox(request):
 @authenticate
 def mailbox_outgoing(request):
     postcards = []
-    for item in items.Postcard.postcards:
-        quantity = request.user.get_item_quantity(item)
+    for postcard in items.Postcard.postcards:
+        quantity = request.user.get_item_quantity(postcard)
         if quantity:
-            postcards.append((item, quantity))
+            postcards.append((postcard, quantity))
 
     body = render_template("mailbox_outgoing.gmi", request=request, postcards=postcards)
     return Response(Status.SUCCESS, "text/gemini", body)
@@ -494,7 +495,10 @@ def mailbox_outgoing(request):
 @app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)")
 @authenticate
 def mailbox_compose(request, postcard_id):
-    postcard = items.registry[int(postcard_id)]
+    postcard = items.Postcard.lookup(postcard_id)
+    if postcard is None:
+        return Response(Status.NOT_FOUND, "Postcard was not found")
+
     data = PostcardData.from_request(request)
     body = render_template("mailbox_compose.gmi", request=request, postcard=postcard, data=data)
     return Response(Status.SUCCESS, "text/gemini", body)
@@ -550,12 +554,12 @@ def mailbox_compose_line(request, postcard_id, line_number):
 @app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/item/(?P<item_id>[0-9]+)")
 @authenticate
 def mailbox_compose_item(request, postcard_id, item_id=None):
-    postcard = items.registry[int(postcard_id)]
-    if not isinstance(postcard, items.Postcard):
-        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+    postcard = items.Postcard.lookup(postcard_id)
+    if postcard is None:
+        return Response(Status.NOT_FOUND, "Postcard was not found")
 
     if item_id is None:
-        item_slots = [slot for slot in request.user.inventory if slot.item.can_trade]
+        item_slots = [slot for slot in request.user.inventory if slot.item.can_trade(request.user)]
         item_slots.sort(key=lambda x: x.item.name)
         body = render_template(
             "mailbox_item.gmi", request=request, postcard=postcard, item_slots=item_slots
@@ -563,7 +567,7 @@ def mailbox_compose_item(request, postcard_id, item_id=None):
         return Response(Status.SUCCESS, "text/gemini", body)
 
     data = PostcardData.from_request(request)
-    data.item = items.registry[int(item_id)]
+    data.item = items.Item.lookup(item_id)
     return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
 
 
@@ -577,9 +581,9 @@ def mailbox_compose_clear(request, postcard_id):
 @app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/preview")
 @authenticate
 def mailbox_preview(request, postcard_id):
-    postcard = items.registry[int(postcard_id)]
-    if not isinstance(postcard, items.Postcard):
-        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+    postcard = items.Postcard.lookup(postcard_id)
+    if postcard is None:
+        return Response(Status.NOT_FOUND, "Postcard was not found")
 
     data = PostcardData.from_request(request)
     if data.user is None:
@@ -594,9 +598,9 @@ def mailbox_preview(request, postcard_id):
 @app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/send")
 @authenticate
 def mailbox_send(request, postcard_id):
-    postcard = items.registry[int(postcard_id)]
-    if not isinstance(postcard, items.Postcard):
-        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+    postcard = items.Postcard.lookup(postcard_id)
+    if postcard is None:
+        return Response(Status.NOT_FOUND, "Postcard was not found")
 
     data = PostcardData.from_request(request)
     if data.user is None:
@@ -612,7 +616,7 @@ def mailbox_send(request, postcard_id):
         return Response(Status.SUCCESS, "text/gemini", "Action cancelled.")
 
     if data.item:
-        if not data.item.can_trade:
+        if not data.item.can_trade(request.user):
             return Response(Status.BAD_REQUEST, "Whoops, it looks like you can't send that item!")
         elif not request.user.get_item_quantity(data.item):
             return Response(Status.BAD_REQUEST, "Whoops, it looks like you can't send that item!")
@@ -838,5 +842,8 @@ def inventory_view(request, item_slot_id):
     if not item_slot.user == request.user:
         return Response(Status.NOT_FOUND, "Not Found")
 
-    body = render_template("inventory_view.gmi", request=request, item_slot=item_slot)
+    description = item_slot.item.get_inventory_description(request.user)
+    body = render_template(
+        "inventory_view.gmi", request=request, item_slot=item_slot, description=description
+    )
     return Response(Status.SUCCESS, "text/gemini", body)

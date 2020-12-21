@@ -320,26 +320,26 @@ def test_plant_refresh_evolve(now):
 def test_plant_pick_petal_dead():
     plant = plant_factory(stage=4, dead=True, color=COLOR_MAP["red"])
     plant.pick_petal()
-    assert plant.user.get_item_quantity(items.petals["red"]) == 0
+    assert plant.user.get_item_quantity(items.red_petal) == 0
 
 
 def test_plant_pick_petal_invalid_stage():
     plant = plant_factory(stage=3, color=COLOR_MAP["red"])
     plant.pick_petal()
-    assert plant.user.get_item_quantity(items.petals["red"]) == 0
+    assert plant.user.get_item_quantity(items.red_petal) == 0
 
 
 def test_plant_pick_petal():
     plant = plant_factory(stage=4, color=COLOR_MAP["red"])
     plant.pick_petal()
-    assert plant.user.get_item_quantity(items.petals["red"]) == 1
+    assert plant.user.get_item_quantity(items.red_petal) == 1
 
 
 def test_plant_pick_petal_twice():
     plant = plant_factory(stage=4, color=COLOR_MAP["red"])
     plant.pick_petal()
     plant.pick_petal()
-    assert plant.user.get_item_quantity(items.petals["red"]) == 1
+    assert plant.user.get_item_quantity(items.red_petal) == 1
 
 
 def test_plant_pick_petal_guest():
@@ -347,18 +347,18 @@ def test_plant_pick_petal_guest():
     user = user_factory()
     plant.pick_petal(user=user)
 
-    assert user.get_item_quantity(items.petals["red"]) == 1
-    assert plant.user.get_item_quantity(items.petals["red"]) == 0
+    assert user.get_item_quantity(items.red_petal) == 1
+    assert plant.user.get_item_quantity(items.red_petal) == 0
 
 
 def test_pick_petal_cooldown(frozen_time):
     plant = plant_factory(stage=4, color=COLOR_MAP["red"])
     plant.pick_petal()
-    assert plant.user.get_item_quantity(items.petals["red"]) == 1
+    assert plant.user.get_item_quantity(items.red_petal) == 1
 
     frozen_time.tick(delta=timedelta(hours=25))
     plant.pick_petal()
-    assert plant.user.get_item_quantity(items.petals["red"]) == 2
+    assert plant.user.get_item_quantity(items.red_petal) == 2
 
 
 def test_user_login():

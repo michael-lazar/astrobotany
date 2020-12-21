@@ -2,6 +2,6 @@
 
 ## {{ item_slot.item.name }}
 
-{{ item_slot.item.description }}
+{{ description }}
 
 =>/app 🚶 Go back
