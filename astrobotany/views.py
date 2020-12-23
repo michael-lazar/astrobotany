@@ -300,7 +300,11 @@ def message_board(request, page=1):
     items = Message.by_date().paginate(page, paginate_by)
 
     body = render_template(
-        "message_board.gmi", request=request, items=items, page=page, page_count=page_count,
+        "message_board.gmi",
+        request=request,
+        items=items,
+        page=page,
+        page_count=page_count,
     )
     return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -379,7 +383,11 @@ def settings_certificates(request):
         Certificate.select().where(Certificate.user == request.user).order_by(Certificate.last_seen)
     )
 
-    body = render_template("settings_certificates.gmi", request=request, certificates=certificates,)
+    body = render_template(
+        "settings_certificates.gmi",
+        request=request,
+        certificates=certificates,
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 

@@ -98,7 +98,10 @@ class User(BaseModel):
         subject, body = Inbox.load_mail_file("welcome.txt")
         body = body.format(user=user)
         Inbox.create(
-            user_from=User.admin(), user_to=user, subject=subject, body=body,
+            user_from=User.admin(),
+            user_to=user,
+            subject=subject,
+            body=body,
         )
         return user
 
@@ -643,7 +646,8 @@ class Plant(BaseModel):
             return "You sprinkle some water over your plant."
 
         query = Plant.select().where(
-            Plant.watered_by == user, Plant.watered_at >= datetime.now() - timedelta(hours=0.5),
+            Plant.watered_by == user,
+            Plant.watered_at >= datetime.now() - timedelta(hours=0.5),
         )
         if query.exists():
             return "Your watering can is empty, try again later!"
