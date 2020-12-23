@@ -42,9 +42,9 @@ class Item:
         self.giftable = giftable
 
     @classmethod
-    def register(cls: typing.Type[T], *args, **kwargs) -> T:
+    def register(cls: typing.Type[T], name: str, *args, **kwargs) -> T:
         item_id = len(cls.registry) + 1
-        item = cls(item_id, *args, **kwargs)
+        item = cls(item_id, name, *args, **kwargs)
         cls.registry[item_id] = item
         return item
 
