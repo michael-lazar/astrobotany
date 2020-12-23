@@ -1,12 +1,13 @@
 import argparse
 
+from astrobotany import settings
 from astrobotany.models import Inbox, User, init_db
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename")
 parser.add_argument("user_from")
 parser.add_argument("user_to")
-parser.add_argument("--db", default="/etc/astrobotany/astrobotany.sqlite")
+parser.add_argument("--db", default=settings.db)
 args = parser.parse_args()
 
 init_db(args.db)

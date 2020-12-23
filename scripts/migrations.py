@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from peewee import BlobField, BooleanField, DateTimeField, IntegerField, TextField
 from playhouse import migrate
 
-from astrobotany import items
+from astrobotany import items, settings
 from astrobotany.models import Certificate, ItemSlot, Plant, User, gen_user_id, init_db
 
 
@@ -94,7 +94,7 @@ def main():
         description="Apply a named migration to the astrobotany database"
     )
     parser.add_argument("migration")
-    parser.add_argument("--db", default="/etc/astrobotany/astrobotany.sqlite")
+    parser.add_argument("--db", default=settings.db)
     args = parser.parse_args()
 
     db = init_db(args.db)
