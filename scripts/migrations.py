@@ -86,6 +86,10 @@ def add_inbox_item(migrator):
     migrate.migrate(migrator.add_column("inbox", "item_id", IntegerField(null=True, default=None)))
 
 
+def add_santa(migrator):
+    User.create(username="santa")
+
+
 MIGRATIONS = locals()
 
 

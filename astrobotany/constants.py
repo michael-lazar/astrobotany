@@ -88,7 +88,7 @@ STAGE_DESCRIPTIONS = {
         "You cry over the withered leaves of your plant.",
         "Your plant died. Maybe you need a fresh start.",
     ],
-    "christmas": ["You gaze at the twinkling lights on your tree and reflect on the past year."],
+    "christmas": ["You gaze at the twinkling lights and reflect on the meaning on christmas."],
 }
 
 COLORS = [

@@ -763,7 +763,7 @@ class Plant(BaseModel):
             return "You don't have any christmas cheer to apply."
 
         Event.create(user=self.user, event_type=Event.ENABLE_CHRISTMAS, target="self")
-        return "✨ POP ✨"
+        return "✨ 💯 ✨"
 
     def harvest(self) -> Plant:
         """

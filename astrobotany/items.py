@@ -19,6 +19,13 @@ def get_store_items(user: User) -> typing.Iterable[Item]:
             yield item
 
 
+def search(name: str) -> typing.Optional[Item]:
+    for item in Item.registry.values():
+        if item.name == name:
+            return item
+    return None
+
+
 class Item:
 
     registry: typing.Dict[int, Item] = {}
