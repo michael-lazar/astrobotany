@@ -29,19 +29,17 @@ class Item:
         name: str,
         description: str,
         price: int = 0,
-        is_buyable: bool = False,
-        is_sellable: bool = False,
-        is_tradable: bool = False,
-        is_usable: bool = False,
+        buyable: bool = False,
+        usable: bool = False,
+        giftable: bool = False,
     ):
         self.item_id = item_id
         self.name = name
         self.description = dedent(description).strip()
         self.price = price
-        self.is_buyable = is_buyable
-        self.is_sellable = is_sellable
-        self.is_tradable = is_tradable
-        self.is_usable = is_usable
+        self.buyable = buyable
+        self.usable = usable
+        self.giftable = giftable
 
     @classmethod
     def register(cls: typing.Type[T], *args, **kwargs) -> T:
@@ -64,16 +62,13 @@ class Item:
         return item
 
     def can_buy(self, user: User) -> bool:
-        return self.is_buyable
-
-    def can_sell(self, user: User) -> bool:
-        return self.is_sellable
-
-    def can_trade(self, user: User) -> bool:
-        return self.is_tradable
+        return self.buyable
 
     def can_use(self, user: User) -> bool:
-        return self.is_usable
+        return self.usable
+
+    def can_gift(self, user: User) -> bool:
+        return self.giftable
 
     def get_inventory_description(self, user: User) -> str:
         return self.description
@@ -152,20 +147,20 @@ fertilizer = Item.register(
     When applied, will increase plant growth rate by 1.5x for 3 days.    
     """,
     price=75,
-    is_buyable=True,
-    is_tradable=True,
+    buyable=True,
+    giftable=True,
 )
 
-red_petal = Petal.register("red", is_tradable=True)
-orange_petal = Petal.register("orange", is_tradable=True)
-yellow_petal = Petal.register("yellow", is_tradable=True)
-green_petal = Petal.register("green", is_tradable=True)
-blue_petal = Petal.register("blue", is_tradable=True)
-indigo_petal = Petal.register("indigo", is_tradable=True)
-violet_petal = Petal.register("violet", is_tradable=True)
-white_petal = Petal.register("white", is_tradable=True)
-black_petal = Petal.register("black", is_tradable=True)
-gold_petal = Petal.register("gold", is_tradable=True)
+red_petal = Petal.register("red", giftable=True)
+orange_petal = Petal.register("orange", giftable=True)
+yellow_petal = Petal.register("yellow", giftable=True)
+green_petal = Petal.register("green", giftable=True)
+blue_petal = Petal.register("blue", giftable=True)
+indigo_petal = Petal.register("indigo", giftable=True)
+violet_petal = Petal.register("violet", giftable=True)
+white_petal = Petal.register("white", giftable=True)
+black_petal = Petal.register("black", giftable=True)
+gold_petal = Petal.register("gold", giftable=True)
 
 coin = Item.register(
     name="coin",
@@ -181,7 +176,8 @@ plain_postcard = Postcard.register(
     description="A blank postcard that can be mailed to another user.",
     border=constants.BORDERS["plain"],
     price=50,
-    is_buyable=True,
+    buyable=True,
+    giftable=True,
 )
 
 fancy_postcard = Postcard.register(
@@ -189,7 +185,8 @@ fancy_postcard = Postcard.register(
     description="A fancy postcard with an intricate design.",
     border=constants.BORDERS["fancy"],
     price=125,
-    is_buyable=True,
+    buyable=True,
+    giftable=True,
 )
 
 cool_postcard = Postcard.register(
@@ -197,7 +194,8 @@ cool_postcard = Postcard.register(
     description="A rad postcard with a picture of a bird on it.",
     border=constants.BORDERS["cool"],
     price=125,
-    is_buyable=True,
+    buyable=True,
+    giftable=True,
 )
 
 romantic_postcard = Postcard.register(
@@ -205,7 +203,8 @@ romantic_postcard = Postcard.register(
     description="A romantic postcard with sparkling hearts on it.",
     border=constants.BORDERS["romantic"],
     price=125,
-    is_buyable=True,
+    buyable=True,
+    giftable=True,
 )
 
 christmas_cheer = Item.register(

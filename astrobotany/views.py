@@ -431,7 +431,7 @@ def store_view(request, item_id):
     item = items.Item.lookup(item_id)
     if item is None:
         return Response(Status.NOT_FOUND, "Item was not found")
-    if not item.can_sell(request.user):
+    if not item.can_buy(request.user):
         return Response(Status.NOT_FOUND, "Item is not for sale")
 
     try:
@@ -455,7 +455,7 @@ def store_purchase(request, item_id, amount):
     item = items.Item.lookup(item_id)
     if item is None:
         return Response(Status.NOT_FOUND, "Item was not found")
-    if not item.can_sell(request.user):
+    if not item.can_buy(request.user):
         return Response(Status.NOT_FOUND, "Item is not for sale")
 
     price = item.price * amount
@@ -567,7 +567,7 @@ def mailbox_compose_item(request, postcard_id, item_id=None):
         return Response(Status.NOT_FOUND, "Postcard was not found")
 
     if item_id is None:
-        item_slots = [slot for slot in request.user.inventory if slot.item.can_trade(request.user)]
+        item_slots = [slot for slot in request.user.inventory if slot.item.can_gift(request.user)]
         item_slots.sort(key=lambda x: x.item.name)
         body = render_template(
             "mailbox_item.gmi", request=request, postcard=postcard, item_slots=item_slots
@@ -624,7 +624,7 @@ def mailbox_send(request, postcard_id):
         return Response(Status.SUCCESS, "text/gemini", "Action cancelled.")
 
     if data.item:
-        if not data.item.can_trade(request.user):
+        if not data.item.can_gift(request.user):
             return Response(Status.BAD_REQUEST, "Whoops, it looks like you can't send that item!")
         elif not request.user.get_item_quantity(data.item):
             return Response(Status.BAD_REQUEST, "Whoops, it looks like you can't send that item!")
