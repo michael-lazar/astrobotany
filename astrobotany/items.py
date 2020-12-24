@@ -48,11 +48,11 @@ class Item:
         self.item_id = len(self.registry) + 1
 
         self.name = name
-        self.description = dedent(description).strip()
-        self.price = price
-        self.buyable = buyable
-        self.usable = usable
-        self.giftable = giftable
+        self._description = dedent(description).strip()
+        self._price = price
+        self._buyable = buyable
+        self._usable = usable
+        self._giftable = giftable
 
         self.registry[self.item_id] = self
 
@@ -70,22 +70,22 @@ class Item:
         return item
 
     def can_buy(self, user: User) -> bool:
-        return self.buyable
+        return self._buyable
 
     def can_use(self, user: User) -> bool:
-        return self.usable
+        return self._usable
 
     def can_gift(self, user: User) -> bool:
-        return self.giftable
+        return self._giftable
 
     def get_price(self, user: User) -> int:
-        return self.price
+        return self._price
 
     def get_inventory_description(self, user: User) -> str:
-        return self.description
+        return self._description
 
     def get_store_description(self, user: User) -> str:
-        return self.description
+        return self._description
 
 
 class Petal(Item):
@@ -176,7 +176,7 @@ class Badge(Item):
         minutes_remaining = int(86400 - time.time() % 86400) // 60
         hours, minutes = divmod(minutes_remaining, 60)
         extra = f"\n\nThis offer will expire in {hours} hours, {minutes} minutes."
-        return self.description + extra
+        return self._description + extra
 
 
 paperclip = Item(

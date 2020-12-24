@@ -2,4 +2,4 @@
 
 ## {{ item.name }}
 
-{{ item.description }}
+{{ description }}
