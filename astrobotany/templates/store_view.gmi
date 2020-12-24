@@ -3,13 +3,13 @@
 ### {{ item_slot.item.name }}
 
 Bank  : {{ coins | number }} coins
-Price : {{ item_slot.item.price | number }} coins
+Price : {{ item_slot.item.get_price(request.user) | number }} coins
 Owned : {{ item_slot.quantity | number }}
 
 {{ description }}
 
-=>/app/store/{{ item_slot.item_id }}/purchase/1 [{{ item_slot.item.name }}] Purchase 1x ({{ item_slot.item.price | number }} coins)
-=>/app/store/{{ item_slot.item_id }}/purchase/5 [{{ item_slot.item.name }}] Purchase 5x ({{ (item_slot.item.price * 5) | number }} coins)
-=>/app/store/{{ item_slot.item_id }}/purchase/10 [{{ item_slot.item.name }}] Purchase 10x ({{ (item_slot.item.price * 10) | number }} coins)
+=>/app/store/{{ item_slot.item_id }}/purchase/1 [{{ item_slot.item.name }}] Purchase 1x ({{ item_slot.item.get_price(request.user) | number }} coins)
+=>/app/store/{{ item_slot.item_id }}/purchase/5 [{{ item_slot.item.name }}] Purchase 5x ({{ (item_slot.item.get_price(request.user) * 5) | number }} coins)
+=>/app/store/{{ item_slot.item_id }}/purchase/10 [{{ item_slot.item.name }}] Purchase 10x ({{ (item_slot.item.get_price(request.user) * 10) | number }} coins)
 
 =>/app/store 🚶 Go back

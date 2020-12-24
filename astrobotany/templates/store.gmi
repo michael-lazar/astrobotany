@@ -7,7 +7,7 @@
 {% for item_slot in for_sale %}
 ### {{ item_slot.item.name }}
 
-Price : {{ item_slot.item.price | number }} coins
+Price : {{ item_slot.item.get_price(request.user) | number }} coins
 Owned : {{ item_slot.quantity | number }}
 
 =>/app/store/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] View Details

@@ -458,7 +458,7 @@ def store_purchase(request, item_id, amount):
     if not item.can_buy(request.user):
         return Response(Status.NOT_FOUND, "Item is not for sale")
 
-    price = item.price * amount
+    price = item.get_price(request.user) * amount
     if not request.query:
         msg = f"Confirm: purchase {amount} {item.name} for {price} coins. [Y]es/[N]o."
         return Response(Status.INPUT, msg)
