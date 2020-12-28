@@ -149,6 +149,8 @@ class User(BaseModel):
     def badge(self) -> Optional[items.Badge]:
         if self.badge_id:
             return items.Badge.lookup(self.badge_id)
+        else:
+            return None
 
     @property
     def display_name(self) -> str:

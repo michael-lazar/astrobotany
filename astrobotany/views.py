@@ -6,6 +6,7 @@ import typing
 from datetime import datetime, timedelta
 from functools import lru_cache
 
+import cryptography.x509
 import jinja2
 from jetforce import JetforceApplication, Request, Response, Status
 from jetforce.app.base import RateLimiter
@@ -45,7 +46,7 @@ message_rate_limiter = RateLimiter("3/h")
 
 
 @lru_cache(2048)
-def load_session(session_id: str):
+def load_session(session_id: str) -> dict:
     """
     A poor man's server-side session object.
 
@@ -63,12 +64,19 @@ def render_template(name: str, *args, **kwargs) -> str:
     return template_env.get_template(name).render(*args, **kwargs)
 
 
+class AstrobotanyRequest(Request):
+    user: User
+    plant: Plant
+    session: dict
+    cert: cryptography.x509.Certficiate
+
+
 def authenticate(func: typing.Callable) -> typing.Callable:
     """
     View wrapper that handles user authentication via client certificates.
     """
 
-    def callback(request: Request, **kwargs):
+    def callback(request: AstrobotanyRequest, **kwargs):
 
         if "REMOTE_USER" not in request.environ:
             if request.path != "/app":
