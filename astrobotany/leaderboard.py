@@ -49,7 +49,7 @@ class HighScore(Leaderboard):
     def list_top_items(self):
         plants = Plant.all_active().order_by(Plant.score.desc())
         for plant in plants.limit(self.count):
-            yield plant.user.username, f"{plant.score} points"
+            yield plant.user.display_name, f"{plant.score} points"
 
 
 class OldestPlant(Leaderboard):
@@ -60,7 +60,7 @@ class OldestPlant(Leaderboard):
         query = query.order_by(Plant.created_at.asc())
         query = query.limit(self.count)
         for plant in query:
-            yield plant.user.username, f"{plant.age} days"
+            yield plant.user.display_name, f"{plant.age} days"
 
 
 class PrettyFlowers(Leaderboard):
@@ -72,7 +72,7 @@ class PrettyFlowers(Leaderboard):
         query = query.order_by(Plant.score.desc())
         query = query.limit(self.count)
         for plant in query:
-            yield plant.user.username, f"{plant.color_str} {plant.species_str}"
+            yield plant.user.display_name, f"{plant.color_str} {plant.species_str}"
 
 
 class RecentlyWatered(Leaderboard):
@@ -85,7 +85,7 @@ class RecentlyWatered(Leaderboard):
         query = query.limit(self.count)
         for plant in query:
             dt = (datetime.now() - plant.watered_at).total_seconds() // 60
-            yield plant.user.username, f"{dt:0.0f} minutes ago"
+            yield plant.user.display_name, f"{dt:0.0f} minutes ago"
 
 
 class MostNeighborly(Leaderboard):
@@ -97,7 +97,7 @@ class MostNeighborly(Leaderboard):
         query = query.order_by(Plant.watered_at.desc())
         query = query.limit(self.count)
         for plant in query:
-            yield plant.watered_by.username, f"visited {plant.user.username}"
+            yield plant.watered_by.display_name, f"visited {plant.user.username}"
 
 
 _leaderboards = [HighScore, OldestPlant, PrettyFlowers, RecentlyWatered, MostNeighborly]

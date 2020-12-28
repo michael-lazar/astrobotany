@@ -76,10 +76,11 @@ class User(BaseModel):
     """
 
     user_id = TextField(unique=True, index=True, default=gen_user_id)
-    username = TextField()
+    username: str = TextField()
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)  # TODO: Delete this field
     password = BlobField(null=True)
+    badge_id: Optional[int] = IntegerField(null=True, default=None)
 
     @classmethod
     def admin(cls) -> User:
@@ -143,6 +144,19 @@ class User(BaseModel):
                 self._plant = Plant.create(user=self, user_active=self)
 
         return self._plant
+
+    @property
+    def badge(self) -> Optional[items.Badge]:
+        if self.badge_id:
+            return items.Badge.lookup(self.badge_id)
+
+    @property
+    def display_name(self) -> str:
+        badge = self.badge
+        if badge:
+            return f"{badge.badge_symbol} {self.username}"
+        else:
+            return self.username
 
     def set_password(self, password: str) -> None:
         self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())

@@ -1,4 +1,4 @@
-# Astrobotany - Certificates
+# Astrobotany - Settings - Certificates
 
 {% for cert in certificates %}
 ### {{ loop.index }}. Certificate "{{ cert.fingerprint[:10] }}"

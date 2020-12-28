@@ -376,6 +376,49 @@ def settings_ansi_enabled(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
 
 
+@app.route("/app/settings/badges")
+@authenticate
+def settings_badges(request):
+    badges = []
+    for item_slot in request.user.inventory:
+        if isinstance(item_slot.item, items.Badge):
+            badges.append(item_slot.item)
+
+    body = render_template(
+        "settings_badges.gmi",
+        request=request,
+        badges=badges,
+    )
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/app/settings/badges/equip/(?P<badge_id>[0-9]+)")
+@authenticate
+def settings_badges_equip(request, badge_id):
+    badge_id = int(badge_id)
+
+    try:
+        item_slot = request.user.inventory.where(ItemSlot.item_id == badge_id).get()
+    except ItemSlot.DoesNotExist:
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    badge = item_slot.item
+    if not isinstance(badge, items.Badge):
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    request.user.badge_id = badge.item_id
+    request.user.save()
+    return Response(Status.REDIRECT_TEMPORARY, "/app/settings/badges")
+
+
+@app.route("/app/settings/badges/remove")
+@authenticate
+def settings_badges_remove(request):
+    request.user.badge_id = None
+    request.user.save()
+    return Response(Status.REDIRECT_TEMPORARY, "/app/settings/badges")
+
+
 @app.route("/app/settings/certificates")
 @authenticate
 def settings_certificates(request):

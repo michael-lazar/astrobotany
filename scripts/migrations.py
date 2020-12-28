@@ -90,6 +90,10 @@ def add_santa(migrator):
     User.create(username="santa")
 
 
+def add_badge_id(migrator):
+    migrate.migrate(migrator.add_column("user", "badge_id", IntegerField(null=True, default=None)))
+
+
 MIGRATIONS = locals()
 
 

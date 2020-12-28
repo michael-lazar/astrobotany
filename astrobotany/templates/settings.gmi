@@ -8,6 +8,12 @@ Enable support for colored text & art using ANSI escape sequences.
 
 (This setting is attached to your client certificate. If you use multiple gemini clients, you can set different color settings for each client certificate linked to your account.)
 
+## Badges
+
+Equip a decorative badge next to your username.
+
+=>/app/settings/badges Select a badge
+
 ## Secret Password
 
 An optional secret password that will be linked to your account. Setting a password is required in order to register new client certificates (see below).
