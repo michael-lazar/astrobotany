@@ -321,7 +321,7 @@ class Inbox(BaseModel):
 
     @property
     def date_str(self) -> str:
-        return self.created_at.strftime("%Y-%M-%d")
+        return self.created_at.strftime("%Y-%m-%d")
 
     @property
     def datetime_str(self) -> str:
