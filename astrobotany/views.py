@@ -6,7 +6,7 @@ import typing
 from datetime import datetime, timedelta
 from functools import lru_cache
 
-import cryptography.x509
+from cryptography import x509
 import jinja2
 from jetforce import JetforceApplication, Request, Response, Status
 from jetforce.app.base import RateLimiter
@@ -68,7 +68,7 @@ class AstrobotanyRequest(Request):
     user: User
     plant: Plant
     session: dict
-    cert: cryptography.x509.Certficiate
+    cert: x509.Certificate
 
 
 def authenticate(func: typing.Callable) -> typing.Callable:
