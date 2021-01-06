@@ -92,7 +92,7 @@ def authenticate(func: typing.Callable) -> typing.Callable:
             fingerprint = f"{serial_number:032X}"  # Convert to hex
         else:
             # New-style self signed certificate
-            fingerprint = request.environ["TLS_CLIENT_HASH_B64"]
+            fingerprint = typing.cast(str, request.environ["TLS_CLIENT_HASH_B64"])
 
         cert = User.login(fingerprint)
         if cert is None:
