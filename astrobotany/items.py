@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import random
 import time
 import typing
 from textwrap import dedent
-import random
 
 from . import constants
 

@@ -1,6 +1,6 @@
 import argparse
 
-from astrobotany import settings, items
+from astrobotany import items, settings
 from astrobotany.models import Inbox, User, init_db
 
 parser = argparse.ArgumentParser()

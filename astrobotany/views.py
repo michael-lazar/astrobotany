@@ -6,8 +6,8 @@ import typing
 from datetime import datetime, timedelta
 from functools import lru_cache
 
-from cryptography import x509
 import jinja2
+from cryptography import x509
 from jetforce import JetforceApplication, Request, Response, Status
 from jetforce.app.base import RateLimiter
 
