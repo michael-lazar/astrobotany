@@ -758,7 +758,7 @@ def xmas(request):
 @authenticate
 def info(request):
     request.session["alert"] = "\n".join(
-        [f"Generation: {request.plant.generation}", f"Growth Rate: {request.plant.growth_rate}"]
+        [f"Generation: {request.plant.generation}", f"Growth Rate: {request.plant.growth_rate:#.2}"]
     )
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
