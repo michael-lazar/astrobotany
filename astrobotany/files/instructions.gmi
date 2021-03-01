@@ -10,6 +10,12 @@
        jgs \\
 ```
 
+## Creating an Account
+
+Astrobotany uses self-signed (TOFU) client certificates for authentication. In order to join in the fun, use your preferred gemini client to generate a new certificate. The subject fields in the certificate (name, location, email, CN, ...) don't matter. You can either leave them blank, or you can enter in values for your own records.
+
+Once you have generated your certificate, attempt to login and you will be guided through the process of creating an account.
+
 ## Gardening Basics
 
 You've been given a seed that will grow into a beautiful plant!
@@ -34,29 +40,19 @@ Your plant will continue to grow and evolve over time.
 Once your plant reaches the seed-bearing stage, you will be given the option to either keep going or harvest your plant. If you chose to harvest, your score will reset and you will start over with a generation score multiplier.
 
 ```
-score_multiplier = 1 + (0.2 * generation)
+generation | multiplier
+---------- | ----------
+1          | 1.00
+2          | 1.23
+3          | 1.39
+4          | 1.51
+5          | 1.62
+6          | 1.71
+7          | 1.79
+8          | 1.86
+9          | 1.93
+10         | 2.00
 ```
-
-## Registration
-
-Astrobotany uses self-signed (TOFU) client certificates for authentication. In order to join in the fun, use your preferred gemini client to generate a new certificate. The subject fields in the certificate (name, location, email, CN, ...) don't matter. You can either leave them blank, or you can enter in values for your own records.
-
-Once you have generated your certificate, attempt to login and you will be guided through the process of creating an account.
-
-### Client Software
-
-Here are some gemini clients that support client certificates:
-
-=>https://tildegit.org/solderpunk/AV-98 AV-98 (TUI)
-=>gopher://thelambdalab.xyz/1/projects/elpher/ elpher (emacs)
-=>https://github.com/MasterQ32/kristall Kristall (GUI)
-=>https://github.com/pitr/gemini-ios Gemini for iOS
-
-## Registration (deprecated)
-
-The old astrobotany registration guide used CSR's to generate authorised client certificates. This method no longer works, but is linked here for historical reference.
-
-=>/files/register_old.gmi
 
 ----------
 

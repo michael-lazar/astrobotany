@@ -239,9 +239,7 @@ def test_plant_refresh_12h_fertilizer(now):
     fertilized_at = now - timedelta(hours=6)
 
     plant = plant_factory(
-        watered_at=watered_at,
-        updated_at=updated_at,
-        fertilized_at=fertilized_at,
+        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -254,7 +252,7 @@ def test_plant_refresh_generation_2_12h(now):
     plant = plant_factory(watered_at=watered_at, updated_at=updated_at, generation=2)
     plant.refresh()
     assert plant.updated_at == datetime.now()
-    assert plant.score == 12 * 3600 * 1.2
+    assert plant.score == int(12 * 3600 * (2 ** 0.3))
 
 
 def test_plant_refresh_18h(now):
@@ -271,9 +269,7 @@ def test_plant_refresh_18h_fertilizer(now):
     updated_at = now - timedelta(hours=12)
     fertilized_at = now - timedelta(hours=18)
     plant = plant_factory(
-        watered_at=watered_at,
-        updated_at=updated_at,
-        fertilized_at=fertilized_at,
+        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -294,9 +290,7 @@ def test_plant_refresh_36h_fertilizer(now):
     updated_at = now - timedelta(hours=24)
     fertilized_at = now - timedelta(hours=30)
     plant = plant_factory(
-        watered_at=watered_at,
-        updated_at=updated_at,
-        fertilized_at=fertilized_at,
+        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -308,9 +302,7 @@ def test_plant_refresh_36h_fertilizer_2(now):
     updated_at = now - timedelta(hours=36)
     fertilized_at = now - timedelta(hours=24)
     plant = plant_factory(
-        watered_at=watered_at,
-        updated_at=updated_at,
-        fertilized_at=fertilized_at,
+        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
