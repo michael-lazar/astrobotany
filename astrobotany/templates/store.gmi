@@ -2,6 +2,8 @@
 
 > No refunds!
 
+Your Account Balance: {{ coins | number }} coins
+
 ## For Sale
 
 {% for item_slot in for_sale %}

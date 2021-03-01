@@ -460,7 +460,8 @@ def settings_certificates_delete(request, certificate_id):
 @authenticate
 def store(request):
     for_sale = ItemSlot.store_view(request.user)
-    body = render_template("store.gmi", request=request, for_sale=for_sale)
+    coins = request.user.get_item_quantity(items.coin)
+    body = render_template("store.gmi", request=request, for_sale=for_sale, coins=coins)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
