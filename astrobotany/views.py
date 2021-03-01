@@ -299,20 +299,16 @@ def epilog(request, page):
 @authenticate
 def message_board(request, page=1):
     page = int(page)
-    paginate_by = 10
+    paginate_by = 20
     page_count = int(math.ceil(Message.select().count() / paginate_by))
     page_count = max(page_count, 1)
     if page > page_count:
         return Response(Status.NOT_FOUND, "Invalid page number")
 
-    items = Message.by_date().paginate(page, paginate_by)
+    messages = Message.by_date().paginate(page, paginate_by)
 
     body = render_template(
-        "message_board.gmi",
-        request=request,
-        items=items,
-        page=page,
-        page_count=page_count,
+        "message_board.gmi", request=request, items=messages, page=page, page_count=page_count,
     )
     return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -392,11 +388,7 @@ def settings_badges(request):
         if isinstance(item_slot.item, items.Badge):
             badges.append(item_slot.item)
 
-    body = render_template(
-        "settings_badges.gmi",
-        request=request,
-        badges=badges,
-    )
+    body = render_template("settings_badges.gmi", request=request, badges=badges,)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -434,11 +426,7 @@ def settings_certificates(request):
         Certificate.select().where(Certificate.user == request.user).order_by(Certificate.last_seen)
     )
 
-    body = render_template(
-        "settings_certificates.gmi",
-        request=request,
-        certificates=certificates,
-    )
+    body = render_template("settings_certificates.gmi", request=request, certificates=certificates,)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
