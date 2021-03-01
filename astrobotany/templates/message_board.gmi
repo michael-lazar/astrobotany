@@ -1,6 +1,6 @@
 # Astrobotany - Message Board
 
-=>/app/message-board/submit ✍️  Submit a new message
+=>/app/message-board/submit ✍️ Submit a new message
 
 ## Posts
 

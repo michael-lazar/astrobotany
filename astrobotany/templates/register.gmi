@@ -14,9 +14,9 @@ not valid after  : {{ cert.not_valid_after }}
 ## New Users
 
 Click here to create a new astrobotany account:
-=>/app/register-new Register certificate as a new user
+=>/app/register-new 🥳 Register certificate as a new user
 
 ## Existing Users
 
 Click here to link this certificate to an existing account:
-=>/app/register-existing Link certificate to an existing user
+=>/app/register-existing 📎 Link certificate to an existing user

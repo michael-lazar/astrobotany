@@ -6,7 +6,7 @@
 
 ## Compose a letter
 
-=>/app/mailbox/outgoing Send a letter to someone special
+=>/app/mailbox/outgoing 💌 Send a letter to someone special
 
 ## Messages
 

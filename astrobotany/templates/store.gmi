@@ -12,6 +12,6 @@ Your Account Balance: {{ coins | number }} coins
 Price : {{ item_slot.item.get_price(request.user) | number }} coins
 Owned : {{ item_slot.quantity | number }}
 
-=>/app/store/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] View Details
+=>/app/store/{{ item_slot.item.item_id }} 🔍 View Details ({{ item_slot.item.name }})
 
 {% endfor %}
