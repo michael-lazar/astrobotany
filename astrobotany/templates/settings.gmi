@@ -25,5 +25,3 @@ An optional secret password that will be linked to your account. Setting a passw
 View & remove your client certificates. In order to attach a new certificate to your account, see the instructions on the astrobotany registration page.
 
 =>/app/settings/certificates Client Certificate List
-
-=>/app 🚶 Go back

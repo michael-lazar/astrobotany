@@ -14,5 +14,3 @@
 
 =>/app/message-board/{{ page + 1 }} Next page
 {% endif %}
-
-=>/app 🚶 Go back

@@ -15,4 +15,3 @@ Owned : {{ item_slot.quantity | number }}
 =>/app/store/{{ item_slot.item.item_id }} [{{ item_slot.item.name }}] View Details
 
 {% endfor %}
-=>/app 🚶 Go back

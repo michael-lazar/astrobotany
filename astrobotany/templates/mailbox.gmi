@@ -22,4 +22,3 @@
 Your mailbox is empty.
 
 {% endfor %}
-=>/app 🚶 Go back

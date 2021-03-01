@@ -37,5 +37,3 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% endif %}
 =>/app/plant/info 🔬 Plant info
 =>/app/plant/name 📛 Plant name
-
-=>/app 🚶 Go back

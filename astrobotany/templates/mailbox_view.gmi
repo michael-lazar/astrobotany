@@ -17,5 +17,3 @@ Attached Gift: 🎁 {{ message.item.name }}
 {% if new_item_slot %}
 ✨ A {{ message.item.name}} has been added to your inventory ✨
 {% endif %}
-
-=>/app/mailbox 🚶 Go back
