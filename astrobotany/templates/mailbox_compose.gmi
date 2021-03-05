@@ -18,3 +18,5 @@ Postcard type selected : {{ postcard.name }}
 ## Actions
 
 =>/app/mailbox/outgoing/{{ postcard.item_id }}/preview Preview and send
+
+=>/app/mailbox/outgoing 🚶 Go back

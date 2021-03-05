@@ -11,3 +11,5 @@ Select a gift to include with your postcard.
 {% else %}
 You have nothing in your inventory that can be used.
 {% endfor %}
+
+=>/app/mailbox/outgoing/{{ postcard.item_id }} 🚶 Go back

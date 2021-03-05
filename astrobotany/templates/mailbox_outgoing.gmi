@@ -14,4 +14,6 @@ Send a private message to a fellow gardener.
 
 =>/app/store 💳 Go to the store
 
+=>/app/mailbox 🚶 Go back
+
 

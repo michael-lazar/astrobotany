@@ -3,3 +3,5 @@
 ## {{ item_slot.item.name }}
 
 {{ description }}
+
+=>/app 🚶 Go back

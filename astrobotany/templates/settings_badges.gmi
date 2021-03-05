@@ -15,3 +15,5 @@ You don't have any badges yet.
 
 =>/app/store Go buy one in the store
 {% endfor %}
+
+=>/app/settings 🚶 Go back
