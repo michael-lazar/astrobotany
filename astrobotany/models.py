@@ -423,7 +423,7 @@ class Plant(BaseModel):
         """
         A growth multiplier based on the plant's generation.
         """
-        return self.generation ** 0.3
+        return 1 + (self.generation - 1) * 0.2
 
     @property
     def is_wilted(self) -> bool:
