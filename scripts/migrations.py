@@ -94,6 +94,10 @@ def add_badge_id(migrator):
     migrate.migrate(migrator.add_column("user", "badge_id", IntegerField(null=True, default=None)))
 
 
+def add_emoji_mode(migrator):
+    migrate.migrate(migrator.add_column("certificate", "emoji_mode", IntegerField(default=0)))
+
+
 MIGRATIONS = locals()
 
 

@@ -1,26 +1,42 @@
 # Astrobotany - Settings
 
-## ANSI Color Support
-
-Enable support for colored text & art using ANSI escape sequences.
-
-=>/app/settings/ansi_enabled ANSI colors enabled: "{{ request.cert.ansi_enabled }}"
-
-(This setting is attached to your client certificate. If you use multiple gemini clients, you can set different color settings for each client certificate linked to your account.)
-
 ## Badges
 
 Equip a decorative badge next to your username.
 
 =>/app/settings/badges Select a badge
 
-## Secret Password
+## Display Settings
+
+All display settings are associated with your currently active client certificate. If you use multiple gemini clients, you can set different display settings for each certificate linked to your account.
+
+### ANSI Color Support
+
+Display colored text using ANSI escape sequences.
+
+=>/app/settings/ansi_enabled ANSI colors enabled: "{{ request.cert.ansi_enabled }}"
+
+### Emoji Support
+
+Display emoji characters on generated pages.
+
+Modes:
+
+* 0 - display all emojis (default)
+* 1 - convert emojis to text strings, e.g. ":thumbs_up:"
+* 2 - hide all emojis
+
+=>/app/settings/emoji_mode Emoji Mode: "{{ request.cert.emoji_mode }}"
+
+## Account Settings
+
+### Secret Password
 
 An optional secret password that will be linked to your account. Setting a password is required in order to register new client certificates (see below).
 
 =>/app/settings/password Password: {{ "********" if request.user.password else "(none)" }}
 
-## Client Certificates
+### Client Certificates
 
 View & remove your client certificates. In order to attach a new certificate to your account, see the instructions on the astrobotany registration page.
 

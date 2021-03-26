@@ -1,3 +1,4 @@
+import emoji
 import math
 import mimetypes
 import os
@@ -7,9 +8,8 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 
 import jinja2
-from cryptography import x509
 from jetforce import JetforceApplication, Request, Response, Status
-from jetforce.app.base import RateLimiter
+from jetforce.app.base import RateLimiter, EnvironDict
 
 from . import items
 from .art import render_art
@@ -68,7 +68,23 @@ class AstrobotanyRequest(Request):
     user: User
     plant: Plant
     session: dict
-    cert: x509.Certificate
+    cert: Certificate
+
+    def __init__(self, environ: EnvironDict, cert: Certificate):
+        super().__init__(environ)
+        self.cert = cert
+        self.user = cert.user
+        self.plant = cert.user.plant
+        self.session = load_session(cert.user.user_id)
+
+    def render_template(self, name: str, *args, **kwargs) -> str:
+        kwargs["request"] = self
+        text = template_env.get_template(name).render(*args, **kwargs)
+        if self.cert.emoji_mode == 1:
+            text = emoji.demojize(text)
+        elif self.cert.emoji_mode == 2:
+            text = emoji.replace_emoji(text)
+        return text
 
 
 def authenticate(func: typing.Callable) -> typing.Callable:
@@ -104,11 +120,7 @@ def authenticate(func: typing.Callable) -> typing.Callable:
             )
             return Response(Status.SUCCESS, "text/gemini", body)
 
-        request.cert = cert
-        request.user = request.cert.user
-        request.plant = request.user.plant
-        request.session = load_session(request.user.user_id)
-
+        request = AstrobotanyRequest(request.environ, cert)
         request.plant.refresh()
         response = func(request, **kwargs)
         request.plant.save()
@@ -275,8 +287,8 @@ def menu(request):
     title_art = render_art("title.psci", ansi_enabled=request.cert.ansi_enabled)
     mailbox_count = request.user.inbox.where(Inbox.is_seen == False).count()
     now = datetime.now()
-    body = render_template(
-        "menu.gmi", request=request, title_art=title_art, mailbox_count=mailbox_count, now=now
+    body = request.render_template(
+        "menu.gmi", title_art=title_art, mailbox_count=mailbox_count, now=now
     )
     return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -290,7 +302,7 @@ def epilog(request, page):
     else:
         art_number = page
     art = render_art(f"epilog{art_number}.psci", ansi_enabled=request.cert.ansi_enabled)
-    body = render_template("epilog.gmi", page=page, art=art)
+    body = request.render_template("epilog.gmi", page=page, art=art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -307,8 +319,11 @@ def message_board(request, page=1):
 
     messages = Message.by_date().paginate(page, paginate_by)
 
-    body = render_template(
-        "message_board.gmi", request=request, items=messages, page=page, page_count=page_count,
+    body = request.render_template(
+        "message_board.gmi",
+        items=messages,
+        page=page,
+        page_count=page_count,
     )
     return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -331,7 +346,7 @@ def message_board_submit(request):
 @app.route("/app/settings")
 @authenticate
 def settings(request):
-    body = render_template("settings.gmi", request=request)
+    body = request.render_template("settings.gmi")
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -380,6 +395,24 @@ def settings_ansi_enabled(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
 
 
+@app.route("/app/settings/emoji_mode")
+@authenticate
+def settings_emoji_mode(request):
+    if not request.query:
+        prompt = f"Set emoji display mode (0/1/2): "
+        return Response(Status.INPUT, prompt)
+
+    answer = request.query.strip()
+
+    if answer in ("0", "1", "2"):
+        request.cert.emoji_mode = int(answer)
+        request.cert.save()
+    else:
+        return Response(Status.BAD_REQUEST, f"Invalid query value: {request.query}")
+
+    return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
+
+
 @app.route("/app/settings/badges")
 @authenticate
 def settings_badges(request):
@@ -388,7 +421,10 @@ def settings_badges(request):
         if isinstance(item_slot.item, items.Badge):
             badges.append(item_slot.item)
 
-    body = render_template("settings_badges.gmi", request=request, badges=badges,)
+    body = request.render_template(
+        "settings_badges.gmi",
+        badges=badges,
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -426,7 +462,10 @@ def settings_certificates(request):
         Certificate.select().where(Certificate.user == request.user).order_by(Certificate.last_seen)
     )
 
-    body = render_template("settings_certificates.gmi", request=request, certificates=certificates,)
+    body = request.render_template(
+        "settings_certificates.gmi",
+        certificates=certificates,
+    )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -461,7 +500,7 @@ def settings_certificates_delete(request, certificate_id):
 def store(request):
     for_sale = ItemSlot.store_view(request.user)
     coins = request.user.get_item_quantity(items.coin)
-    body = render_template("store.gmi", request=request, for_sale=for_sale, coins=coins)
+    body = request.render_template("store.gmi", for_sale=for_sale, coins=coins)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -481,8 +520,8 @@ def store_view(request, item_id):
 
     description = item_slot.item.get_store_description(request.user)
     coins = request.user.get_item_quantity(items.coin)
-    body = render_template(
-        "store_view.gmi", request=request, item_slot=item_slot, coins=coins, description=description
+    body = request.render_template(
+        "store_view.gmi", item_slot=item_slot, coins=coins, description=description
     )
     return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -521,9 +560,7 @@ def mailbox(request):
         .order_by(Inbox.id.desc())
     )
     mailbox_art = render_art("mailbox.psci", ansi_enabled=request.cert.ansi_enabled)
-    body = render_template(
-        "mailbox.gmi", request=request, messages=messages, mailbox_art=mailbox_art
-    )
+    body = request.render_template("mailbox.gmi", messages=messages, mailbox_art=mailbox_art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -536,7 +573,7 @@ def mailbox_outgoing(request):
         if quantity:
             postcards.append((postcard, quantity))
 
-    body = render_template("mailbox_outgoing.gmi", request=request, postcards=postcards)
+    body = request.render_template("mailbox_outgoing.gmi", postcards=postcards)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -548,7 +585,7 @@ def mailbox_compose(request, postcard_id):
         return Response(Status.NOT_FOUND, "Postcard was not found")
 
     data = PostcardData.from_request(request)
-    body = render_template("mailbox_compose.gmi", request=request, postcard=postcard, data=data)
+    body = request.render_template("mailbox_compose.gmi", postcard=postcard, data=data)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -609,9 +646,7 @@ def mailbox_compose_item(request, postcard_id, item_id=None):
     if item_id is None:
         item_slots = [slot for slot in request.user.inventory if slot.item.can_gift(request.user)]
         item_slots.sort(key=lambda x: x.item.name)
-        body = render_template(
-            "mailbox_item.gmi", request=request, postcard=postcard, item_slots=item_slots
-        )
+        body = request.render_template("mailbox_item.gmi", postcard=postcard, item_slots=item_slots)
         return Response(Status.SUCCESS, "text/gemini", body)
 
     data = PostcardData.from_request(request)
@@ -639,7 +674,7 @@ def mailbox_preview(request, postcard_id):
     if not data.subject:
         return Response(Status.BAD_REQUEST, "Cannot proceed without a subject defined")
 
-    body = render_template("mailbox_preview.gmi", request=request, postcard=postcard, data=data)
+    body = request.render_template("mailbox_preview.gmi", postcard=postcard, data=data)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -682,7 +717,7 @@ def mailbox_send(request, postcard_id):
     )
     PostcardData.delete(request)
 
-    body = render_template("mailbox_send.gmi", request=request)
+    body = request.render_template("mailbox_send.gmi")
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -705,9 +740,7 @@ def mailbox_view(request, message_id):
     else:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
-    body = render_template(
-        "mailbox_view.gmi", request=request, message=message, new_item_slot=new_item_slot
-    )
+    body = request.render_template("mailbox_view.gmi", message=message, new_item_slot=new_item_slot)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -718,7 +751,7 @@ def plant(request):
     if alert is None:
         alert = request.plant.get_observation(request.cert.ansi_enabled)
 
-    body = render_template("plant.gmi", request=request, plant=request.plant, alert=alert)
+    body = request.render_template("plant.gmi", plant=request.plant, alert=alert)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -789,13 +822,13 @@ def harvest(request):
             msg = f'Type "Goodbye {request.plant.name}" to send off your plant.'
             return Response(Status.INPUT, msg)
 
-    body = render_template("plant_harvest.gmi", request=request, plant=request.plant)
+    body = request.render_template("plant_harvest.gmi", plant=request.plant)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
 @app.route("/app/plant/name")
 @authenticate
-def name(request):
+def plant_name(request):
     if not request.query:
         return Response(Status.INPUT, "Enter a new nickname for your plant:")
 
@@ -814,7 +847,7 @@ def visit(request):
         .order_by(Plant.score.desc())
     )
 
-    body = render_template("visit.gmi", request=request, plants=plants)
+    body = request.render_template("visit.gmi", plants=plants)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -831,7 +864,7 @@ def visit_plant(request, user_id):
     user.plant.save()
 
     alert = request.session.pop("alert", None)
-    body = render_template("visit_plant.gmi", request=request, plant=user.plant, alert=alert)
+    body = request.render_template("visit_plant.gmi", plant=user.plant, alert=alert)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -874,7 +907,7 @@ def visit_plant_search(request, user_id):
 @authenticate
 def inventory(request):
     inventory = sorted(request.user.inventory, key=lambda x: x.item.name)
-    body = render_template("inventory.gmi", request=request, inventory=inventory)
+    body = request.render_template("inventory.gmi", inventory=inventory)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
@@ -891,7 +924,7 @@ def inventory_view(request, item_slot_id):
         return Response(Status.NOT_FOUND, "Not Found")
 
     description = item_slot.item.get_inventory_description(request.user)
-    body = render_template(
-        "inventory_view.gmi", request=request, item_slot=item_slot, description=description
+    body = request.render_template(
+        "inventory_view.gmi", item_slot=item_slot, description=description
     )
     return Response(Status.SUCCESS, "text/gemini", body)

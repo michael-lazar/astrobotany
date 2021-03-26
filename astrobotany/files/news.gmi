@@ -2,4 +2,5 @@
 
 ### 2021-03-26
 
-* Started this news section in order to make site changes more visible.
+* Started this news page in order to make site changes more visible!
+* Added "emoji mode" setting to disable rendering emoji characters.
