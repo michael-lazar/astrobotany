@@ -1,4 +1,4 @@
-# Astrobotany
+# 🪐 Astrobotany
 
 ```
 {{ title_art }}
@@ -7,23 +7,18 @@
 > "Don't judge each day by the harvest you reap but by the seeds that you plant."
 >     ― Robert Louis Stevenson
 
-## Links
-
 =>/app 🌷 Login
-=>/files/instructions.gmi 📚 Instructions
-
-## Leaderboard
+=>/files/instructions.gmi 📚 About
+=>/files/news.gmi 🗞 News
 
 ```
 {{ leaderboard }}
 ```
 
-## Credits
-
 Astrobotany is a fork of the tilde.town pubnix game, botany.
 
-Botany by Jake Funke
+Botany, by Jake Funke
 =>https://github.com/jifunks/botany
 
-Astrobotany by Michael Lazar
+Astrobotany, by Michael Lazar
 =>https://github.com/michael-lazar/astrobotany

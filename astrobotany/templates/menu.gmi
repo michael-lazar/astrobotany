@@ -21,3 +21,7 @@ The current time is {{ now | datetime }}.
 =>/app/mailbox 📪 Mailbox
 {% endif %}
 =>/app/settings 🐌 Settings
+=>/files/news.gmi 🗞 News
+=>/files/instructions.gmi 📚 Instructions
+=>/ 🏡 Home
+
