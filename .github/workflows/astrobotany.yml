@@ -22,9 +22,6 @@ jobs:
     - name: Lint with mypy
       run: |
         mypy --ignore-missing-imports .
-    - name: Link with isort
-      run: |
-        isort --check-only .
     - name: Run tests
       run: |
         pytest -v tests/
