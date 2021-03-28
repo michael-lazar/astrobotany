@@ -1,4 +1,3 @@
-import emoji
 import math
 import mimetypes
 import os
@@ -7,9 +6,10 @@ import typing
 from datetime import datetime, timedelta
 from functools import lru_cache
 
+import emoji
 import jinja2
 from jetforce import JetforceApplication, Request, Response, Status
-from jetforce.app.base import RateLimiter, EnvironDict
+from jetforce.app.base import EnvironDict, RateLimiter
 
 from . import items
 from .art import render_art

@@ -23,7 +23,8 @@ init_db(args.db_file)
 for _ in range(args.count):
     age = random.randrange(int(timedelta(days=50).total_seconds()))
     user = User.create(
-        user_id="".join(random.choices("0123456789ABCDEF", k=16)), username=fake.name().lower(),
+        user_id="".join(random.choices("0123456789ABCDEF", k=16)),
+        username=fake.name().lower(),
     )
     plant = Plant(
         user=user,

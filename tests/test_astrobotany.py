@@ -239,7 +239,9 @@ def test_plant_refresh_12h_fertilizer(now):
     fertilized_at = now - timedelta(hours=6)
 
     plant = plant_factory(
-        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
+        watered_at=watered_at,
+        updated_at=updated_at,
+        fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -269,7 +271,9 @@ def test_plant_refresh_18h_fertilizer(now):
     updated_at = now - timedelta(hours=12)
     fertilized_at = now - timedelta(hours=18)
     plant = plant_factory(
-        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
+        watered_at=watered_at,
+        updated_at=updated_at,
+        fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -290,7 +294,9 @@ def test_plant_refresh_36h_fertilizer(now):
     updated_at = now - timedelta(hours=24)
     fertilized_at = now - timedelta(hours=30)
     plant = plant_factory(
-        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
+        watered_at=watered_at,
+        updated_at=updated_at,
+        fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
@@ -302,7 +308,9 @@ def test_plant_refresh_36h_fertilizer_2(now):
     updated_at = now - timedelta(hours=36)
     fertilized_at = now - timedelta(hours=24)
     plant = plant_factory(
-        watered_at=watered_at, updated_at=updated_at, fertilized_at=fertilized_at,
+        watered_at=watered_at,
+        updated_at=updated_at,
+        fertilized_at=fertilized_at,
     )
     plant.refresh()
     assert plant.updated_at == datetime.now()
