@@ -30,7 +30,7 @@ Your plant will continue to grow and evolve over time.
 
 * seed (0 days)
 * seedling (3 day)
-* young (3 days
+* young (3 days)
 * mature (10 days)
 * flowering (20 days)
 * seed-bearing (30 days)
