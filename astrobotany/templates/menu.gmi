@@ -8,20 +8,26 @@ Welcome, {{ request.user.username }}!
 
 The current time is {{ now | datetime }}.
 
-## Links
+## Grow
 
 =>/app/plant 🌻 Visit your plant
 =>/app/visit ⛲ Community garden
 =>/app/inventory 🎒 Inventory
 =>/app/store 💳 Store
+
+## Read
+
 =>/app/message-board 📌 Message board
 {% if mailbox_count %}
 =>/app/mailbox 📬 Mailbox ({{ mailbox_count }} unread)
 {% else %}
 =>/app/mailbox 📪 Mailbox
 {% endif %}
-=>/app/settings 🐌 Settings
 =>/files/news.gmi 🗞 News
+
+## Meta
+
+=>/app/settings 🐌 Settings
 =>/files/instructions.gmi 📚 Instructions
 =>/ 🏡 Home
 
