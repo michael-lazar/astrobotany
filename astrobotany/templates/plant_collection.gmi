@@ -1,0 +1,6 @@
+# Directory of {{ state }} Plants
+
+{% for plant in plants %}
+=>/app/visit/{{ plant.user.user_id }} {{ plant.user.display_name }}'s Garden
+{% endfor %}
+
