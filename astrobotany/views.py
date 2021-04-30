@@ -850,6 +850,38 @@ def visit(request):
     body = request.render_template("visit.gmi", plants=plants)
     return Response(Status.SUCCESS, "text/gemini", body)
 
+@app.route("/app/visit/healthy")
+@authenticate
+def visit(request):
+    plants = (
+        Plant.all_active()
+        .filter(not Plant.dead, not Plant.is_wilting())
+    )
+
+    body = request.render_template("plant_collection.gmi", plants=plants, state="Healthy")
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+@app.route("/app/visit/wilting")
+@authenticate
+def visit(request):
+    plants = (
+        Plant.all_active()
+        .filter(Plant.is_wilted())
+    )
+
+    body = request.render_template("plant_collection.gmi", plants=plants, state="Wilting")
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+@app.route("/app/visit/dead")
+@authenticate
+def visit(request):
+    plants = (
+        Plant.all_active()
+        .filter(Plant.dead)
+    )
+
+    body = request.render_template("plant_collection.gmi", plants=plants, state="Dead")
+    return Response(Status.SUCCESS, "text/gemini", body)
 
 @app.route("/app/visit/(?P<user_id>[0-9a-f]{32})")
 @authenticate
