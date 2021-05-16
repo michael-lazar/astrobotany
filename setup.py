@@ -19,7 +19,14 @@ setup(
     keywords="gemini",
     packages=["astrobotany"],
     python_requires=">=3.7, <4",
-    install_requires=["jetforce", "peewee", "jinja2", "faker", "bcrypt", "emoji"],
+    install_requires=[
+        "jetforce",
+        "peewee",
+        "jinja2",
+        "faker",
+        "bcrypt",
+        "emoji @ git+https://github.com/carpedm20/emoji.git@v.1.2.1#egg=emoji-1.2.1",
+    ],
     extras_require={
         "test": ["pytest", "black", "isort", "mypy", "freezegun"],
     },
