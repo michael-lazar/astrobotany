@@ -83,7 +83,7 @@ class AstrobotanyRequest(Request):
         if self.cert.emoji_mode == 1:
             text = emoji.demojize(text)
         elif self.cert.emoji_mode == 2:
-            text = emoji.replace_emoji(text)
+            text = emoji.replace_emoji(text)  # type: ignore
         return text
 
 

@@ -1,5 +1,9 @@
 # Astrobotany - News
 
+### Unreleased
+
+* Multi-line message board postings are now formatted correctly.
+
 ### 2021-03-26
 
 * Started this news page in order to make site changes more visible!
