@@ -6,6 +6,7 @@
 * Reorganized links on the home page and the main menu.
 * Added a better capsule description to the home page.
 * Added recent site activity to the home page and moved leaderboards.
+* The badge selection tool has been moved to the main menu.
 
 ### 2021-03-26
 

@@ -25,7 +25,7 @@ The current time is {{ now | datetime }}.
 => /app/inventory 🎒 Open backpack
 => /app/store 💳 Shop items
 => /app/music 🎷 Compose music (🚧 under construction 🚧)
-=> /app/badges 📛 Equip badges (🚧 under construction 🚧)
+=> /app/badges 📛 Equip badges
 => /app/leaderboards 🏅 View leaderboards (🚧 under construction 🚧)
 => /app/settings 🐌 Change settings
 
