@@ -254,7 +254,7 @@ def test_plant_refresh_generation_2_12h(now):
     plant = plant_factory(watered_at=watered_at, updated_at=updated_at, generation=2)
     plant.refresh()
     assert plant.updated_at == datetime.now()
-    assert plant.score == int(12 * 3600 * (2 ** 0.3))
+    assert plant.score == int(12 * 3600 * 1.2)
 
 
 def test_plant_refresh_18h(now):
