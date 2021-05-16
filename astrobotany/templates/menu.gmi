@@ -8,20 +8,34 @@ Welcome, {{ request.user.username }}!
 
 The current time is {{ now | datetime }}.
 
+## Garden
+
+=> /app/plant 🌻 Visit your plant
+=> /app/visit ⛲ Community garden
+=> /app/message-board 📌 Message board
+=> /app/pond 🦆 Koi pond (🚧 under construction 🚧)
+
+## Places
+
+{% if mailbox_count %}
+=> /app/mailbox 📬 Check mailbox ({{ mailbox_count }} unread)
+{% else %}
+=> /app/mailbox 📪 Check mailbox
+{% endif %}
+=> /app/inventory 🎒 Open backpack
+=> /app/store 💳 Shop items
+=> /app/music 🎷 Compose music (🚧 under construction 🚧)
+=> /app/badges 📛 Equip badges (🚧 under construction 🚧)
+=> /app/leaderboards 🏅 View leaderboards (🚧 under construction 🚧)
+=> /app/settings 🐌 Change settings
+
+## Info
+
+=> /files/news.gmi 🗞 Astrobotany News
+=> /files/instructions.gmi 📚 Astrobotany FAQ
+
 ## Links
 
-=>/app/plant 🌻 Visit your plant
-=>/app/visit ⛲ Community garden
-=>/app/inventory 🎒 Inventory
-=>/app/store 💳 Store
-=>/app/message-board 📌 Message board
-{% if mailbox_count %}
-=>/app/mailbox 📬 Mailbox ({{ mailbox_count }} unread)
-{% else %}
-=>/app/mailbox 📪 Mailbox
-{% endif %}
-=>/app/settings 🐌 Settings
-=>/files/news.gmi 🗞 News
-=>/files/instructions.gmi 📚 Instructions
-=>/ 🏡 Home
-
+=> gemini://astrobotany.mozz.us 🏡 Astrobotany Home
+=> https://github.com/michael-lazar/astrobotany 🐞 Astrobotany Issue Tracker (github)
+=> gemini://gardengnome.ml/ 🗿 Garden Gnome Society
