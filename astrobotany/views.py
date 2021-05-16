@@ -151,8 +151,21 @@ app = JetforceApplication()
 @app.route("", strict_trailing_slash=False)
 def index(request):
     title_art = render_art("title.psci")
-    leaderboard = get_daily_leaderboard().render(False)
-    body = render_template("index.gmi", title_art=title_art, leaderboard=leaderboard)
+
+    query = (
+        Plant.all_active()
+        .where(Plant.watered_by.is_null(True))
+        .order_by(Plant.watered_at.desc())
+        .limit(10)
+    )
+
+    activity = []
+    for plant in query:
+        dt = (datetime.now() - plant.watered_at).total_seconds() // 60
+        activity.append(f"{plant.user.username} watered their plant {dt:0.0f} minutes ago")
+
+    total = User.select().count()
+    body = render_template("index.gmi", title_art=title_art, activity=activity, total=total)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 

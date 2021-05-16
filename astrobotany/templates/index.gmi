@@ -7,18 +7,20 @@
 > "Don't judge each day by the harvest you reap but by the seeds that you plant."
 >     ― Robert Louis Stevenson
 
-=>/app 🌷 Login
-=>/files/instructions.gmi 📚 About
-=>/files/news.gmi 🗞 News
+Welcome! Astrobotany is a community gardening experience in geminispace.
 
-```
-{{ leaderboard }}
-```
+* Plant a virtual seed and water your flower every day to watch it grow!
+* Gather coins and buy items to personalize your unique space!
+* Chat with your friends and send private messages and gifts!
+* Compete for high scores and a coveted position on the leaderboards!
 
-Astrobotany is a fork of the tilde.town pubnix game, botany.
+Astrobotany is free to join and requires no personal info. Simply attach a client certificate to the following link to get started!
 
-Botany, by Jake Funke
-=>https://github.com/jifunks/botany
+=>/app 🌷 Astrobotany Login
+=>/files/instructions.gmi 📚 Astrobotany FAQ
 
-Astrobotany, by Michael Lazar
-=>https://github.com/michael-lazar/astrobotany
+{{ total }} gardeners registered, recent activity...
+
+{% for line in activity %}
+* {{ line }}
+{% endfor %}

@@ -1,4 +1,4 @@
-# Garden Directory
+# Community Garden
 
 {% for plant in plants %}
 =>/app/visit/{{ plant.user.user_id }} {{ plant.description }}

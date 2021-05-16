@@ -53,3 +53,17 @@ generation | multiplier
 9          | 2.60
 10         | 2.80
 ```
+
+## Credits
+
+Astrobotany is a fork of the tilde.town pubnix game, botany.
+
+Botany, by Jake Funke
+=> https://github.com/jifunks/botany
+
+Astrobotany, by Michael Lazar
+=> https://github.com/michael-lazar/astrobotany
+
+Most of the ASCII art on this capsule (besides the plants) was created by Joan G. Stark. ANSI colorization added by Michael Lazar.
+
+=> https://web.archive.org/web/20091028031718/http://www.geocities.com/SoHo/7373/indexother.htm jgs geocities site (internet archive)
