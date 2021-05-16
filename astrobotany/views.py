@@ -9,11 +9,10 @@ from functools import lru_cache
 import emoji
 import jinja2
 from jetforce import JetforceApplication, Request, Response, Status
-from jetforce.app.base import EnvironDict, RateLimiter
+from jetforce.app.base import EnvironDict, RateLimiter, RouteHandler, RoutePattern
 
 from . import items
 from .art import render_art
-from .leaderboard import get_daily_leaderboard
 from .models import Certificate, Inbox, ItemSlot, Message, Plant, User
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -64,7 +63,11 @@ def render_template(name: str, *args, **kwargs) -> str:
     return template_env.get_template(name).render(*args, **kwargs)
 
 
-class AstrobotanyRequest(Request):
+class AuthenticatedRequest(Request):
+    """
+    Request class that includes
+    """
+
     user: User
     plant: Plant
     session: dict
@@ -87,20 +90,30 @@ class AstrobotanyRequest(Request):
         return text
 
 
-def authenticate(func: typing.Callable) -> typing.Callable:
+class AstrobotanyApplication(JetforceApplication):
+    def auth_route(self, path: str = ".*") -> typing.Callable[[RouteHandler], RouteHandler]:
+        """
+        Jetforce route decorator with an added authentication layer.
+        """
+        route_pattern = RoutePattern(path)
+
+        def wrap(func: RouteHandler) -> RouteHandler:
+            authenticated_func = authenticated_route(func)
+            app.routes.append((route_pattern, authenticated_func))
+            return func
+
+        return wrap
+
+
+def authenticated_route(func: RouteHandler) -> RouteHandler:
     """
-    View wrapper that handles user authentication via client certificates.
+    Wraps a route method to ensure that the request is authenticated.
     """
 
-    def callback(request: AstrobotanyRequest, **kwargs):
-
+    def wrapped(request: Request, **kwargs) -> Response:
         if "REMOTE_USER" not in request.environ:
-            if request.path != "/app":
-                # Redirect the user to the correct "path scope" first
-                return Response(Status.REDIRECT_TEMPORARY, "/app")
-            else:
-                msg = "Attach your client certificate to continue."
-                return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
+            msg = "Attach your client certificate to continue."
+            return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
 
         if request.environ["TLS_CLIENT_AUTHORISED"]:
             # Old-style verified certificate
@@ -120,13 +133,16 @@ def authenticate(func: typing.Callable) -> typing.Callable:
             )
             return Response(Status.SUCCESS, "text/gemini", body)
 
-        request = AstrobotanyRequest(request.environ, cert)
+        request = AuthenticatedRequest(request.environ, cert)
         request.plant.refresh()
         response = func(request, **kwargs)
         request.plant.save()
         return response
 
-    return callback
+    return wrapped
+
+
+app = AstrobotanyApplication()
 
 
 class PostcardData:
@@ -145,11 +161,8 @@ class PostcardData:
         request.session.pop("postcard", None)
 
 
-app = JetforceApplication()
-
-
-@app.route("", strict_trailing_slash=False)
-def index(request):
+@app.route("")
+def index_view(request):
     title_art = render_art("title.psci")
 
     query = (
@@ -170,7 +183,7 @@ def index(request):
 
 
 @app.route("/app/register-new")
-def register_new(request):
+def register_new_view(request):
     if "REMOTE_USER" not in request.environ:
         msg = "Attach your client certificate to continue."
         return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
@@ -217,7 +230,7 @@ def register_new(request):
 
 @app.route("/app/register-existing")
 @app.route("/app/register-existing/(?P<user_id>[0-9]+)")
-def register_existing(request, user_id=None):
+def register_existing_view(request, user_id=None):
     if "REMOTE_USER" not in request.environ:
         msg = "Attach your client certificate to continue."
         return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
@@ -272,7 +285,7 @@ def register_existing(request, user_id=None):
 
 
 @app.route("/files/(?P<path>.*)")
-def files(request, path):
+def files_view(request, path):
     url_path = pathlib.Path(path.strip("/"))
 
     filename = pathlib.Path(os.path.normpath(str(url_path)))
@@ -294,9 +307,8 @@ def files(request, path):
     return Response(Status.SUCCESS, mimetype, body)
 
 
-@app.route("/app")
-@authenticate
-def menu(request):
+@app.auth_route("/app")
+def app_view(request):
     title_art = render_art("title.psci", ansi_enabled=request.cert.ansi_enabled)
     mailbox_count = request.user.inbox.where(Inbox.is_seen == False).count()
     now = datetime.now()
@@ -306,9 +318,8 @@ def menu(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/epilog/(?P<page>[0-9]+)")
-@authenticate
-def epilog(request, page):
+@app.auth_route("/app/epilog/(?P<page>[0-9]+)")
+def epilog_view(request, page):
     page = int(page)
     if page == 5:
         art_number = 4
@@ -319,10 +330,9 @@ def epilog(request, page):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/message-board")
-@app.route("/app/message-board/(?P<page>[0-9]+)")
-@authenticate
-def message_board(request, page=1):
+@app.auth_route("/app/message-board")
+@app.auth_route("/app/message-board/(?P<page>[0-9]+)")
+def message_board_view(request, page=1):
     page = int(page)
     paginate_by = 20
     page_count = int(math.ceil(Message.select().count() / paginate_by))
@@ -341,9 +351,8 @@ def message_board(request, page=1):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/message-board/submit")
-@authenticate
-def message_board_submit(request):
+@app.auth_route("/app/message-board/submit")
+def message_board_submit_view(request):
     if not request.query:
         return Response(Status.INPUT, "What would you like to say? ")
 
@@ -356,16 +365,14 @@ def message_board_submit(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/message-board")
 
 
-@app.route("/app/settings")
-@authenticate
-def settings(request):
+@app.auth_route("/app/settings")
+def settings_view(request):
     body = request.render_template("settings.gmi")
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/settings/password")
-@authenticate
-def settings_password(request):
+@app.auth_route("/app/settings/password")
+def settings_password_view(request):
     new_password = request.session.pop("new_password", None)
 
     if not request.query:
@@ -387,9 +394,8 @@ def settings_password(request):
     return Response(Status.SUCCESS, "text/gemini", message)
 
 
-@app.route("/app/settings/ansi_enabled")
-@authenticate
-def settings_ansi_enabled(request):
+@app.auth_route("/app/settings/ansi_enabled")
+def settings_ansi_enabled_view(request):
     if not request.query:
         prompt = f"Enable ANSI support for colors? [T]rue / [F]alse"
         return Response(Status.INPUT, prompt)
@@ -408,9 +414,8 @@ def settings_ansi_enabled(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
 
 
-@app.route("/app/settings/emoji_mode")
-@authenticate
-def settings_emoji_mode(request):
+@app.auth_route("/app/settings/emoji_mode")
+def settings_emoji_mode_view(request):
     if not request.query:
         prompt = f"Set emoji display mode (0/1/2): "
         return Response(Status.INPUT, prompt)
@@ -426,8 +431,7 @@ def settings_emoji_mode(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
 
 
-@app.route("/app/badges")
-@authenticate
+@app.auth_route("/app/badges")
 def badges_view(request):
     badges = []
     for item_slot in request.user.inventory:
@@ -441,8 +445,7 @@ def badges_view(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/badges/equip/(?P<badge_id>[0-9]+)")
-@authenticate
+@app.auth_route("/app/badges/equip/(?P<badge_id>[0-9]+)")
 def badges_equip_view(request, badge_id):
     badge_id = int(badge_id)
 
@@ -460,17 +463,15 @@ def badges_equip_view(request, badge_id):
     return Response(Status.REDIRECT_TEMPORARY, "/app/badges")
 
 
-@app.route("/app/badges/remove")
-@authenticate
+@app.auth_route("/app/badges/remove")
 def badges_remove_view(request):
     request.user.badge_id = None
     request.user.save()
     return Response(Status.REDIRECT_TEMPORARY, "/app/badges")
 
 
-@app.route("/app/settings/certificates")
-@authenticate
-def settings_certificates(request):
+@app.auth_route("/app/settings/certificates")
+def settings_certificates_view(request):
     certificates = (
         Certificate.select().where(Certificate.user == request.user).order_by(Certificate.last_seen)
     )
@@ -482,9 +483,8 @@ def settings_certificates(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/settings/certificates/(?P<certificate_id>[0-9]+)/delete")
-@authenticate
-def settings_certificates_delete(request, certificate_id):
+@app.auth_route("/app/settings/certificates/(?P<certificate_id>[0-9]+)/delete")
+def settings_certificates_delete_view(request, certificate_id):
     cert = Certificate.get_or_none(id=certificate_id)
     if cert is None:
         msg = "Certificate not found"
@@ -508,18 +508,16 @@ def settings_certificates_delete(request, certificate_id):
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings/certificates")
 
 
-@app.route("/app/store")
-@authenticate
-def store(request):
+@app.auth_route("/app/store")
+def store_view(request):
     for_sale = ItemSlot.store_view(request.user)
     coins = request.user.get_item_quantity(items.coin)
     body = request.render_template("store.gmi", for_sale=for_sale, coins=coins)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/store/(?P<item_id>[0-9]+)")
-@authenticate
-def store_view(request, item_id):
+@app.auth_route("/app/store/(?P<item_id>[0-9]+)")
+def store_item_view(request, item_id):
     item = items.Item.lookup(item_id)
     if item is None:
         return Response(Status.NOT_FOUND, "Item was not found")
@@ -539,9 +537,8 @@ def store_view(request, item_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/store/(?P<item_id>[0-9]+)/purchase/(?P<amount>[0-9]+)")
-@authenticate
-def store_purchase(request, item_id, amount):
+@app.auth_route("/app/store/(?P<item_id>[0-9]+)/purchase/(?P<amount>[0-9]+)")
+def store_purchase_view(request, item_id, amount):
     amount = int(amount)
 
     item = items.Item.lookup(item_id)
@@ -564,9 +561,8 @@ def store_purchase(request, item_id, amount):
     return Response(Status.REDIRECT_TEMPORARY, "/app/store")
 
 
-@app.route("/app/mailbox")
-@authenticate
-def mailbox(request):
+@app.auth_route("/app/mailbox")
+def mailbox_view(request):
     messages = (
         Inbox.select()
         .where((Inbox.user_to == request.user) | (Inbox.user_from == request.user))
@@ -577,9 +573,8 @@ def mailbox(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/mailbox/outgoing")
-@authenticate
-def mailbox_outgoing(request):
+@app.auth_route("/app/mailbox/outgoing")
+def mailbox_outgoing_view(request):
     postcards = []
     for postcard in items.Postcard.postcards:
         quantity = request.user.get_item_quantity(postcard)
@@ -590,9 +585,8 @@ def mailbox_outgoing(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)")
-@authenticate
-def mailbox_compose(request, postcard_id):
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)")
+def mailbox_compose_view(request, postcard_id):
     postcard = items.Postcard.lookup(postcard_id)
     if postcard is None:
         return Response(Status.NOT_FOUND, "Postcard was not found")
@@ -602,9 +596,8 @@ def mailbox_compose(request, postcard_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/to")
-@authenticate
-def mailbox_compose_to(request, postcard_id):
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/to")
+def mailbox_compose_to_view(request, postcard_id):
     username = request.query
     if not username:
         return Response(
@@ -622,9 +615,8 @@ def mailbox_compose_to(request, postcard_id):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
 
 
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/subject")
-@authenticate
-def mailbox_compose_subject(request, postcard_id):
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/subject")
+def mailbox_compose_subject_view(request, postcard_id):
     subject = request.query
     if not subject:
         return Response(Status.INPUT, f"Enter subject:")
@@ -634,9 +626,8 @@ def mailbox_compose_subject(request, postcard_id):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
 
 
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/line/(?P<line_number>[0-9]+)")
-@authenticate
-def mailbox_compose_line(request, postcard_id, line_number):
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/line/(?P<line_number>[0-9]+)")
+def mailbox_compose_line_view(request, postcard_id, line_number):
     line = request.query
     if not line:
         return Response(
@@ -648,10 +639,9 @@ def mailbox_compose_line(request, postcard_id, line_number):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
 
 
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/item")
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/item/(?P<item_id>[0-9]+)")
-@authenticate
-def mailbox_compose_item(request, postcard_id, item_id=None):
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/item")
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/item/(?P<item_id>[0-9]+)")
+def mailbox_compose_item_view(request, postcard_id, item_id=None):
     postcard = items.Postcard.lookup(postcard_id)
     if postcard is None:
         return Response(Status.NOT_FOUND, "Postcard was not found")
@@ -667,16 +657,14 @@ def mailbox_compose_item(request, postcard_id, item_id=None):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
 
 
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/clear")
-@authenticate
-def mailbox_compose_clear(request, postcard_id):
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/clear")
+def mailbox_compose_clear_view(request, postcard_id):
     PostcardData.delete(request)
     return Response(Status.REDIRECT_TEMPORARY, f"/app/mailbox/outgoing/{postcard_id}")
 
 
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/preview")
-@authenticate
-def mailbox_preview(request, postcard_id):
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/preview")
+def mailbox_preview_view(request, postcard_id):
     postcard = items.Postcard.lookup(postcard_id)
     if postcard is None:
         return Response(Status.NOT_FOUND, "Postcard was not found")
@@ -691,9 +679,8 @@ def mailbox_preview(request, postcard_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/send")
-@authenticate
-def mailbox_send(request, postcard_id):
+@app.auth_route("/app/mailbox/outgoing/(?P<postcard_id>[0-9]+)/send")
+def mailbox_send_view(request, postcard_id):
     postcard = items.Postcard.lookup(postcard_id)
     if postcard is None:
         return Response(Status.NOT_FOUND, "Postcard was not found")
@@ -734,9 +721,8 @@ def mailbox_send(request, postcard_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/mailbox/(?P<message_id>[0-9]+)")
-@authenticate
-def mailbox_view(request, message_id):
+@app.auth_route("/app/mailbox/(?P<message_id>[0-9]+)")
+def mailbox_message_view(request, message_id):
     message = Inbox.get_or_none(id=message_id)
     if message is None:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
@@ -757,9 +743,8 @@ def mailbox_view(request, message_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/plant")
-@authenticate
-def plant(request):
+@app.auth_route("/app/plant")
+def plant_view(request):
     alert = request.session.pop("alert", None)
     if alert is None:
         alert = request.plant.get_observation(request.cert.ansi_enabled)
@@ -768,39 +753,34 @@ def plant(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/plant/water")
-@authenticate
-def water(request):
+@app.auth_route("/app/plant/water")
+def water_view(request):
     request.session["alert"] = request.plant.water()
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/plant/fertilize")
-@authenticate
-def fertilize(request):
+@app.auth_route("/app/plant/fertilize")
+def fertilize_view(request):
     request.session["alert"] = request.plant.fertilize()
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/plant/xmas")
-@authenticate
-def xmas(request):
+@app.auth_route("/app/plant/xmas")
+def xmas_view(request):
     request.session["alert"] = request.plant.use_christmas_cheer()
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/plant/info")
-@authenticate
-def info(request):
+@app.auth_route("/app/plant/info")
+def info_view(request):
     request.session["alert"] = "\n".join(
         [f"Generation: {request.plant.generation}", f"Growth Rate: {request.plant.growth_rate:#.2}"]
     )
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/plant/search")
-@authenticate
-def search(request):
+@app.auth_route("/app/plant/search")
+def search_view(request):
     if request.plant.dead or request.plant.stage != 4:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
@@ -808,9 +788,8 @@ def search(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/plant/shake")
-@authenticate
-def shake(request):
+@app.auth_route("/app/plant/shake")
+def shake_view(request):
     if request.plant.dead:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
@@ -818,10 +797,9 @@ def shake(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/plant/harvest")
-@app.route("/app/plant/harvest/confirm")
-@authenticate
-def harvest(request):
+@app.auth_route("/app/plant/harvest")
+@app.auth_route("/app/plant/harvest/confirm")
+def harvest_view(request):
     if not (request.plant.dead or request.plant.stage == 5):
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
@@ -839,9 +817,8 @@ def harvest(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/plant/name")
-@authenticate
-def plant_name(request):
+@app.auth_route("/app/plant/name")
+def plant_name_view(request):
     if not request.query:
         return Response(Status.INPUT, "Enter a new nickname for your plant:")
 
@@ -851,9 +828,8 @@ def plant_name(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
-@app.route("/app/visit")
-@authenticate
-def visit(request):
+@app.auth_route("/app/visit")
+def visit_view(request):
     plants = (
         Plant.all_active()
         .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8))
@@ -864,9 +840,8 @@ def visit(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})")
-@authenticate
-def visit_plant(request, user_id):
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})")
+def visit_plant_view(request, user_id):
     user = User.get_or_none(user_id=user_id)
     if user is None:
         return Response(Status.NOT_FOUND, "User not found")
@@ -881,9 +856,8 @@ def visit_plant(request, user_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})/water")
-@authenticate
-def visit_plant_water(request, user_id):
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/water")
+def visit_plant_water_view(request, user_id):
     user = User.get_or_none(user_id=user_id)
     if user is None:
         return Response(Status.NOT_FOUND, "User not found")
@@ -897,9 +871,8 @@ def visit_plant_water(request, user_id):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")
 
 
-@app.route("/app/visit/(?P<user_id>[0-9a-f]{32})/search")
-@authenticate
-def visit_plant_search(request, user_id):
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/search")
+def visit_plant_search_view(request, user_id):
     user = User.get_or_none(user_id=user_id)
     if user is None:
         return Response(Status.NOT_FOUND, "User not found")
@@ -916,17 +889,15 @@ def visit_plant_search(request, user_id):
     return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user_id}")
 
 
-@app.route("/app/inventory")
-@authenticate
-def inventory(request):
+@app.auth_route("/app/inventory")
+def inventory_view(request):
     inventory = sorted(request.user.inventory, key=lambda x: x.item.name)
     body = request.render_template("inventory.gmi", inventory=inventory)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/inventory/(?P<item_slot_id>[0-9]+)")
-@authenticate
-def inventory_view(request, item_slot_id):
+@app.auth_route("/app/inventory/(?P<item_slot_id>[0-9]+)")
+def inventory_view_item(request, item_slot_id):
     item_slot_id = int(item_slot_id)
     try:
         item_slot = ItemSlot.get_by_id(item_slot_id)
