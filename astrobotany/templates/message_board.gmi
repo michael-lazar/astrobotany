@@ -5,7 +5,9 @@
 ## Posts
 
 {% for item in items %}
-> "{{ item.text }}"
+{% for line in item.text.splitlines(keepends=False) %}
+> {{ line }}
+{% endfor %}
 > - {{ item.user.display_name }}, {{ item.created_at.strftime('%Y-%m-%d') }}
 
 {% endfor %}
