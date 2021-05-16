@@ -1,11 +1,5 @@
 # Astrobotany - Settings
 
-## Badges
-
-Equip a decorative badge next to your username.
-
-=>/app/settings/badges Select a badge
-
 ## Display Settings
 
 All display settings are associated with your currently active client certificate. If you use multiple gemini clients, you can set different display settings for each certificate linked to your account.

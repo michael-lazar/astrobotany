@@ -426,24 +426,24 @@ def settings_emoji_mode(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/settings")
 
 
-@app.route("/app/settings/badges")
+@app.route("/app/badges")
 @authenticate
-def settings_badges(request):
+def badges_view(request):
     badges = []
     for item_slot in request.user.inventory:
         if isinstance(item_slot.item, items.Badge):
             badges.append(item_slot.item)
 
     body = request.render_template(
-        "settings_badges.gmi",
+        "badges.gmi",
         badges=badges,
     )
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.route("/app/settings/badges/equip/(?P<badge_id>[0-9]+)")
+@app.route("/app/badges/equip/(?P<badge_id>[0-9]+)")
 @authenticate
-def settings_badges_equip(request, badge_id):
+def badges_equip_view(request, badge_id):
     badge_id = int(badge_id)
 
     try:
@@ -457,15 +457,15 @@ def settings_badges_equip(request, badge_id):
 
     request.user.badge_id = badge.item_id
     request.user.save()
-    return Response(Status.REDIRECT_TEMPORARY, "/app/settings/badges")
+    return Response(Status.REDIRECT_TEMPORARY, "/app/badges")
 
 
-@app.route("/app/settings/badges/remove")
+@app.route("/app/badges/remove")
 @authenticate
-def settings_badges_remove(request):
+def badges_remove_view(request):
     request.user.badge_id = None
     request.user.save()
-    return Response(Status.REDIRECT_TEMPORARY, "/app/settings/badges")
+    return Response(Status.REDIRECT_TEMPORARY, "/app/badges")
 
 
 @app.route("/app/settings/certificates")

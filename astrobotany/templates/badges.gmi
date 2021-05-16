@@ -1,19 +1,21 @@
-# Astrobotany - Settings - Badges
+# Astrobotany - Badges
+
+Equip a decorative badge next to your username.
 
 Currently Equipped: {{ request.user.badge.badge_symbol | default("<empty>") }}
 
 {% if request.user.badge_id %}
-=>/app/settings/badges/remove Remove current badge
+=>/app/badges/remove Remove current badge
 {% endif %}
 
 ## Badges Owned
 
 {% for badge in badges %}
-=>/app/settings/badges/equip/{{ badge.item_id }} Equip: {{ badge.name }}
+=>/app/badges/equip/{{ badge.item_id }} Equip: {{ badge.name }}
 {% else %}
 You don't have any badges yet.
 
 =>/app/store Go buy one in the store
 {% endfor %}
 
-=>/app/settings 🚶 Go back
+=>/app 🚶 Go back
