@@ -75,6 +75,8 @@ class User(BaseModel):
     A user account corresponding to a TLS client certificate.
     """
 
+    _plant: Plant
+
     user_id = TextField(unique=True, index=True, default=gen_user_id)
     username: str = TextField()
     created_at = DateTimeField(default=datetime.now)

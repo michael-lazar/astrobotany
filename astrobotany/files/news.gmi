@@ -8,6 +8,8 @@
 * Added recent site activity to the home page and moved leaderboards.
 * The badge selection tool has been moved to the main menu.
 * Unauthenticated users will no longer be redirected to "/app" before being prompted to present a client certificate.
+* Plant generation & growth rate are now displayed alongside the plant's details.
+
 
 ### 2021-03-26
 
