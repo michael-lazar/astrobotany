@@ -34,8 +34,18 @@ def number_format(value):
     return "{:,}".format(value)
 
 
+def ordinal_format(value):
+    # https://stackoverflow.com/a/50992575
+    n = int(value)
+    suffix = ["th", "st", "nd", "rd", "th"][min(n % 10, 4)]
+    if 11 <= (n % 100) <= 13:
+        suffix = "th"
+    return str(n) + suffix
+
+
 template_env.filters["datetime"] = datetime_format
 template_env.filters["number"] = number_format
+template_env.filters["ordinal"] = ordinal_format
 
 mimetypes.add_type("text/gemini", ".gmi")
 
@@ -768,14 +778,6 @@ def fertilize_view(request):
 @app.auth_route("/app/plant/xmas")
 def xmas_view(request):
     request.session["alert"] = request.plant.use_christmas_cheer()
-    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
-
-
-@app.auth_route("/app/plant/info")
-def info_view(request):
-    request.session["alert"] = "\n".join(
-        [f"Generation: {request.plant.generation}", f"Growth Rate: {request.plant.growth_rate:#.2}"]
-    )
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 

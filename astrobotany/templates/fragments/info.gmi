@@ -4,6 +4,7 @@
 name  : "{{ plant.name }}"
 stage : {{ plant.description }}
 age   : {{ plant.age }} days
+rate  : {{ plant.generation | ordinal}} generation (x{{ plant.growth_rate | round(2) }})
 score : {{ plant.score }}
 water : {{ plant.get_water_gauge(request.cert.ansi_enabled) }}
 {% if plant.fertilizer_percent %}
