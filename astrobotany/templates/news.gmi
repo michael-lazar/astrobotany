@@ -1,0 +1,7 @@
+# Astrobotany - News
+
+## Issues
+
+{% for date in files %}
+=> /static/changes/{{ date }}.gmi {{ date }} - Astrobotany News
+{% endfor %}

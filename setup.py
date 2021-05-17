@@ -31,6 +31,13 @@ setup(
         "test": ["pytest", "black", "isort", "mypy", "freezegun"],
     },
     package_data={
-        "astrobotany": ["art/*", "templates/*", "static/*", "mail/*", "templates/fragments/*"]
+        "astrobotany": [
+            "art/*",
+            "templates/*",
+            "templates/fragments/*",
+            "static/*",
+            "static/changes/*",
+            "mail/*",
+        ]
     },
 )

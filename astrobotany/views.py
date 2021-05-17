@@ -218,6 +218,18 @@ def index_view(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
+@app.route("/news")
+def news_view(request):
+    files = []
+    for filename in os.listdir(os.path.join(STATIC_DIR, "changes")):
+        files.append(os.path.splitext(filename)[0])
+
+    files.sort(reverse=True)
+
+    body = render_template("news.gmi", files=files)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
 @app.route("/app/register-new")
 def register_new_view(request):
     if "REMOTE_USER" not in request.environ:

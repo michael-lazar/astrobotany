@@ -1,0 +1,8 @@
+# Astrobotany News - 2021-03-26
+
+=> gemini://astrobotany.mozz.us/news
+
+## Changes
+
+* Started this news page in order to make site changes more visible!
+* Added "emoji mode" setting to disable rendering emoji characters.

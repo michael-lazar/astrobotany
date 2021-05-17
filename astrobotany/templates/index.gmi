@@ -16,8 +16,9 @@ Welcome! Astrobotany is a community gardening experience in geminispace.
 
 Astrobotany is free to join and requires no personal info. Simply attach a client certificate to the following link to get started!
 
-=>/app 🌷 Astrobotany Login
-=>/static/instructions.gmi 📚 Astrobotany FAQ
+=> /app 🌷 Astrobotany Login
+=> /static/instructions.gmi 📚 Astrobotany FAQ
+=> /news 🗞 Astrobotany News
 
 {{ total }} gardeners registered, recent activity...
 
