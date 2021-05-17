@@ -1,8 +1,26 @@
-# Community Garden
+# Astrobotany - {{ plant.user.username }}'s Garden
 
-{% for plant in plants %}
-=>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
-(tended by {{ plant.user.display_name }})
+{% include 'fragments/info.gmi' %}
 
-{% endfor %}
-=>/app 🚶 Go back
+
+{% if alert %}
+{{ alert }}
+
+{% endif %}
+{% if plant.is_wilted %}
+This plant is wilting, it will die soon without water!
+
+{% endif %}
+## Plant Actions
+
+{% if plant.can_water() %}
+=> /app/visit/{{ plant.user.user_id }}/water 💧 Water
+{% endif %}
+{% if plant.can_fertilize() %}
+=> /app/visit/{{ plant.user.user_id }}/fertilize 🍄 Apply fertilizer
+{% endif %}
+{% if plant.can_search() %}
+=> /app/visit/{{ plant.user.user_id }}/search 🌸 Pick a petal
+{% endif %}
+
+=>/app/visit 🚶 Go back

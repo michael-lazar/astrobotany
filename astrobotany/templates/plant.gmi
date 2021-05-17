@@ -17,24 +17,26 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% endif %}
 ## Plant Actions
 
+{% if plant.can_water() %}
 =>/app/plant/water 💧 Water
-{% if not plant.dead %}
-=>/app/plant/shake 💰 Shake
-{% endif %}
-{% if plant.stage == 4 and not plant.dead %}
-=>/app/plant/search 🌹 Pick a petal
-{% endif %}
-{% if plant.stage == 5 %}
-=>/app/plant/harvest 🏆 Harvest
-{% elif plant.dead %}
-=>/app/plant/harvest 💀 Harvest
 {% endif %}
 {% if plant.can_fertilize() %}
-=>/app/plant/fertilize 🍄 Fertilize
+=> /app/plant/fertilize 🍄 Apply fertilizer
+{% endif %}
+{% if plant.can_harvest() %}
+=> /app/plant/harvest 🌾 Harvest plant
+{% endif %}
+{% if plant.can_shake() %}
+=> /app/plant/shake 💰 Shake leaves (collect $$$)
+{% endif %}
+{% if plant.can_search() %}
+=> /app/plant/search 🌸 Pick a petal
 {% endif %}
 {% if plant.can_use_christmas_cheer() %}
-=>/app/plant/xmas 🎅 Use Christmas Cheer
+=> /app/plant/xmas 🎅 Apply Christmas cheer
 {% endif %}
-=>/app/plant/name 📛 Plant name
+{% if plant.can_rename() %}
+=> /app/plant/rename 🏷 Rename plant
+{% endif %}
 
-=>/app 🚶 Go back
+=> /app 🚶 Go back

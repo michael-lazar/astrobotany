@@ -461,18 +461,26 @@ class Plant(BaseModel):
         remaining_fertilizer = max(0.0, 1 - (elapsed_seconds / seconds_per_day))
         return math.ceil(remaining_fertilizer * 100)
 
+    def can_water(self) -> bool:
+        return not self.dead
+
+    def can_shake(self) -> bool:
+        return not self.dead
+
+    def can_search(self) -> bool:
+        return not self.dead and self.stage == 4
+
+    def can_harvest(self) -> bool:
+        return self.dead or self.stage == 5
+
+    def can_rename(self) -> bool:
+        return not self.dead
+
     def can_fertilize(self) -> bool:
         """
         Return if the user can apply fertilizer to the plant.
         """
-        if self.dead:
-            return False
-        elif self.fertilizer_percent:
-            return False
-        elif not self.user.get_item_quantity(items.fertilizer):
-            return False
-        else:
-            return True
+        return not self.dead
 
     def can_use_christmas_cheer(self) -> bool:
         """
@@ -480,9 +488,12 @@ class Plant(BaseModel):
         """
         if self.dead:
             return False
-        if self.user.christmas_mode:
+        elif self.user.christmas_mode:
             return False
-        return self.user.get_item_quantity(items.christmas_cheer)
+        elif not self.user.get_item_quantity(items.christmas_cheer):
+            return False
+        else:
+            return True
 
     def get_water_gauge(self, ansi_enabled: bool = False) -> str:
         """
@@ -645,7 +656,7 @@ class Plant(BaseModel):
             else:
                 break
 
-    def water(self, user: User = None) -> str:
+    def water(self, user: Optional[User] = None) -> str:
         """
         Attempt to water the plant.
 
@@ -677,7 +688,7 @@ class Plant(BaseModel):
 
         return info
 
-    def pick_petal(self, user: User = None) -> str:
+    def pick_petal(self, user: Optional[User] = None) -> str:
         """
         Pick a petal from a flowering plant.
 
@@ -755,30 +766,27 @@ class Plant(BaseModel):
 
         return f"You shake your plant, {msg}\n(+{coins} coins)"
 
-    def fertilize(self) -> str:
+    def fertilize(self, user: Optional[User] = None) -> str:
         """
         Attempt to fertilize the plant.
 
         Returns: A string with a description of the resulting action.
         """
-        if self.dead:
-            return "It's time to let go."
-        elif self.fertilizer_percent:
-            return "The soil is still rich with nutrients."
+        if user is None:
+            user = self.user
 
-        if not self.user.remove_item(items.fertilizer):
-            return "You don't have any fertilizer to apply."
+        if self.fertilizer_percent:
+            return "The soil is still rich with nutrients."
+        elif not user.remove_item(items.fertilizer):
+            return "You don't have any fertilizer, so nothing happened."
 
         self.fertilized_at = datetime.now()
-        return "You apply a bottle of fertilizer to your plant."
+        return "You apply a bottle of fertilizer to the plant."
 
     def use_christmas_cheer(self) -> str:
-        if self.dead:
-            return "It's time to let go."
-        elif self.user.christmas_mode:
+        if self.user.christmas_mode:
             return "Nothing happened."
-
-        if not self.user.remove_item(items.christmas_cheer):
+        elif not self.user.remove_item(items.christmas_cheer):
             return "You don't have any christmas cheer to apply."
 
         Event.create(user=self.user, event_type=Event.ENABLE_CHRISTMAS, target="self")
