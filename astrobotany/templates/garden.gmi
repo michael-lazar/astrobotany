@@ -1,5 +1,9 @@
 # Community Garden
 
+```
+{{ garden_art }}
+```
+
 {% for plant in plants %}
 =>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
 (tended by {{ plant.user.display_name }})
