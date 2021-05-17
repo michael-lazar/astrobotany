@@ -31,8 +31,8 @@ The current time is {{ now | datetime }}.
 
 ## Info
 
-=> /files/news.gmi 🗞 Astrobotany News
-=> /files/instructions.gmi 📚 Astrobotany FAQ
+=> /static/news.gmi 🗞 Astrobotany News
+=> /static/instructions.gmi 📚 Astrobotany FAQ
 
 ## Links
 

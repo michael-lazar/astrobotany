@@ -16,7 +16,7 @@ from .art import render_art
 from .models import Certificate, Inbox, ItemSlot, Message, Plant, User
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
-FILES_DIR = os.path.join(os.path.dirname(__file__), "files")
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 template_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(TEMPLATE_DIR),
@@ -320,8 +320,8 @@ def register_existing_view(request, user_id=None):
     return Response(Status.REDIRECT_TEMPORARY, "/app")
 
 
-@app.route("/files/(?P<path>.*)")
-def files_view(request, path):
+@app.route("/static/(?P<path>.*)")
+def static_view(request, path):
     url_path = pathlib.Path(path.strip("/"))
 
     filename = pathlib.Path(os.path.normpath(str(url_path)))
@@ -329,7 +329,7 @@ def files_view(request, path):
         # Guard against breaking out of the directory
         return Response(Status.NOT_FOUND, "Not Found")
 
-    filepath = FILES_DIR / filename
+    filepath = STATIC_DIR / filename
     if not filepath.exists():
         return Response(Status.NOT_FOUND, "Not Found")
 

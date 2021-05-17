@@ -54,6 +54,12 @@ generation | multiplier
 10         | 2.80
 ```
 
+## Registration (Legacy)
+
+The original guide for astrobotany user registration involved using certificate signing requests (CSRs). It's documented here for historical reference.
+
+=> /static/register_old.gmi Legacy Registration Guide
+
 ## Credits
 
 Astrobotany is a fork of the tilde.town pubnix game, botany.
