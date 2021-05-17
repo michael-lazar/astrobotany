@@ -1,6 +1,8 @@
-# Astrobotany - News
+# Astrobotany News - Unreleased
 
-### Unreleased
+=> gemini://astrobotany.mozz.us/news
+
+## Changes
 
 * Multi-line message board postings are now formatted correctly.
 * Reorganized links on the home page and the main menu.
@@ -12,8 +14,4 @@
 * You can now fertilize other player's plants.
 * Added new art on the community garden page.
 * Prevent accidentally double-posting to the message board.
-
-### 2021-03-26
-
-* Started this news page in order to make site changes more visible!
-* Added "emoji mode" setting to disable rendering emoji characters.
+* The astrobotany changelog has been converted to use the "gemfeed" format to allow users to subscribe to updates.

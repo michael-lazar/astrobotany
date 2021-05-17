@@ -1,4 +1,4 @@
-# Astrobotany - Instructions
+# Astrobotany - FAQ
 
 ```
              .--'}        _   ,
@@ -53,6 +53,12 @@ generation | multiplier
 9          | 2.60
 10         | 2.80
 ```
+
+## Registration (Legacy)
+
+The original guide for astrobotany user registration involved using certificate signing requests (CSRs). It's documented here for historical reference.
+
+=> /static/register_old.gmi Legacy Registration Guide
 
 ## Credits
 

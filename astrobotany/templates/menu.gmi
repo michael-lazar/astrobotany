@@ -29,13 +29,13 @@ The current time is {{ now | datetime }}.
 => /app/leaderboards 🏅 View leaderboards (🚧 under construction 🚧)
 => /app/settings 🐌 Change settings
 
-## Info
+## Information
 
-=> /files/news.gmi 🗞 Astrobotany News
-=> /files/instructions.gmi 📚 Astrobotany FAQ
+=> / 🏡 Astrobotany Home
+=> /static/instructions.gmi 📚 Astrobotany FAQ
+=> /news 🗞 Astrobotany News
 
-## Links
+## External
 
-=> gemini://astrobotany.mozz.us 🏡 Astrobotany Home
 => https://github.com/michael-lazar/astrobotany 🐞 Astrobotany Issue Tracker (github)
 => gemini://gardengnome.ml/ 🗿 Garden Gnome Society
