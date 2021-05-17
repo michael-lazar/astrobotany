@@ -9,7 +9,8 @@
 * The badge selection tool has been moved to the main menu.
 * Unauthenticated users will no longer be redirected to "/app" before being prompted to present a client certificate.
 * Plant generation & growth rate are now displayed alongside the plant's details.
-* You can now fertilize other player's plants
+* You can now fertilize other player's plants.
+* Added new art on the community garden page.
 
 ### 2021-03-26
 

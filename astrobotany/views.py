@@ -787,7 +787,8 @@ def garden_view(request):
         .order_by(Plant.score.desc())
     )
 
-    body = request.render_template("garden.gmi", plants=plants)
+    garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
+    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
