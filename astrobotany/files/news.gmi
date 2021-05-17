@@ -11,6 +11,7 @@
 * Plant generation & growth rate are now displayed alongside the plant's details.
 * You can now fertilize other player's plants.
 * Added new art on the community garden page.
+* Prevent accidentally double-posting to the message board.
 
 ### 2021-03-26
 

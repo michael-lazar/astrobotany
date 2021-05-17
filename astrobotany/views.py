@@ -396,6 +396,11 @@ def message_board_submit_view(request):
     if rate_limit_resp:
         return rate_limit_resp
 
+    last = Message.select().order_by(Message.id.desc()).first()
+    if last and (last.user, last.text) == (request.user, request.query):
+        # Almost definitely an accidental double-post by the user
+        return Response(Status.REDIRECT_TEMPORARY, "/app/message-board")
+
     message = Message(user=request.user, text=request.query)
     message.save()
     return Response(Status.REDIRECT_TEMPORARY, "/app/message-board")
