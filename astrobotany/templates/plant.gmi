@@ -15,10 +15,10 @@ Your plant is wilting, it will die soon without water!
 Your plant was recently watered by {{ plant.watered_by.username }}.
 
 {% endif %}
-## Plant Actions
+## Actions
 
 {% if plant.can_water() %}
-=>/app/plant/water 💧 Water
+=>/app/plant/water 💧 Water plant
 {% endif %}
 {% if plant.can_fertilize() %}
 => /app/plant/fertilize 🍄 Apply fertilizer
@@ -38,5 +38,12 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% if plant.can_rename() %}
 => /app/plant/rename 🏷 Rename plant
 {% endif %}
+
+## Links
+
+Unauthenticated public links to show off your garden.
+
+=> /public/{{ plant.user.user_id }} 🖼 Your plant
+=> /public/{{ plant.user.user_id }}/m1 🖼 Your plant (with color)
 
 => /app 🚶 Go back

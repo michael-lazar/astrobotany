@@ -90,7 +90,7 @@ class AuthenticatedRequest(Request):
 
     def render_template(self, name: str, *args, **kwargs) -> str:
         kwargs["request"] = self
-        text = template_env.get_template(name).render(*args, **kwargs)
+        text = render_template(name, *args, **kwargs)
         if self.cert.emoji_mode == 1:
             text = emoji.demojize(text)
         elif self.cert.emoji_mode == 2:
@@ -937,4 +937,25 @@ def inventory_view_item(request, item_slot_id):
     body = request.render_template(
         "inventory_view.gmi", item_slot=item_slot, description=description
     )
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/public/(?P<user_id>[0-9a-f]{32})")
+@app.route("/public/(?P<user_id>[0-9a-f]{32})/m(?P<mode>[0-9])+")
+def public_view(request, user_id: str, mode: typing.Optional[str] = "0"):
+    user = User.get_or_none(User.user_id == user_id)
+    if user is None:
+        return Response(Status.NOT_FOUND, "Not Found")
+
+    mode = int(mode)
+    if mode == 0:
+        ansi_enabled = False
+    elif mode == 1:
+        ansi_enabled = True
+    else:
+        return Response(Status.NOT_FOUND, "Not Found")
+
+    request.cert = Certificate(ansi_enabled=ansi_enabled)
+
+    body = render_template("public.gmi", request=request, plant=user.plant)
     return Response(Status.SUCCESS, "text/gemini", body)

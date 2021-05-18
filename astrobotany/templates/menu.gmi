@@ -37,5 +37,5 @@ The current time is {{ now | datetime }}.
 
 ## External
 
-=> https://github.com/michael-lazar/astrobotany 🐞 Astrobotany Issue Tracker (github)
+=> https://github.com/michael-lazar/astrobotany 🐞 Issue Tracker (Github)
 => gemini://gardengnome.ml/ 🗿 Garden Gnome Society

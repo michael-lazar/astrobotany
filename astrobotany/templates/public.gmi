@@ -1,0 +1,5 @@
+# {{ plant.user.username }}'s Garden
+
+{% include 'fragments/info.gmi' %}
+
+=> gemini://astrobotany.mozz.us
