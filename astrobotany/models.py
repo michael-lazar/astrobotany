@@ -442,6 +442,20 @@ class Plant(BaseModel):
             return self.watered_at < datetime.now() - timedelta(days=3)
 
     @property
+    def health(self) -> str:
+        watered_delta = datetime.now() - self.watered_at
+        if self.dead:
+            return "dead"
+        elif watered_delta < timedelta(days=1):
+            return "healthy"
+        elif watered_delta < timedelta(days=3):
+            return "dry"
+        elif watered_delta < timedelta(days=5):
+            return "wilting"
+        else:
+            return "dead"
+
+    @property
     def water_supply_percent(self) -> int:
         """
         The percentage of water supply remaining, as an integer from 0 to 100.

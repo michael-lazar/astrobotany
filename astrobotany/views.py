@@ -1,3 +1,4 @@
+import json
 import math
 import mimetypes
 import os
@@ -958,3 +959,26 @@ def public_view(request, user_id: str, mode: str = "0"):
 
     body = render_template("public.gmi", request=request, plant=user.plant)
     return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/api/plants")
+def plants_api_view(request):
+    query = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8))
+        .order_by(Plant.score.desc())
+    )
+
+    response = []
+    for plant in query:
+        response.append(
+            {
+                "url": f"gemini://astrobotany.mozz.us/app/visit/{plant.user.user_id}",
+                "username": plant.user.username,
+                "description": plant.description,
+                "health": plant.health,
+            }
+        )
+    data = {"response": response}
+    body = json.dumps(data, indent=4)
+    return Response(Status.SUCCESS, "application/json", body)
