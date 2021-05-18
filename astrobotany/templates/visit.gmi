@@ -11,10 +11,10 @@
 This plant is wilting, it will die soon without water!
 
 {% endif %}
-## Plant Actions
+## Actions
 
 {% if plant.can_water() %}
-=> /app/visit/{{ plant.user.user_id }}/water 💧 Water
+=> /app/visit/{{ plant.user.user_id }}/water 💧 Water plant
 {% endif %}
 {% if plant.can_fertilize() %}
 => /app/visit/{{ plant.user.user_id }}/fertilize 🍄 Apply fertilizer

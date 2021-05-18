@@ -15,3 +15,4 @@
 * Added new art on the community garden page.
 * Prevent accidentally double-posting to the message board.
 * The astrobotany changelog has been converted to use the "gemfeed" format to allow users to subscribe to updates.
+* Added public links to view plants without a client certificate.
