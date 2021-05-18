@@ -1,6 +1,8 @@
-# Astrobotany - Mailbox - Outgoing Mail
+# Astrobotany - Outgoing Mail
 
 Send a private message to a fellow gardener.
+
+=>/app/mailbox 🚶 Go back
 
 ## Available postcards
 
@@ -13,7 +15,5 @@ Send a private message to a fellow gardener.
 ## Buy a postcard
 
 =>/app/store 💳 Go to the store
-
-=>/app/mailbox 🚶 Go back
 
 

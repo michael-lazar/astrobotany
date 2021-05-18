@@ -1,5 +1,9 @@
 # Astrobotany - Message Board
 
+=>/app 🚶 Go back
+
+## Actions
+
 =>/app/message-board/submit ✍️ Submit a new message
 
 ## Posts
@@ -16,5 +20,3 @@
 
 =>/app/message-board/{{ page + 1 }} Next page
 {% endif %}
-
-=>/app 🚶 Go back

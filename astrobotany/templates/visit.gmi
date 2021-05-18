@@ -1,5 +1,7 @@
 # Astrobotany - {{ plant.user.username }}'s Garden
 
+=>/app/visit 🚶 Go back
+
 {% include 'fragments/info.gmi' %}
 
 
@@ -22,5 +24,3 @@ This plant is wilting, it will die soon without water!
 {% if plant.can_search() %}
 => /app/visit/{{ plant.user.user_id }}/search 🌸 Pick a petal
 {% endif %}
-
-=>/app/visit 🚶 Go back

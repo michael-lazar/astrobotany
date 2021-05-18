@@ -1,6 +1,8 @@
-# Astrobotany - Inventory
+# Astrobotany - Backpack
 
-## Your Backpack
+=>/app 🚶 Go back
+
+## Your Inventory
 
 {% for item_slot in inventory %}
 =>/app/inventory/{{ item_slot.id }} {{ item_slot.item.name }}
@@ -10,4 +12,3 @@
 There's nothing here!
 
 {% endfor %}
-=>/app 🚶 Go back

@@ -2,9 +2,11 @@
 
 > No refunds!
 
-Your Account Balance: {{ coins | number }} coins
+=>/app 🚶 Go back
 
 ## For Sale
+
+Your Account Balance: {{ coins | number }} coins
 
 {% for item_slot in for_sale %}
 ### {{ item_slot.item.name }}
@@ -15,4 +17,3 @@ Owned : {{ item_slot.quantity | number }}
 =>/app/store/{{ item_slot.item.item_id }} 🔍 View Details ({{ item_slot.item.name }})
 
 {% endfor %}
-=>/app 🚶 Go back

@@ -1,5 +1,7 @@
 # Astrobotany - Settings
 
+=>/app 🚶 Go back
+
 ## Display Settings
 
 All display settings are associated with your currently active client certificate. If you use multiple gemini clients, you can set different display settings for each certificate linked to your account.
@@ -35,5 +37,3 @@ An optional secret password that will be linked to your account. Setting a passw
 View & remove your client certificates. In order to attach a new certificate to your account, see the instructions on the astrobotany registration page.
 
 =>/app/settings/certificates Client Certificate List
-
-=>/app 🚶 Go back

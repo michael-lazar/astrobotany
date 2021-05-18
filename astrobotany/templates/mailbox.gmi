@@ -4,6 +4,8 @@
 {{ mailbox_art }}
 ```
 
+=>/app 🚶 Go back
+
 ## Compose a letter
 
 =>/app/mailbox/outgoing 💌 Send a letter to someone special
@@ -22,4 +24,3 @@
 Your mailbox is empty.
 
 {% endfor %}
-=>/app 🚶 Go back

@@ -2,6 +2,10 @@
 
 Equip a decorative badge next to your username.
 
+=>/app 🚶 Go back
+
+## Equipped
+
 Currently Equipped: {{ request.user.badge.badge_symbol | default("<empty>") }}
 
 {% if request.user.badge_id %}
@@ -17,5 +21,3 @@ You don't have any badges yet.
 
 =>/app/store Go buy one in the store
 {% endfor %}
-
-=>/app 🚶 Go back

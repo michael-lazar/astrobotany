@@ -1,8 +1,10 @@
-# Astrobotany - Mailbox - Compose Letter
+# Astrobotany - Compose Letter
+
+=>/app/mailbox/outgoing 🚶 Go back
+
+## Compose
 
 Postcard type selected : {{ postcard.name }}
-
-## Details
 
 =>/app/mailbox/outgoing/{{ postcard.item_id }}/to To: {{ data.user.username | default("<empty>") }}
 =>/app/mailbox/outgoing/{{ postcard.item_id }}/subject Subject: {{ data.subject | default("<empty>", true) }}
@@ -18,5 +20,3 @@ Postcard type selected : {{ postcard.name }}
 ## Actions
 
 =>/app/mailbox/outgoing/{{ postcard.item_id }}/preview Preview and send
-
-=>/app/mailbox/outgoing 🚶 Go back

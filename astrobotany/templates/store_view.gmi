@@ -1,4 +1,6 @@
-# Astrobotany - Store - View Item
+# Astrobotany - Purchase Item
+
+=>/app/store 🚶 Go back
 
 ### {{ item_slot.item.name }}
 
@@ -11,5 +13,3 @@ Owned : {{ item_slot.quantity | number }}
 =>/app/store/{{ item_slot.item_id }}/purchase/1 💵 Purchase 1x ({{ item_slot.item.get_price(request.user) | number }} coins)
 =>/app/store/{{ item_slot.item_id }}/purchase/5 💰 Purchase 5x ({{ (item_slot.item.get_price(request.user) * 5) | number }} coins)
 =>/app/store/{{ item_slot.item_id }}/purchase/10 💎 Purchase 10x ({{ (item_slot.item.get_price(request.user) * 10) | number }} coins)
-
-=>/app/store 🚶 Go back

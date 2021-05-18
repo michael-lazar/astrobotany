@@ -1,5 +1,7 @@
 # Astrobotany - Mailbox - Item
 
+=>/app/mailbox/outgoing/{{ postcard.item_id }} 🚶 Go back
+
 Select a gift to include with your postcard.
 
 (Sending an item will remove it from your inventory)
@@ -11,5 +13,3 @@ Select a gift to include with your postcard.
 {% else %}
 You have nothing in your inventory that can be used.
 {% endfor %}
-
-=>/app/mailbox/outgoing/{{ postcard.item_id }} 🚶 Go back

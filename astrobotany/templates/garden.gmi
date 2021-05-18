@@ -4,9 +4,12 @@
 {{ garden_art }}
 ```
 
+=>/app 🚶 Go back
+
+## Plants
+
 {% for plant in plants %}
 =>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
 (tended by {{ plant.user.display_name }})
 
 {% endfor %}
-=>/app 🚶 Go back

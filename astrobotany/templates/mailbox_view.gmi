@@ -1,5 +1,7 @@
 # Astrobotany - Mailbox - View Message
 
+=>/app/mailbox 🚶 Go back
+
 ## Message Details
 
 From: {{ message.user_from.username }}
@@ -17,5 +19,3 @@ Attached Gift: 🎁 {{ message.item.name }}
 {% if new_item_slot %}
 ✨ A {{ message.item.name}} has been added to your inventory ✨
 {% endif %}
-
-=>/app/mailbox 🚶 Go back

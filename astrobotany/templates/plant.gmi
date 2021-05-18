@@ -1,5 +1,9 @@
 # Astrobotany - Your Garden
 
+=> /app 🚶 Go back
+
+## Plant Details
+
 {% include 'fragments/info.gmi' %}
 
 
@@ -45,5 +49,3 @@ Unauthenticated public links to show off your garden.
 
 => /public/{{ plant.user.user_id }} 🖼 Your plant
 => /public/{{ plant.user.user_id }}/m1 🖼 Your plant (with color)
-
-=> /app 🚶 Go back

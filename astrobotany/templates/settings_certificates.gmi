@@ -1,4 +1,6 @@
-# Astrobotany - Settings - Certificates
+# Astrobotany - Certificates
+
+=>/app/settings 🚶 Go back
 
 {% for cert in certificates %}
 ### {{ loop.index }}. Certificate "{{ cert.fingerprint[:10] }}"
@@ -15,4 +17,3 @@ last used   : {{ cert.last_seen | datetime }} (EST)
 {% endif %}
 
 {% endfor %}
-=>/app/settings 🚶 Go back

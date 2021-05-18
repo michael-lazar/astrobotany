@@ -1,7 +1,7 @@
-# Astrobotany - Inventory - View Item
+# Astrobotany - View Item
+
+=>/app 🚶 Go back
 
 ## {{ item_slot.item.name }}
 
 {{ description }}
-
-=>/app 🚶 Go back
