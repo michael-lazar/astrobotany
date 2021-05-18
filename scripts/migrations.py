@@ -98,6 +98,11 @@ def add_emoji_mode(migrator):
     migrate.migrate(migrator.add_column("certificate", "emoji_mode", IntegerField(default=0)))
 
 
+def add_pond(migrator):
+    migrate.migrate(migrator.add_column("user", "karma", IntegerField(default=0)))
+    migrate.migrate(migrator.add_column("event", "count", IntegerField(default=0)))
+
+
 MIGRATIONS = locals()
 
 

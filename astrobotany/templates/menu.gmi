@@ -13,7 +13,7 @@ The current time is {{ now | datetime }}.
 => /app/plant 🌻 Visit your plant
 => /app/visit ⛲ Community garden
 => /app/message-board 📌 Message board
-=> /app/pond 🦆 Koi pond (🚧 under construction 🚧)
+=> /app/pond 🦆 Koi pond
 
 ## Places
 

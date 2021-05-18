@@ -83,6 +83,7 @@ class User(BaseModel):
     ansi_enabled = BooleanField(default=False)  # TODO: Delete this field
     password = BlobField(null=True)
     badge_id: Optional[int] = IntegerField(null=True, default=None)
+    karma: int = IntegerField(default=0)
 
     @classmethod
     def admin(cls) -> User:
@@ -299,11 +300,13 @@ class Event(BaseModel):
 
     PICK_PETAL = "pick_petal"
     ENABLE_CHRISTMAS = "enable_christmas"
+    TRIBUTE_PETAL = "tribute_petal"
 
     user = ForeignKeyField(User, backref="events")
     created_at = DateTimeField(default=datetime.now)
     event_type = TextField(index=True)
     target = TextField(index=True)
+    count = IntegerField(default=0)
 
 
 class Inbox(BaseModel):

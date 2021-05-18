@@ -1,0 +1,28 @@
+# Astrobotany - Koi Pond
+
+```
+{{ pond_art }}
+```
+
+=>/app 🚶 Go back
+
+## Pond
+
+Your karma: {{ request.user.karma }}
+
+Today's blessed color is {{ blessed_color }}.
+{{ blessed_color }} petals will bestow 3x karma.
+
+Across all users, {{ tribute_total }} petals have been tossed into the pond in total.
+
+## Your Petals
+
+{% if alert %}
+{{ alert }}
+
+{% endif %}
+{% for data in petal_data %}
+=> /app/pond/tribute/{{ data['color'] }} Toss in {{ data['amount'] }} {{ data['petal_str'] }} petals.
+{% else %}
+You don't currently have any petals.
+{% endfor %}
