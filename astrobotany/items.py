@@ -100,6 +100,7 @@ class Petal(Item):
         Graceful, delicate, and reserved.
         """
         super().__init__(name, description, giftable=True)
+        self.color = color
         self.petals[color] = self
 
 
@@ -215,11 +216,7 @@ gold_petal = Petal("gold")
 
 coin = Item(
     name="coin",
-    description="""
-    A copper coin with a portrait of a long-dead cosmonaut on it.
-    
-    Go buy yourself something shiny.
-    """,
+    description="A copper coin with a portrait of a long-dead cosmonaut on it.",
 )
 
 plain_postcard = Postcard(

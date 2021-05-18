@@ -15,6 +15,7 @@ from jetforce.app.base import EnvironDict, RateLimiter, RouteHandler, RoutePatte
 from . import items
 from .art import render_art
 from .models import Certificate, Inbox, ItemSlot, Message, Plant, User
+from .pond import Pond
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -982,3 +983,33 @@ def plants_api_view(request):
     data = {"response": response}
     body = json.dumps(data, indent=4)
     return Response(Status.SUCCESS, "application/json", body)
+
+
+@app.auth_route("/app/pond")
+def pond_view(request):
+    pond = Pond(request.user)
+    alert = request.session.pop("alert", None)
+    pond_art = render_art("duck.psci", ansi_enabled=request.cert.ansi_enabled)
+
+    blessed_color = pond.get_blessed_color(ansi_enabled=request.cert.ansi_enabled)
+    petal_data = pond.get_available_petal_data(ansi_enabled=request.cert.ansi_enabled)
+    tribute_total = pond.get_tribute_total()
+    body = request.render_template(
+        "pond.gmi",
+        blessed_color=blessed_color,
+        petal_data=petal_data,
+        pond_art=pond_art,
+        tribute_total=tribute_total,
+        alert=alert,
+    )
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.auth_route("/app/pond/tribute/(?P<color>[a-z]+)")
+def pond_tribute_view(request, color: str):
+    pond = Pond(request.user)
+    if color not in pond.petal_map:
+        return Response(Status.BAD_REQUEST, "Not Found")
+
+    request.session["alert"] = pond.tribute(color)
+    return Response(Status.REDIRECT_TEMPORARY, "/app/pond/")
