@@ -8,34 +8,24 @@ Welcome, {{ request.user.username }}!
 
 The current time is {{ now | datetime }}.
 
-## Garden
+=> / 🏡 Astrobotany Home
+
+## Places
 
 => /app/plant 🌻 Visit your plant
 => /app/visit ⛲ Community garden
 => /app/message-board 📌 Message board
 => /app/pond 🦆 Koi pond
 
-## Places
+## Activities
 
 {% if mailbox_count %}
-=> /app/mailbox 📬 Check mailbox ({{ mailbox_count }} unread)
+=> /app/mailbox 📬 Your mailbox ({{ mailbox_count }} unread)
 {% else %}
-=> /app/mailbox 📪 Check mailbox
+=> /app/mailbox 📪 Your mailbox
 {% endif %}
-=> /app/inventory 🎒 Open backpack
-=> /app/store 💳 Shop items
-=> /app/music 🎷 Compose music (🚧 under construction 🚧)
-=> /app/badges 📛 Equip badges
-=> /app/settings 🐌 Change settings
-
-## Information
-
-=> / 🏡 Astrobotany Home
-=> /static/instructions.gmi 📚 Astrobotany FAQ
-=> /news 🗞 Astrobotany News
-=> /leaderboards 🏆 Astrobotany Leaderboards
-
-## External
-
-=> https://github.com/michael-lazar/astrobotany 🐞 Issue Tracker (Github)
-=> gemini://gardengnome.ml/ 🗿 Garden Gnome Society
+=> /app/inventory 🎒 Your backpack
+=> /app/store 💳 Item shop
+=> /app/music 🎷 Your music (🚧 under construction 🚧)
+=> /app/badges 📛 Your badges
+=> /app/settings 🐌 Account settings

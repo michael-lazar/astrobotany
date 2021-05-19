@@ -14,13 +14,24 @@ Welcome! Astrobotany is a community gardening experience in geminispace.
 * Chat with your friends and send private messages and gifts!
 * Compete for high scores and a coveted position on the leaderboards!
 
-Astrobotany is free to join and requires no personal info. Simply attach a client certificate to the following link to get started!
+Astrobotany is free to join and requires no personal info. Simply click the following link and attach a self-signed client certificate to get started!
+
+## Main Menu
 
 => /app 🌷 Astrobotany Login
+
+## Information
 
 => /static/instructions.gmi 📚 Astrobotany FAQ
 => /news 🗞 Astrobotany News
 => /leaderboards 🏆 Astrobotany Leaderboards
+
+## External Links
+
+=> https://github.com/michael-lazar/astrobotany 🐞 Issue Tracker (Github)
+=> gemini://gardengnome.ml/ 🗿 Garden Gnome Society
+
+## Capsule Activity
 
 🧑‍🌾 {{ total }} gardeners registered
 

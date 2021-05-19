@@ -1,5 +1,7 @@
 # Astrobotany - News
 
+=> / 🚶 Go back
+
 ## Issues
 
 {% for date in files %}

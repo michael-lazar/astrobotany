@@ -10,6 +10,8 @@
        jgs \\
 ```
 
+=> / 🚶 Go back
+
 ## Creating an Account
 
 Astrobotany uses self-signed (TOFU) client certificates for authentication. In order to join in the fun, use your preferred gemini client to generate a new certificate. The subject fields in the certificate (name, location, email, CN, ...) don't matter. You can either leave them blank, or you can enter in values for your own records.
