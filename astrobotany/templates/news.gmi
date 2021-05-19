@@ -3,5 +3,5 @@
 ## Issues
 
 {% for date in files %}
-=> /static/changes/{{ date }}.gmi {{ date }} - Astrobotany News
+=> /static/changes/{{ date }}.gmi {{ date }}
 {% endfor %}

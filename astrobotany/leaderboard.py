@@ -1,17 +1,13 @@
-from datetime import datetime
-from typing import Dict, Iterable
+import csv
+import io
+from typing import Iterable
 
-from .art import colorize
-from .models import Plant
+from .models import Plant, User
 
 
 class Leaderboard:
+    key: str = ""
     name: str = ""
-    medal_colors: Dict[int, int] = {
-        1: 205,  # Gold
-        2: 231,  # Silver
-        3: 115,  # Bronze
-    }
 
     def __init__(self, count: int = 10) -> None:
         self.count = count
@@ -19,8 +15,8 @@ class Leaderboard:
     def list_top_items(self) -> Iterable:
         raise NotImplementedError
 
-    def render(self, ansi_enabled: bool = False, width: int = 63) -> str:
-        title = f"Daily Leaderboard - {self.name}"
+    def render_table(self, width: int = 50) -> str:
+        title = f"Leaderboard - {self.name}"
         table = [
             "╔" + "═" * (width - 2) + "╗",
             "║" + title.center(width - 2) + "║",
@@ -33,14 +29,19 @@ class Leaderboard:
 
         for i, (col1, col2) in enumerate(items, start=1):
             name = f"{i:>2}. {col1[:19]:<19}"
-            if ansi_enabled:
-                if col1 and i in self.medal_colors:
-                    name = colorize(name, fg=self.medal_colors[i])
             row = f"║ {name} │ {col2:<{width - 30}} ║"
             table.append(row)
 
         table.append("╚" + "═" * 25 + "╧" + "═" * (width - 28) + "╝")
         return "\n".join(table)
+
+    def render_csv(self) -> str:
+        buffer = io.StringIO()
+        writer = csv.writer(buffer)
+        writer.writerow(["rank", "username", "value"])
+        for i, (username, value) in enumerate(self.list_top_items(), start=1):
+            writer.writerow([str(i), username, value])
+        return buffer.getvalue()
 
 
 class HighScore(Leaderboard):
@@ -75,34 +76,18 @@ class PrettyFlowers(Leaderboard):
             yield plant.user.username, f"{plant.color_str} {plant.species_str}"
 
 
-class RecentlyWatered(Leaderboard):
-    name = "Most Recently Watered"
+class MostKarma(Leaderboard):
+    name = "Most Karma"
 
     def list_top_items(self):
-        query = Plant.all_active()
-        query = query.where(Plant.watered_by.is_null(True))
-        query = query.order_by(Plant.watered_at.desc())
-        query = query.limit(self.count)
-        for plant in query:
-            dt = (datetime.now() - plant.watered_at).total_seconds() // 60
-            yield plant.user.username, f"{dt:0.0f} minutes ago"
+        query = User.select().order_by(User.karma.desc())
+        for user in query.limit(self.count):
+            yield user.username, f"{user.karma} karma"
 
 
-class MostNeighborly(Leaderboard):
-    name = "Most Neighborly"
-
-    def list_top_items(self):
-        query = Plant.all_active()
-        query = query.where(Plant.watered_by.is_null(False))
-        query = query.order_by(Plant.watered_at.desc())
-        query = query.limit(self.count)
-        for plant in query:
-            yield plant.watered_by.username, f"visited {plant.user.username}"
-
-
-_leaderboards = [HighScore, OldestPlant, PrettyFlowers, RecentlyWatered, MostNeighborly]
-
-
-def get_daily_leaderboard():
-    offset = (datetime.now() - datetime(1970, 1, 1)).days
-    return _leaderboards[offset % len(_leaderboards)]()
+leaderboards = {
+    "high_score": HighScore(),
+    "oldest_plant": OldestPlant(),
+    "pretty_flowers": PrettyFlowers(),
+    "most_karma": MostKarma(),
+}

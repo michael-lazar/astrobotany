@@ -14,6 +14,7 @@ from jetforce.app.base import EnvironDict, RateLimiter, RouteHandler, RoutePatte
 
 from . import items
 from .art import render_art
+from .leaderboard import leaderboards
 from .models import Certificate, Inbox, ItemSlot, Message, Plant, User
 from .pond import Pond
 
@@ -207,7 +208,7 @@ def index_view(request):
         Plant.all_active()
         .where(Plant.watered_by.is_null(True))
         .order_by(Plant.watered_at.desc())
-        .limit(10)
+        .limit(5)
     )
 
     activity = []
@@ -1013,3 +1014,18 @@ def pond_tribute_view(request, color: str):
 
     request.session["alert"] = pond.tribute(color)
     return Response(Status.REDIRECT_TEMPORARY, "/app/pond/")
+
+
+@app.route("/leaderboards")
+def leaderboards_view(request):
+    body = render_template("leaderboards.gmi", leaderboards=leaderboards)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.route("/leaderboards/(?P<key>[a-z_]+).csv")
+def leaderboards_view(request, key: str):
+    if key not in leaderboards:
+        return Response(Status.NOT_FOUND, "Not Found")
+
+    body = leaderboards[key].render_csv()
+    return Response(Status.SUCCESS, "text/csv", body)

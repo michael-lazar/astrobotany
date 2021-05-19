@@ -83,7 +83,7 @@ class User(BaseModel):
     ansi_enabled = BooleanField(default=False)  # TODO: Delete this field
     password = BlobField(null=True)
     badge_id: Optional[int] = IntegerField(null=True, default=None)
-    karma: int = IntegerField(default=0)
+    karma = IntegerField(default=0)
 
     @classmethod
     def admin(cls) -> User:
