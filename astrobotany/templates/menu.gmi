@@ -26,7 +26,6 @@ The current time is {{ now | datetime }}.
 => /app/store 💳 Shop items
 => /app/music 🎷 Compose music (🚧 under construction 🚧)
 => /app/badges 📛 Equip badges
-=> /app/leaderboards 🏅 View leaderboards (🚧 under construction 🚧)
 => /app/settings 🐌 Change settings
 
 ## Information
@@ -34,6 +33,7 @@ The current time is {{ now | datetime }}.
 => / 🏡 Astrobotany Home
 => /static/instructions.gmi 📚 Astrobotany FAQ
 => /news 🗞 Astrobotany News
+=> /leaderboards 🏆 Astrobotany Leaderboards
 
 ## External
 

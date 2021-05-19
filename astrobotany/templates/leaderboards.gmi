@@ -1,0 +1,12 @@
+## Astrobotany - Leaderboards
+
+{% for key, leaderboard in leaderboards.items() %}
+### {{ leaderboard.name }}
+
+```
+{{ leaderboard.render_table() }}
+```
+
+=> /leaderboards/{{ key }}.csv {{ leaderboard.name }} - Download CSV file
+
+{% endfor %}

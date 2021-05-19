@@ -1,6 +1,6 @@
-# Astrobotany News - Unreleased
+# Astrobotany News
 
-=> gemini://astrobotany.mozz.us/news
+Date: Unreleased
 
 ## Changes
 
@@ -18,4 +18,5 @@
 * Added public links to view plants without a client certificate.
 * Moved "go back" links to the top of the page and standardized the format.
 * Add a JSON API endpoint to get details for plants in the garden.
-* Added koi pond & karma.
+* Added koi pond.
+* Updated the leaderboard structure and moved them to a separate page.

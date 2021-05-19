@@ -1,6 +1,6 @@
-# Astrobotany News - 2021-03-26
+# Astrobotany News
 
-=> gemini://astrobotany.mozz.us/news
+Date: 2021-03-26
 
 ## Changes
 
