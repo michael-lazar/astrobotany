@@ -23,7 +23,7 @@ Astrobotany is free to join and requires no personal info. Simply click the foll
 ## Information
 
 => /static/instructions.gmi 📚 Astrobotany FAQ
-=> /news 🗞 Astrobotany News
+=> /news 🗞  Astrobotany News
 => /leaderboards 🏆 Astrobotany Leaderboards
 
 ## External Links

@@ -3,7 +3,7 @@
 => / 🚶 Go back
 
 {% for key, leaderboard in leaderboards.items() %}
-### {{ leaderboard.name }}
+## {{ leaderboard.name }}
 
 ```
 {{ leaderboard.render_table() }}
