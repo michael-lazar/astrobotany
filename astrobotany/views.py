@@ -1023,7 +1023,7 @@ def leaderboards_view(request):
 
 
 @app.route("/leaderboards/(?P<key>[a-z_]+).csv")
-def leaderboards_view(request, key: str):
+def leaderboards_csv_view(request, key: str):
     if key not in leaderboards:
         return Response(Status.NOT_FOUND, "Not Found")
 
