@@ -8,10 +8,10 @@ from datetime import datetime, timedelta
 import pytest
 from freezegun import freeze_time
 
-from astrobotany import init_db, items
+from astrobotany import init_db, items, sounds
 from astrobotany.art import ArtFile
 from astrobotany.constants import COLOR_MAP, COLORS, SPECIES, STAGES
-from astrobotany.models import Certificate, Plant, User
+from astrobotany.models import Certificate, Plant, Song, User
 
 
 @pytest.fixture(autouse=True)
@@ -434,3 +434,23 @@ def test_shake_plant_fractional():
     user.plant.shake()
     assert user.get_item_quantity(items.coin) == 1
     assert user.plant.shaken_at == 3600
+
+
+def test_song():
+    user = user_factory()
+    song = Song.create(user=user)
+
+    data = song.get_data()
+    data["notes"][5] = 7
+    song.set_data(data)
+    song.save()
+
+    song = user.songs.get()
+    data = song.get_data()
+    assert data["notes"][5] == 7
+
+
+def test_music_player_get_raw_data():
+    song_map = [0] * 16
+    player = sounds.Synthesizer(song_map)
+    assert player.get_raw_data()

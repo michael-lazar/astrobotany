@@ -1,0 +1,29 @@
+# Astrobotany - Audio Synth
+
+=> /app 🚶 Go back
+
+## Your Song
+
+{% if not synthesizer %}
+You don't own an audio synthesizer yet.
+
+=> /app/store Purchase one in the store
+{% else %}
+```
+{{ synthesizer.get_tab() }}
+
+{{ (1000 / synthesizer.duration * 60) | int }} BPM
+
+"." = rest
+"-" = hold previous note
+```
+
+=> /app/synth/audio.mp3 🎵 listen
+
+## Quarter Notes (click to edit)
+
+{% for char in synthesizer.note_chars %}
+=> /app/synth/beat/{{ loop.index - 1 }} Beat {{ loop.index - 1 }}: {{ char }}
+{% endfor %}
+
+{% endif %}

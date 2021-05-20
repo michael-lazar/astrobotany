@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import math
 import os
 import random
@@ -147,6 +148,15 @@ class User(BaseModel):
                 self._plant = Plant.create(user=self, user_active=self)
 
         return self._plant
+
+    def get_song(self) -> Optional[Song]:
+        try:
+            return self.songs.get()
+        except Song.DoesNotExist:
+            if self.get_item_quantity(items.audio_synthesizer):
+                return Song.create(user=self)
+            else:
+                return None
 
     @property
     def badge(self) -> Optional[items.Badge]:
@@ -348,6 +358,22 @@ class Inbox(BaseModel):
         return subject, body
 
 
+class Song(BaseModel):
+
+    default_data = {"notes": [0] * 16}
+
+    user = ForeignKeyField(User, backref="songs")
+    title = TextField(default="")
+    created_at = DateTimeField(default=datetime.now)
+    data: str = TextField(default=json.dumps(default_data))
+
+    def get_data(self) -> dict:
+        return json.loads(self.data)
+
+    def set_data(self, data: dict) -> None:
+        self.data = json.dumps(data)
+
+
 class Plant(BaseModel):
     """
     A plant, i.e. the whole purpose of this application.
@@ -492,6 +518,9 @@ class Plant(BaseModel):
 
     def can_rename(self) -> bool:
         return not self.dead
+
+    def can_play_song(self) -> bool:
+        return not self.dead and self.user.get_song()
 
     def can_fertilize(self) -> bool:
         """
@@ -795,7 +824,7 @@ class Plant(BaseModel):
         if self.fertilizer_percent:
             return "The soil is still rich with nutrients."
         elif not user.remove_item(items.fertilizer):
-            return "You don't have any fertilizer, so nothing happened."
+            return "You don't have any fertilizer to use, so nothing happened."
 
         self.fertilized_at = datetime.now()
         return "You apply a bottle of fertilizer to the plant."

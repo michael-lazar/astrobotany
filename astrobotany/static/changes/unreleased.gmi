@@ -20,3 +20,4 @@ Date: Unreleased
 * Add a JSON API endpoint to get details for plants in the garden.
 * Added koi pond.
 * Updated the leaderboard structure and moved them to a separate page.
+* Added audio synthesizer.

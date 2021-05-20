@@ -1,0 +1,15 @@
+# Astrobotany - Select Note
+
+=> /app/synth 🚶 Go back
+
+## Note Selection
+
+Select a new note for the beat in position {{ beat }}.
+
+{% for char in synthesizer.note_char_map %}
+{% if loop.index - 1 == synthesizer.song_map[beat] %}
+=> /app/synth/beat/{{ beat }}/note/{{ loop.index - 1 }} 👉 {{ char }} (current)
+{% else %}
+=> /app/synth/beat/{{ beat }}/note/{{ loop.index - 1}} {{ char }}
+{% endif %}
+{% endfor %}
