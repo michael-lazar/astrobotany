@@ -1,4 +1,4 @@
-# Astrobotany - Mailbox - Item
+# Astrobotany - Select Gift
 
 =>/app/mailbox/outgoing/{{ postcard.item_id }} 🚶 Go back
 

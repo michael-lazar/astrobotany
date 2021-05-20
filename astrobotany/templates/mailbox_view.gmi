@@ -1,8 +1,8 @@
-# Astrobotany - Mailbox - View Message
+# Astrobotany - View Letter
 
 =>/app/mailbox 🚶 Go back
 
-## Message Details
+## Details
 
 From: {{ message.user_from.username }}
 To: {{ message.user_to.username }}
