@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import typing
+from tempfile import NamedTemporaryFile
 from typing import List
 
 from midiutil import MIDIFile
@@ -12,8 +13,8 @@ if typing.TYPE_CHECKING:
 
 class Synthesizer:
 
-    # Use stdin/stdout and generate mono OGG Vorbis
-    midi_command = ["timidity", "-", "-OvM", "-o", "-"]
+    # Use stdin/stdout and generate a RIFF WAVE
+    midi_command = ["timidity", "-OwMU", "-o", "-"]
     midi_notes = {
         "G₃": 55,
         "A₃": 57,
@@ -72,11 +73,12 @@ class Synthesizer:
 
     def get_raw_data(self) -> bytes:
         midi = self.build_midi_file()
-        proc = subprocess.Popen(self.midi_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-
-        midi.writeFile(proc.stdin)
-        data, _ = proc.communicate(timeout=5)
-        return data
+        with NamedTemporaryFile(mode="wb", suffix=".wav") as fp:
+            midi.writeFile(fp)
+            fp.flush()
+            command = self.midi_command + [fp.name]
+            proc = subprocess.run(command, timeout=10, capture_output=True)
+            return proc.stdout
 
     def get_tab(self) -> str:
         display_chars = (f" {x:<2}" for x in self.song_map)

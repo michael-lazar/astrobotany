@@ -884,9 +884,9 @@ def song_view(request, plant: Plant, user: typing.Optional[User] = None):
 
     text = f"You play the tune that {plant.user.username} wrote for their plant."
     if user:
-        link = f"=> /app/visit/{user.user_id}/song/audio.ogg Listen (download audio)"
+        link = f"=> /app/visit/{user.user_id}/song/audio.wav Listen (download audio)"
     else:
-        link = f"=> /app/plant/song/audio.ogg Listen (download audio)"
+        link = f"=> /app/plant/song/audio.wav Listen (download audio)"
 
     request.session["alert"] = f"{text}\n{link}"
 
@@ -894,8 +894,8 @@ def song_view(request, plant: Plant, user: typing.Optional[User] = None):
     return Response(Status.REDIRECT_TEMPORARY, endpoint)
 
 
-@app.auth_route("/app/plant/song/audio.ogg")
-@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song/audio.ogg")
+@app.auth_route("/app/plant/song/audio.wav")
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song/audio.wav")
 @load_plant
 def song_audio_view(request, plant: Plant, user: typing.Optional[User] = None):
     song = plant.user.get_song()
@@ -904,7 +904,7 @@ def song_audio_view(request, plant: Plant, user: typing.Optional[User] = None):
 
     synthesizer = Synthesizer.from_song(song)
     data = synthesizer.get_raw_data()
-    return Response(Status.SUCCESS, "audio/ogg", data)
+    return Response(Status.SUCCESS, "audio/wav", data)
 
 
 @app.auth_route("/app/plant/shake")
@@ -1132,7 +1132,7 @@ def synth_note_view(request, beat_str: str, note_str: str):
     return Response(Status.REDIRECT_TEMPORARY, "/app/synth")
 
 
-@app.auth_route("/app/synth/audio.ogg")
+@app.auth_route("/app/synth/audio.wav")
 def synth_listen_view(request):
     song = request.user.get_song()
     if not song:
@@ -1140,4 +1140,4 @@ def synth_listen_view(request):
 
     synthesizer = Synthesizer.from_song(song)
     data = synthesizer.get_raw_data()
-    return Response(Status.SUCCESS, "audio/ogg", data)
+    return Response(Status.SUCCESS, "audio/wav", data)
