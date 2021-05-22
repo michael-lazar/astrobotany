@@ -1102,9 +1102,9 @@ def synth_tempo_view(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/synth")
 
 
-@app.auth_route("/app/synth/beat/(?P<beat>[0-9]+)")
-def synth_beat_view(request, beat: str):
-    beat = int(beat)
+@app.auth_route("/app/synth/beat/(?P<beat_str>[0-9]+)")
+def synth_beat_view(request, beat_str: str):
+    beat = int(beat_str)
 
     song = request.user.get_song()
     if not song:
@@ -1115,10 +1115,10 @@ def synth_beat_view(request, beat: str):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.auth_route("/app/synth/beat/(?P<beat>[0-9]+)/note/(?P<note>[0-9]+)")
-def synth_note_view(request, beat: str, note: str):
-    beat = int(beat)
-    note = int(note)
+@app.auth_route("/app/synth/beat/(?P<beat_str>[0-9]+)/note/(?P<note_str>[0-9]+)")
+def synth_note_view(request, beat_str: str, note_str: str):
+    beat = int(beat_str)
+    note = int(note_str)
 
     song = request.user.get_song()
     if not song:

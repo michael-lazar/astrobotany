@@ -47,12 +47,14 @@ class Synthesizer:
 
     def build_midi_file(self) -> MIDIFile:
         # Compress runs of the same note
-        reduced_song_map = [[self.song_map[0], 1]]  # [(note, duration), ...]
+        reduces_song_map: typing.List[typing.Tuple[str, int]]
+        reduced_song_map = [(self.song_map[0], 1)]  # [(note, duration), ...]
         for note in self.song_map[1:]:
             if note == "-":
-                reduced_song_map[-1][1] += 1
+                last = reduced_song_map[-1]
+                reduced_song_map[-1] = (last[0], last[1] + 1)
             else:
-                reduced_song_map.append([note, 1])
+                reduced_song_map.append((note, 1))
 
         midi = MIDIFile()
         midi.addTempo(0, 0, self.bpm)
