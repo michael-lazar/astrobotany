@@ -12,18 +12,25 @@ You don't own an audio synthesizer yet.
 ```
 {{ synthesizer.get_tab() }}
 
-{{ (1000 / synthesizer.duration * 60) | int }} BPM
-
 "." = rest
 "-" = hold previous note
 ```
 
-=> /app/synth/audio.mp3 🎵 listen
+=> /app/synth/audio.ogg 🎵 listen
+
+## Tempo
+
+Set the song tempo in BPM (beats per minute)
+
+=> /app/synth/tempo Tempo: {{ synthesizer.bpm }} BPM
 
 ## Quarter Notes (click to edit)
 
-{% for char in synthesizer.note_chars %}
-=> /app/synth/beat/{{ loop.index - 1 }} Beat {{ loop.index - 1 }}: {{ char }}
+{% for char in synthesizer.song_map %}
+{% if loop.index0 % 4 == 0 %}
+
+{% endif %}
+=> /app/synth/beat/{{ loop.index0 }} Beat {{ loop.index0 }}: {{ char }}
 {% endfor %}
 
 {% endif %}

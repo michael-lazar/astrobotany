@@ -882,11 +882,11 @@ def song_view(request, plant: Plant, user: typing.Optional[User] = None):
     if not plant.can_play_song():
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
-    text = f"You play the song that {plant.user.username} wrote for their plant."
+    text = f"You play the tune that {plant.user.username} wrote for their plant."
     if user:
-        link = f"=> /app/visit/{user.user_id}/song/audio.mp3 Listen (download mp3)"
+        link = f"=> /app/visit/{user.user_id}/song/audio.ogg Listen (download audio)"
     else:
-        link = f"=> /app/plant/song/audio.mp3 Listen (download mp3)"
+        link = f"=> /app/plant/song/audio.ogg Listen (download audio)"
 
     request.session["alert"] = f"{text}\n{link}"
 
@@ -894,8 +894,8 @@ def song_view(request, plant: Plant, user: typing.Optional[User] = None):
     return Response(Status.REDIRECT_TEMPORARY, endpoint)
 
 
-@app.auth_route("/app/plant/song/audio.mp3")
-@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song/audio.mp3")
+@app.auth_route("/app/plant/song/audio.ogg")
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song/audio.ogg")
 @load_plant
 def song_audio_view(request, plant: Plant, user: typing.Optional[User] = None):
     song = plant.user.get_song()
@@ -904,7 +904,7 @@ def song_audio_view(request, plant: Plant, user: typing.Optional[User] = None):
 
     synthesizer = Synthesizer.from_song(song)
     data = synthesizer.get_raw_data()
-    return Response(Status.SUCCESS, "audio/mpeg", data)
+    return Response(Status.SUCCESS, "audio/ogg", data)
 
 
 @app.auth_route("/app/plant/shake")
@@ -1076,11 +1076,35 @@ def synth_view(request):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
+@app.auth_route("/app/synth/tempo")
+def synth_tempo_view(request):
+    song = request.user.get_song()
+    if not song:
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    if not request.query:
+        message = "Enter a number between 60 and 240."
+        return Response(Status.INPUT, message)
+
+    try:
+        bpm = int(request.query)
+        if not 60 <= bpm <= 240:
+            raise ValueError("Value out of range")
+    except ValueError:
+        message = "Invalid value. Enter a number between 60 and 240."
+        return Response(Status.INPUT, message)
+
+    data = song.get_data()
+    data["tempo"] = bpm
+    song.set_data(data)
+    song.save()
+
+    return Response(Status.REDIRECT_TEMPORARY, "/app/synth")
+
+
 @app.auth_route("/app/synth/beat/(?P<beat>[0-9]+)")
-def synth_beat_view(request, beat):
+def synth_beat_view(request, beat: str):
     beat = int(beat)
-    if not 0 <= beat < 16:
-        return Response(Status.NOT_FOUND, "Not Found")
 
     song = request.user.get_song()
     if not song:
@@ -1092,28 +1116,23 @@ def synth_beat_view(request, beat):
 
 
 @app.auth_route("/app/synth/beat/(?P<beat>[0-9]+)/note/(?P<note>[0-9]+)")
-def synth_note_view(request, beat, note):
+def synth_note_view(request, beat: str, note: str):
     beat = int(beat)
-    if not 0 <= beat < 16:
-        return Response(Status.NOT_FOUND, "Not Found")
-
     note = int(note)
-    if not 0 <= note < 16:
-        return Response(Status.NOT_FOUND, "Not Found")
 
     song = request.user.get_song()
     if not song:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     data = song.get_data()
-    data["notes"][beat] = note
+    data["notes"][beat] = Synthesizer.note_char_map[note]
     song.set_data(data)
     song.save()
 
     return Response(Status.REDIRECT_TEMPORARY, "/app/synth")
 
 
-@app.auth_route("/app/synth/audio.mp3")
+@app.auth_route("/app/synth/audio.ogg")
 def synth_listen_view(request):
     song = request.user.get_song()
     if not song:
@@ -1121,4 +1140,4 @@ def synth_listen_view(request):
 
     synthesizer = Synthesizer.from_song(song)
     data = synthesizer.get_raw_data()
-    return Response(Status.SUCCESS, "audio/mpeg", data)
+    return Response(Status.SUCCESS, "audio/ogg", data)

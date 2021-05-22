@@ -360,7 +360,27 @@ class Inbox(BaseModel):
 
 class Song(BaseModel):
 
-    default_data = {"notes": [0] * 16}
+    default_data = {
+        "tempo": 200,
+        "notes": [
+            "A₃",
+            "C₄",
+            "A₄",
+            "—",
+            "A₃",
+            "C₄",
+            "A₄",
+            "—",
+            "B₄",
+            "—",
+            "C₅",
+            "B₄",
+            "C₅",
+            "B₄",
+            "G₄",
+            "E₄",
+        ],
+    }
 
     user = ForeignKeyField(User, backref="songs")
     title = TextField(default="")

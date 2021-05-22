@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import io
+import subprocess
 import typing
-from functools import lru_cache
-from typing import Iterable, List
+from typing import List
 
-from pydub import AudioSegment
-from pydub.generators import Square
+from midiutil import MIDIFile
 
 if typing.TYPE_CHECKING:
     from models import Song
@@ -14,74 +12,70 @@ if typing.TYPE_CHECKING:
 
 class Synthesizer:
 
-    # MIDI note numbers for C major scale, starting at G3
-    scale = [55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72, 74, 76]
-
-    duration = 250  # ms, length for each note
-
-    silent_segment = AudioSegment.silent(duration=duration)
+    # Use stdin/stdout and generate mono OGG Vorbis
+    midi_command = ["timidity", "-", "-OvM", "-o", "-"]
+    midi_notes = {
+        "G₃": 55,
+        "A₃": 57,
+        "B₃": 59,
+        "C₄": 60,
+        "D₄": 62,
+        "E₄": 64,
+        "F₄": 65,
+        "G₄": 67,
+        "A₄": 69,
+        "B₄": 71,
+        "C₅": 72,
+        "D₅": 74,
+        "E₅": 76,
+    }
 
     tab_string = "||{}{}{}{}|{}{}{}{}|{}{}{}{}|{}{}{}{}||"
     note_char_map = [
-        " . ",  # Rest
-        " — ",  # Hold previous note
-        " G₃",
-        " A₃",
-        " B₃",
-        " C₄",
-        " D₄",
-        " E₄",
-        " F₄",
-        " G₄",
-        " A₄",
-        " B₄",
-        " C₅",
-        " D₅",
-        " E₅",
-    ]
+        ".",  # Rest
+        "—",  # Hold previous note
+    ] + list(midi_notes.keys())
 
-    def __init__(self, song_map: List[int]):
+    def __init__(self, song_map: List[str], bpm):
         self.song_map = song_map
+        self.bpm = bpm
 
     @classmethod
     def from_song(cls, song: Song) -> Synthesizer:
-        return cls(song.get_data()["notes"])
+        data = song.get_data()
+        return cls(data["notes"], data["tempo"])
 
-    @classmethod
-    @lru_cache(400)
-    def compile_note(cls, midi_number: int, count: int) -> AudioSegment:
-        # http://en.wikipedia.org/wiki/MIDI_Tuning_Standard#Frequency_values
-        # https://gist.github.com/jiaaro/339df443b005e12d6c2a
-        frequency = (2.0 ** ((midi_number - 69) / 12.0)) * 440
-        waveform = Square(frequency, duty_cycle=0.5)
-        segment = waveform.to_audio_segment(duration=cls.duration * count, volume=-20)
-        segment = segment.fade_in(40).fade_out(100)
-        return segment
-
-    def play_audio(self) -> Iterable[AudioSegment]:
+    def build_midi_file(self) -> MIDIFile:
         # Compress runs of the same note
-        reduced_song_map = [[self.song_map[0], 1]]
+        reduced_song_map = [[self.song_map[0], 1]]  # [(note, duration), ...]
         for note in self.song_map[1:]:
-            if note == 1:
+            if note == "-":
                 reduced_song_map[-1][1] += 1
             else:
                 reduced_song_map.append([note, 1])
 
+        midi = MIDIFile()
+        midi.addTempo(0, 0, self.bpm)
+        midi.addProgramChange(0, 0, 0, 7)
+
+        offset = 0
         for note, count in reduced_song_map:
-            if note <= 1:
-                yield self.silent_segment * count
-            else:
-                yield self.compile_note(midi_number=self.scale[note - 2], count=count)
+            if note not in (".", "—"):
+                pitch = self.midi_notes[note]
+                duration = count - 0.5
+                midi.addNote(0, 0, pitch, offset, duration, 127)
+            offset += count
+
+        return midi
 
     def get_raw_data(self) -> bytes:
-        fp = io.BytesIO()
-        raw_data = sum(self.play_audio())
-        raw_data.export(fp, format="mp3")
-        return fp.getvalue()
+        midi = self.build_midi_file()
+        proc = subprocess.Popen(self.midi_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
-    @property
-    def note_chars(self) -> List[str]:
-        return [self.note_char_map[n] for n in self.song_map]
+        midi.writeFile(proc.stdin)
+        data, _ = proc.communicate(timeout=5)
+        return data
 
     def get_tab(self) -> str:
-        return self.tab_string.format(*self.note_chars)
+        display_chars = (f" {x:<2}" for x in self.song_map)
+        return self.tab_string.format(*display_chars)
