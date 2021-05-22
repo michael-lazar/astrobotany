@@ -10,10 +10,7 @@
 
 Your karma: {{ request.user.karma }}
 
-Today's blessed color is {{ blessed_color }}.
-{{ blessed_color }} petals will bestow 3x karma.
-
-Across all users, {{ tribute_total }} petals have been tossed into the pond in total.
+Today's blessed color is {{ blessed_color }}. Tossing in {{ blessed_color }} petals will bestow 3x karma upon you.
 
 ## Your Petals
 
@@ -26,3 +23,7 @@ Across all users, {{ tribute_total }} petals have been tossed into the pond in t
 {% else %}
 You don't currently have any petals.
 {% endfor %}
+
+## Statistics
+
+Across all of astrobotany, {{ tribute_total }} total petals have been tributed so far.
