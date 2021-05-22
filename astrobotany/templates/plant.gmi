@@ -39,6 +39,9 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% if plant.can_use_christmas_cheer() %}
 => /app/plant/xmas 🎅 Apply Christmas cheer
 {% endif %}
+{% if plant.can_play_song() %}
+=> /app/plant/song 🎷 Play a song
+{% endif %}
 {% if plant.can_rename() %}
 => /app/plant/rename 🏷 Rename plant
 {% endif %}

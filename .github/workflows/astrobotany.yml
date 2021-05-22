@@ -19,6 +19,7 @@ jobs:
       run: |
         pip install .
         pip install .[test]
+        sudo apt-get install timidity
     - name: Lint with mypy
       run: |
         mypy --ignore-missing-imports .

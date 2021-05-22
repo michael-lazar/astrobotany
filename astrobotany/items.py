@@ -360,3 +360,11 @@ badge_97 = Badge(name="squid", number=97, symbol="🦑")
 badge_98 = Badge(name="ringed planet", number=98, symbol="🪐")
 badge_99 = Badge(name="eggplant", number=99, symbol="🍆")
 badge_100 = Badge(name="money bag", number=100, symbol="💰")
+
+audio_synthesizer = Item(
+    name="Audio Synthesizer",
+    description="An audio synth that can be programmed to play a musical jingle for your plant.",
+    price=300,
+    buyable=True,
+    giftable=True,
+)

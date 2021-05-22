@@ -10,22 +10,28 @@ The current time is {{ now | datetime }}.
 
 => / 🏡 Astrobotany Home
 
-## Places
+## Garden
 
 => /app/plant 🌻 Visit your plant
 => /app/visit ⛲ Community garden
-=> /app/message-board 📌 Message board
-=> /app/pond 🦆 Koi pond
+=> /app/message-board 📌 Community message board
 
-## Activities
+## Places
+
+=> /app/pond 🦆 Koi pond
+=> /app/store 🛍 Astrobotany shop
+
+## Home
 
 {% if mailbox_count %}
 => /app/mailbox 📬 Your mailbox ({{ mailbox_count }} unread)
 {% else %}
 => /app/mailbox 📪 Your mailbox
 {% endif %}
-=> /app/inventory 🎒 Your backpack
-=> /app/store 💳 Item shop
-=> /app/music 🎷 Your music (🚧 under construction 🚧)
-=> /app/badges 📛 Your badges
+=> /app/inventory 🎒 Your inventory
+
+## Customize
+
+=> /app/badges 📛 Badge collection
+=> /app/synth 🎹 Audio synthesizer
 => /app/settings 🐌 Account settings

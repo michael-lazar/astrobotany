@@ -24,3 +24,6 @@ This plant is wilting, it will die soon without water!
 {% if plant.can_search() %}
 => /app/visit/{{ plant.user.user_id }}/search 🌸 Pick a petal
 {% endif %}
+{% if plant.can_play_song() %}
+=> /app/visit/{{ plant.user.user_id }}/song 🎷 Play a song
+{% endif %}
