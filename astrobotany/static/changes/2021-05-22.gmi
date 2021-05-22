@@ -1,0 +1,25 @@
+# Astrobotany News
+
+2021-05-22
+
+## Summary
+
+This update includes a large revamp to the astrobotany UI/UX. Several pages and links have been adjusted to display a consistent style and theme.
+
+## Changes
+
+* A new location, the koi pond, has been added. Now you can finally exchange your useless flower petals for brand new (and still useless) karma!
+* An audio synthesizer has been added to the store. Once purchased, it will unlock the ability to create a custom MIDI song for your plant.
+* The leaderboards have been re-worked and moved to a separate page. In addition to the ASCII-formatted tables, leaderboards can now be downloaded as CSV files.
+* The landing page now displays the total user count and recent activity.
+* "🚶 Go back" links are now always displayed at the top of the page, below the first header.
+* The badge selection tool has been moved out of settings and into the main menu.
+* Unauthenticated users will no longer be redirected to "/app" before being prompted to present a client certificate.
+* Multi-line message board postings are now formatted correctly.
+* Plant generation & growth rate are now displayed alongside the plant's details.
+* You can now fertilize other player's plants for them.
+* ASCII art was added to the community garden page.
+* Prevent accidentally double-posting to the message board.
+* The astrobotany changelog has been converted to use the "gemfeed" format to allow users to subscribe to updates.
+* There are new public links to view your plant without needing a client certificate.
+* A JSON API endpoint has been added to get details for plants in the garden.
