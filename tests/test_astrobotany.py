@@ -451,6 +451,6 @@ def test_song():
 
 
 def test_music_player_get_raw_data():
-    song_map = [0] * 16
-    player = sounds.Synthesizer(song_map)
+    song_map = ["."] * 16
+    player = sounds.Synthesizer(song_map, 200)
     assert player.get_raw_data()
