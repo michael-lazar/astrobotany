@@ -4,4 +4,5 @@
 
 ## Changes
 
-* Some minor visual / wording tweaks.
+* Fix broken behavior when watering other user's plants that was caused by the previous release.
+* Some minor visual & wording tweaks.

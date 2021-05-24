@@ -167,36 +167,6 @@ def authenticated_route(func: RouteHandler) -> RouteHandler:
     return wrapped
 
 
-def load_plant(func: RouteHandler) -> RouteHandler:
-    """
-    Wraps an route method to handle loading / refreshing the specified user's plant.
-    """
-
-    def wrapped(
-        request: AuthenticatedRequest, user_id: typing.Optional[str] = None, **kwargs
-    ) -> Response:
-        if user_id:
-            user = User.get_or_none(User.user_id == user_id)
-            if user is None:
-                return Response(Status.NOT_FOUND, "Not Found")
-            elif user == request.user:
-                return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
-            kwargs["user"] = user
-            plant = user.plant
-        else:
-            plant = request.user.plant
-
-        try:
-            plant.refresh()
-            response = func(request, plant, **kwargs)
-        finally:
-            plant.save()
-
-        return response
-
-    return wrapped
-
-
 app = AstrobotanyApplication()
 
 
@@ -829,91 +799,209 @@ def garden_view(request):
 
 
 @app.auth_route("/app/plant")
-@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})")
-@load_plant
-def plant_view(request, plant: Plant, user: typing.Optional[User] = None):
+def plant_view(request):
+    plant = request.user.plant
+    plant.refresh()
+    plant.save()
+
     alert = request.session.pop("alert", None)
-    if alert is None and user is None:
+    if alert is None:
         alert = plant.get_observation(request.cert.ansi_enabled)
 
-    template = "visit.gmi" if user else "plant.gmi"
-    body = request.render_template(template, plant=plant, alert=alert)
+    body = request.render_template("plant.gmi", plant=plant, alert=alert)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})")
+def visit_plant_view(request, user_id: str):
+    user = User.get_or_none(User.user_id == user_id)
+    if user is None:
+        return Response(Status.NOT_FOUND, "Not Found")
+    elif user == request.user:
+        return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+    plant = user.plant
+    plant.refresh()
+    plant.save()
+
+    alert = request.session.pop("alert", None)
+
+    body = request.render_template("visit.gmi", plant=plant, alert=alert)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
 @app.auth_route("/app/plant/water")
-@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/water")
-@load_plant
-def water_view(request, plant: Plant, user: typing.Optional[User] = None):
+def water_view(request):
+    plant = request.user.plant
+    plant.refresh()
+
     if not plant.can_water():
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
-    request.session["alert"] = plant.water(user=user)
+    request.session["alert"] = plant.water()
+    plant.save()
 
-    endpoint = f"/app/visit/{user.user_id}" if user else "/app/plant"
-    return Response(Status.REDIRECT_TEMPORARY, endpoint)
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/water")
+def visit_water_view(request, user_id: str):
+    user = User.get_or_none(User.user_id == user_id)
+    if user is None:
+        return Response(Status.NOT_FOUND, "Not Found")
+    elif user == request.user:
+        return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+    plant = user.plant
+    plant.refresh()
+
+    if not plant.can_water():
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    request.session["alert"] = plant.water(user=request.user)
+    plant.save()
+
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user.user_id}")
 
 
 @app.auth_route("/app/plant/fertilize")
-@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/fertilize")
-@load_plant
-def fertilize_view(request, plant: Plant, user: typing.Optional[User] = None):
+def fertilize_view(request):
+    plant = request.user.plant
+    plant.refresh()
+
     if not plant.can_fertilize():
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
-    request.session["alert"] = plant.fertilize(user=user)
+    request.session["alert"] = plant.fertilize()
+    plant.save()
 
-    endpoint = f"/app/visit/{user.user_id}" if user else "/app/plant"
-    return Response(Status.REDIRECT_TEMPORARY, endpoint)
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/fertilize")
+def visit_fertilize_view(request, user_id: str):
+    user = User.get_or_none(User.user_id == user_id)
+    if user is None:
+        return Response(Status.NOT_FOUND, "Not Found")
+    elif user == request.user:
+        return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+    plant = user.plant
+    plant.refresh()
+
+    if not plant.can_fertilize():
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    request.session["alert"] = plant.fertilize(user=request.user)
+    plant.save()
+
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user.user_id}")
 
 
 @app.auth_route("/app/plant/xmas")
-@load_plant
-def xmas_view(request, plant: Plant):
+def xmas_view(request):
+    plant = request.user.plant
+    plant.refresh()
+
     if not plant.can_use_christmas_cheer():
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     request.session["alert"] = plant.use_christmas_cheer()
+    plant.save()
+
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
 @app.auth_route("/app/plant/search")
-@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/search")
-@load_plant
-def search_view(request, plant: Plant, user: typing.Optional[User] = None):
+def search_view(request):
+    plant = request.user.plant
+    plant.refresh()
+
     if not plant.can_search():
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
-    request.session["alert"] = plant.pick_petal(user=user)
+    request.session["alert"] = plant.pick_petal()
+    plant.save()
 
-    endpoint = f"/app/visit/{user.user_id}" if user else "/app/plant"
-    return Response(Status.REDIRECT_TEMPORARY, endpoint)
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/search")
+def visit_search_view(request, user_id: str):
+    user = User.get_or_none(User.user_id == user_id)
+    if user is None:
+        return Response(Status.NOT_FOUND, "Not Found")
+    elif user == request.user:
+        return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+    plant = user.plant
+    plant.refresh()
+
+    if not plant.can_search():
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    request.session["alert"] = plant.pick_petal(user=request.user)
+    plant.save()
+
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user.user_id}")
 
 
 @app.auth_route("/app/plant/song")
-@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song")
-@load_plant
-def song_view(request, plant: Plant, user: typing.Optional[User] = None):
+def song_view(request):
+    plant = request.user.plant
+    plant.refresh()
+
     if not plant.can_play_song():
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
-    text = f"You play the tune that {plant.user.username} wrote for their plant."
-    if user:
-        link = f"=> /app/visit/{user.user_id}/song/audio.wav Listen (download audio)"
-    else:
-        link = f"=> /app/plant/song/audio.wav Listen (download audio)"
-
+    text = "You play the tune that you wrote for your plant."
+    link = "=> /app/plant/song/audio.wav Listen (download audio)"
     request.session["alert"] = f"{text}\n{link}"
 
-    endpoint = f"/app/visit/{user.user_id}" if user else "/app/plant"
-    return Response(Status.REDIRECT_TEMPORARY, endpoint)
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song")
+def visit_song_view(request, user_id: str):
+    user = User.get_or_none(User.user_id == user_id)
+    if user is None:
+        return Response(Status.NOT_FOUND, "Not Found")
+    elif user == request.user:
+        return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+    plant = user.plant
+    plant.refresh()
+
+    if not plant.can_play_song():
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    text = f"You play the tune that {user.username} wrote for their plant."
+    link = f"=> /app/visit/{user.user_id}/song/audio.wav Listen (download audio)"
+    request.session["alert"] = f"{text}\n{link}"
+
+    return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user.user_id}")
 
 
 @app.auth_route("/app/plant/song/audio.wav")
+def song_audio_view(request):
+    song = request.user.get_song()
+    if not song:
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    synthesizer = Synthesizer.from_song(song)
+    data = synthesizer.get_raw_data()
+    return Response(Status.SUCCESS, "audio/wav", data)
+
+
 @app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song/audio.wav")
-@load_plant
-def song_audio_view(request, plant: Plant, user: typing.Optional[User] = None):
-    song = plant.user.get_song()
+def visit_song_audio_view(request, user_id: str):
+    user = User.get_or_none(User.user_id == user_id)
+    if user is None:
+        return Response(Status.NOT_FOUND, "Not Found")
+    elif user == request.user:
+        return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+    song = user.get_song()
     if not song:
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
@@ -923,26 +1011,32 @@ def song_audio_view(request, plant: Plant, user: typing.Optional[User] = None):
 
 
 @app.auth_route("/app/plant/shake")
-@load_plant
-def shake_view(request, plant: Plant):
+def shake_view(request):
+    plant = request.user.plant
+    plant.refresh()
+
     if not plant.can_shake():
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     request.session["alert"] = plant.shake()
+    plant.save()
 
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
 @app.auth_route("/app/plant/harvest")
 @app.auth_route("/app/plant/harvest/confirm")
-@load_plant
-def harvest_view(request, plant: Plant):
+def harvest_view(request):
+    plant = request.user.plant
+    plant.refresh()
+
     if not plant.can_harvest():
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     if request.path.endswith("/confirm"):
         if request.query.strip() == f"Goodbye {plant.name}":
             plant.harvest()
+            plant.save()
             return Response(Status.REDIRECT_TEMPORARY, "/app/epilog/1")
         elif request.query:
             return Response(Status.REDIRECT_TEMPORARY, "/app/plant/harvest")
@@ -955,14 +1049,18 @@ def harvest_view(request, plant: Plant):
 
 
 @app.auth_route("/app/plant/rename")
-@load_plant
-def plant_rename_view(request, plant: Plant):
+def plant_rename_view(request):
+    plant = request.user.plant
+    plant.refresh()
+
     if not request.query:
         return Response(Status.INPUT, "Enter a new nickname for your plant:")
 
     plant.name = request.query[:40]
     msg = f'Your plant shall henceforth be known as "{plant.name}".'
     request.session["alert"] = msg
+    plant.save()
+
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
 
 
