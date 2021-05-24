@@ -19,7 +19,7 @@ The current time is {{ now | datetime }}.
 ## Places
 
 => /app/pond 🦆 Koi pond
-=> /app/store 🛍 Astrobotany shop
+=> /app/store 🛍 Item shop
 
 ## Home
 
