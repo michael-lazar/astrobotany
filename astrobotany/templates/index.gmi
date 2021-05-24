@@ -37,6 +37,6 @@ Astrobotany is free to join and requires no personal info. Simply click the foll
 
 Recent activity...
 
-{% for line in activity %}
-* {{ line }}
+{% for username, dt in activity %}
+* {{ username }} watered their plant {{ dt | humanize_timedelta }} ago.
 {% endfor %}

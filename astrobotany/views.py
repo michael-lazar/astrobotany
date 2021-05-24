@@ -47,9 +47,24 @@ def ordinal_format(value):
     return str(n) + suffix
 
 
+def humanize_timedelta(value):
+    minutes = int(value.total_seconds() // 60)
+    if minutes == 1:
+        return "1 minute"
+    elif minutes < 60:
+        return f"{minutes} minutes"
+
+    hours = minutes // 60
+    if hours == 1:
+        return "1 hour"
+    else:
+        return f"{hours} hours"
+
+
 template_env.filters["datetime"] = datetime_format
 template_env.filters["number"] = number_format
 template_env.filters["ordinal"] = ordinal_format
+template_env.filters["humanize_timedelta"] = humanize_timedelta
 
 mimetypes.add_type("text/gemini", ".gmi")
 
@@ -214,8 +229,8 @@ def index_view(request):
 
     activity = []
     for plant in query:
-        dt = (datetime.now() - plant.watered_at).total_seconds() // 60
-        activity.append(f"{plant.user.username} watered their plant {dt:0.0f} minutes ago")
+        dt = datetime.now() - plant.watered_at
+        activity.append((plant.user.username, dt))
 
     total = User.select().count()
     body = render_template("index.gmi", title_art=title_art, activity=activity, total=total)
