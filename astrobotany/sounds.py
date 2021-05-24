@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
 class Synthesizer:
 
     # Use stdin/stdout and generate a RIFF WAVE
-    midi_command = ["timidity", "-OwMU", "-o", "-"]
+    midi_command = ["timidity", "-OvM", "-o", "-"]
     midi_notes = {
         "G₃": 55,
         "A₃": 57,
@@ -73,7 +73,7 @@ class Synthesizer:
 
     def get_raw_data(self) -> bytes:
         midi = self.build_midi_file()
-        with NamedTemporaryFile(mode="wb", suffix=".wav") as fp:
+        with NamedTemporaryFile(mode="wb", suffix=".ogg") as fp:
             midi.writeFile(fp)
             fp.flush()
             command = self.midi_command + [fp.name]

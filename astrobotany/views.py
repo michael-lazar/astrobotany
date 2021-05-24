@@ -955,7 +955,7 @@ def song_view(request):
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     text = "You play the tune that you wrote for your plant."
-    link = "=> /app/plant/song/audio.wav Listen (download audio)"
+    link = "=> /app/plant/song/audio.ogg Listen (download audio)"
     request.session["alert"] = f"{text}\n{link}"
 
     return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
@@ -976,13 +976,13 @@ def visit_song_view(request, user_id: str):
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     text = f"You play the tune that {user.username} wrote for their plant."
-    link = f"=> /app/visit/{user.user_id}/song/audio.wav Listen (download audio)"
+    link = f"=> /app/visit/{user.user_id}/song/audio.ogg Listen (download audio)"
     request.session["alert"] = f"{text}\n{link}"
 
     return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{user.user_id}")
 
 
-@app.auth_route("/app/plant/song/audio.wav")
+@app.auth_route("/app/plant/song/audio.ogg")
 def song_audio_view(request):
     song = request.user.get_song()
     if not song:
@@ -990,10 +990,10 @@ def song_audio_view(request):
 
     synthesizer = Synthesizer.from_song(song)
     data = synthesizer.get_raw_data()
-    return Response(Status.SUCCESS, "audio/wav", data)
+    return Response(Status.SUCCESS, "audio/ogg", data)
 
 
-@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song/audio.wav")
+@app.auth_route("/app/visit/(?P<user_id>[0-9a-f]{32})/song/audio.ogg")
 def visit_song_audio_view(request, user_id: str):
     user = User.get_or_none(User.user_id == user_id)
     if user is None:
@@ -1007,7 +1007,7 @@ def visit_song_audio_view(request, user_id: str):
 
     synthesizer = Synthesizer.from_song(song)
     data = synthesizer.get_raw_data()
-    return Response(Status.SUCCESS, "audio/wav", data)
+    return Response(Status.SUCCESS, "audio/ogg", data)
 
 
 @app.auth_route("/app/plant/shake")
@@ -1245,7 +1245,7 @@ def synth_note_view(request, beat_str: str, note_str: str):
     return Response(Status.REDIRECT_TEMPORARY, "/app/synth")
 
 
-@app.auth_route("/app/synth/audio.wav")
+@app.auth_route("/app/synth/audio.ogg")
 def synth_listen_view(request):
     song = request.user.get_song()
     if not song:
@@ -1253,4 +1253,4 @@ def synth_listen_view(request):
 
     synthesizer = Synthesizer.from_song(song)
     data = synthesizer.get_raw_data()
-    return Response(Status.SUCCESS, "audio/wav", data)
+    return Response(Status.SUCCESS, "audio/ogg", data)

@@ -4,5 +4,6 @@
 
 ## Changes
 
-* Fix broken behavior when watering other user's plants that was caused by the previous release.
-* Some minor visual & wording tweaks.
+* Fixed broken behavior when watering other user's plants that was caused by the previous release.
+* Changed synthesizer audio encoding from WAVE to Ogg Vorbis.
+* Minor visual & wording tweaks.
