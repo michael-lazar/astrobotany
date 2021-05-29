@@ -1,4 +1,4 @@
-# Astrobotany - Community Garden
+# Astrobotany - {{ garden_section }}
 
 ```
 {{ garden_art }}

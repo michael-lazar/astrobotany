@@ -77,7 +77,7 @@ def test_validate_art_files(filename: str):
 
 
 def test_draw_plant_dead():
-    plant = plant_factory(dead=True)
+    plant = plant_factory(watered_at=now - timedelta(days=6))
     assert "R.I.P." in plant.get_ascii_art()
 
 
@@ -211,7 +211,7 @@ def test_plant_harvest():
     user = plant.user
     plant.user_active = user
     plant.harvest()
-    assert plant.dead
+    assert plant.is_dead()
     assert plant.user_active is None
     assert plant.get(user_active=user)
 
@@ -219,7 +219,7 @@ def test_plant_harvest():
 def test_plant_refresh_dead(now):
     plant = plant_factory(watered_at=now - timedelta(days=6))
     plant.refresh()
-    assert plant.dead
+    assert plant.is_dead()
     assert plant.updated_at == datetime.now()
     assert plant.score == 0
 
@@ -326,7 +326,7 @@ def test_plant_refresh_evolve(now):
 
 
 def test_plant_pick_petal_dead():
-    plant = plant_factory(stage=4, dead=True, color=COLOR_MAP["red"])
+    plant = plant_factory(stage=4, watered_at=now - timedelta(days=6), color=COLOR_MAP["red"])
     plant.pick_petal()
     assert plant.user.get_item_quantity(items.red_petal) == 0
 

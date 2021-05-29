@@ -793,10 +793,62 @@ def garden_view(request):
         .order_by(Plant.score.desc())
     )
 
+    garden_section = "Community Garden"
     garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
-    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art)
+    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art, garden_section=garden_section)
     return Response(Status.SUCCESS, "text/gemini", body)
 
+@app.auth_route("/app/visit/healthy")
+def garden_view(request):
+    plants = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=1))
+        .order_by(Plant.score.desc())
+    )
+
+    garden_section = "Healthy Plants"
+    garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
+    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art, garden_section=garden_section)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+@app.auth_route("/app/visit/dry")
+def garden_view(request):
+    plants = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at < datetime.now() - timedelta(days=1), Plant.watered_at >= datetime.now() - timedelta(days=3))
+        .order_by(Plant.score.desc())
+    )
+
+    garden_section = "Dry Plants"
+    garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
+    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art, garden_section=garden_section)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+@app.auth_route("/app/visit/wilting")
+def garden_view(request):
+    plants = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at < datetime.now() - timedelta(days=3), Plant.watered_at >= datetime.now() - timedelta(days=5))
+        .order_by(Plant.score.desc())
+    )
+
+    garden_section = "Wilting Plants"
+    garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
+    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art, garden_section=garden_section)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+@app.auth_route("/app/visit/dead")
+def garden_view(request):
+    plants = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8), Plant.watered_at < datetime.now() - timedelta(days=5))
+        .order_by(Plant.score.desc())
+    )
+
+    garden_section = "Dead Plants"
+    garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
+    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art, garden_section=garden_section)
+    return Response(Status.SUCCESS, "text/gemini", body)
 
 @app.auth_route("/app/plant")
 def plant_view(request):

@@ -412,7 +412,6 @@ class Plant(BaseModel):
     rarity = IntegerField(default=_default_rarity)
     color = IntegerField(default=lambda: random.randrange(len(constants.COLORS)))
     mutation = IntegerField(null=True)
-    dead = BooleanField(default=False)
     name = TextField(default=fake.first_name)
     fertilized_at = DateTimeField(default=lambda: datetime.now() - timedelta(days=4))
     shaken_at = IntegerField(default=0)
@@ -462,7 +461,7 @@ class Plant(BaseModel):
         words.append(self.stage_str)
         if self.stage > 1:
             words.append(self.species_str)
-        if self.dead:
+        if self.is_dead:
             words.append("(deceased)")
         return " ".join(words)
 
@@ -481,28 +480,34 @@ class Plant(BaseModel):
         return 1 + (self.generation - 1) * 0.2
 
     @property
+    def is_healthy(self) -> bool:
+        """
+        Is the plant healthy?
+        """
+        return datetime.now() - self.watered_at <= timedelta(days=1)
+ 
+    @property
+    def is_dry(self) -> bool:
+        """
+        Is the plant dry?
+        """
+        watered_delta = datetime.now() - self.watered_at
+        return watered_delta > timedelta(days=1) and watered_delta <= timedelta(days=3)
+
+    @property
     def is_wilted(self) -> bool:
         """
         Is the plant close to death?
         """
-        if self.dead:
-            return False
-        else:
-            return self.watered_at < datetime.now() - timedelta(days=3)
+        watered_delta = datetime.now() - self.watered_at
+        return watered_delta > timedelta(days=3) and watered_delta <= timedelta(days=5)
 
     @property
-    def health(self) -> str:
-        watered_delta = datetime.now() - self.watered_at
-        if self.dead:
-            return "dead"
-        elif watered_delta < timedelta(days=1):
-            return "healthy"
-        elif watered_delta < timedelta(days=3):
-            return "dry"
-        elif watered_delta < timedelta(days=5):
-            return "wilting"
-        else:
-            return "dead"
+    def is_dead(self) -> bool:
+        """
+        Is the plant dead?
+        """
+        return datetime.now() - self.watered_at > timedelta(days=5)
 
     @property
     def water_supply_percent(self) -> int:
@@ -525,34 +530,34 @@ class Plant(BaseModel):
         return math.ceil(remaining_fertilizer * 100)
 
     def can_water(self) -> bool:
-        return not self.dead
+        return not self.is_dead
 
     def can_shake(self) -> bool:
-        return not self.dead
+        return not self.is_dead
 
     def can_search(self) -> bool:
-        return not self.dead and self.stage == 4
+        return not self.is_dead and self.stage == 4
 
     def can_harvest(self) -> bool:
-        return self.dead or self.stage == 5
+        return self.is_dead or self.stage == 5
 
     def can_rename(self) -> bool:
-        return not self.dead
+        return not self.is_dead
 
     def can_play_song(self) -> bool:
-        return not self.dead and self.user.get_song()
+        return not self.is_dead and self.user.get_song()
 
     def can_fertilize(self) -> bool:
         """
         Return if the user can apply fertilizer to the plant.
         """
-        return not self.dead
+        return not self.is_dead
 
     def can_use_christmas_cheer(self) -> bool:
         """
         Return if the user can apply christmas cheer to the plant.
         """
-        if self.dead:
+        if self.is_dead:
             return False
         elif self.user.christmas_mode:
             return False
@@ -565,7 +570,7 @@ class Plant(BaseModel):
         """
         Build an ascii graph that displays the plant's remaining water supply.
         """
-        if self.dead:
+        if self.is_dead:
             return "N/A"
 
         percent = self.water_supply_percent
@@ -585,7 +590,7 @@ class Plant(BaseModel):
         """
         Build an ascii graph that displays the plant's remaining fertilizer.
         """
-        if self.dead:
+        if self.is_dead:
             return "N/A"
 
         percent = self.fertilizer_percent
@@ -600,7 +605,7 @@ class Plant(BaseModel):
         Build an ascii-art picture based on the plant's generation and species.
         """
         today = date.today()
-        if self.dead:
+        if self.is_dead:
             filename = "rip.psci"
         elif self.user.christmas_mode:
             filename = "christmas.psci"
@@ -630,7 +635,7 @@ class Plant(BaseModel):
         """
         observation = []
 
-        stage = 99 if self.dead else self.stage
+        stage = 99 if self.is_dead else self.stage
 
         if self.user.christmas_mode:
             return constants.STAGE_DESCRIPTIONS["christmas"][0]
@@ -682,8 +687,7 @@ class Plant(BaseModel):
         self.updated_at = datetime.now()
 
         # If it has been >5 days since watering, sorry plant is dead :(
-        if self.updated_at - self.watered_at >= timedelta(days=5):
-            self.dead = True
+        if self.is_dead:
             return
 
         # Add a tick for every second since we last updated, up to 24 hours
@@ -731,7 +735,7 @@ class Plant(BaseModel):
 
         Returns: A string with a description of the resulting action.
         """
-        if self.dead:
+        if self.is_dead:
             return "There's no point in watering a dead plant."
         elif self.water_supply_percent == 100:
             return "The soil is already damp."
@@ -763,7 +767,7 @@ class Plant(BaseModel):
 
         Returns: A string with a description of the resulting action.
         """
-        if self.dead:
+        if self.is_dead:
             return "You shouldn't be here!"
         elif self.stage_str != "flowering":
             return "You shouldn't be here!"
@@ -867,7 +871,6 @@ class Plant(BaseModel):
         else:
             new_generation = 1
 
-        self.dead = True
         self.user_active = None
         self.save()
 
