@@ -787,14 +787,29 @@ def mailbox_message_view(request, message_id):
 
 @app.auth_route("/app/visit")
 def garden_view(request):
-    plants = (
+    healthy_plants = (
         Plant.all_active()
-        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8))
+        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=1))
+        .order_by(Plant.score.desc())
+    )
+    dry_plants = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at < datetime.now() - timedelta(days=1), Plant.watered_at >= datetime.now() - timedelta(days=3))
+        .order_by(Plant.score.desc())
+    )
+    wilting_plants = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at < datetime.now() - timedelta(days=3), Plant.watered_at >= datetime.now() - timedelta(days=5))
+        .order_by(Plant.score.desc())
+    )
+    dead_plants = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8), Plant.watered_at < datetime.now() - timedelta(days=5))
         .order_by(Plant.score.desc())
     )
 
     garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
-    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art)
+    body = request.render_template("garden.gmi", healthy_plants=healthy_plants, dry_plants=dry_plants, wilting_plants=wilting_plants, dead_plants=dead_plants, garden_art=garden_art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
