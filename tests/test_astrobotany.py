@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import pytest
 from freezegun import freeze_time
 
-from astrobotany import init_db, items, sounds
+from astrobotany import init_db, items, sounds, tasks
 from astrobotany.art import ArtFile
 from astrobotany.constants import COLOR_MAP, COLORS, SPECIES, STAGES
 from astrobotany.models import Certificate, Plant, Song, User
@@ -454,3 +454,13 @@ def test_music_player_get_raw_data():
     song_map = ["."] * 16
     player = sounds.Synthesizer(song_map, 200)
     assert player.get_raw_data()
+
+
+def test_tasks():
+    _ = plant_factory()
+    _ = plant_factory()
+
+    for task in tasks.schedule.daily_tasks:
+        task()
+    for task in tasks.schedule.hourly_tasks:
+        task()
