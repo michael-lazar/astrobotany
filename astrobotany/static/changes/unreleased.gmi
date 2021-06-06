@@ -4,4 +4,5 @@ Unreleased
 
 ## Changes
 
-* Added ability to delete posts to the message board within 24 hours of posting them.
+* Added the ability to delete posts on the message board within 24 hours of posting them.
+* Plant petals now regenerate after midnight instead of 24 hrs after shaking the plant.

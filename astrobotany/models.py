@@ -776,9 +776,10 @@ class Plant(BaseModel):
 
         target = f"plant_{self.id}"
 
+        midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         last_event = Event.select().where(
             Event.user == user,
-            Event.created_at >= datetime.now() - timedelta(days=1),
+            Event.created_at >= midnight,
             Event.event_type == Event.PICK_PETAL,
             Event.target == target,
         )
