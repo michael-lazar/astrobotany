@@ -41,4 +41,9 @@ setup(
             "mail/*",
         ]
     },
+    entry_points={
+        "console_scripts": [
+            "astrobotany-tasks=astrobotany.tasks:main",
+        ]
+    },
 )
