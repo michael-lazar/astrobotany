@@ -275,6 +275,9 @@ class Message(BaseModel):
     def by_date(cls):
         return cls.select().order_by(cls.created_at.desc())
 
+    def can_delete(self):
+        return self.created_at > datetime.now() - timedelta(days=1)
+
 
 class ItemSlot(BaseModel):
     """
