@@ -4,7 +4,7 @@
 
 ## Actions
 
-=>/app/message-board/submit ✍️ Submit a new message
+=>/app/message-board/submit ✍️ Post a new message
 
 ## Posts
 
@@ -13,6 +13,9 @@
 > {{ line }}
 {% endfor %}
 > - {{ item.user.display_name }}, {{ item.created_at.strftime('%Y-%m-%d') }}
+{% if item.user == request.user and item.can_delete() %}
+=> /app/message-board/delete/{{ item.id }} 🪓 delete this message (option available for 24 hours)
+{% endif %}
 
 {% endfor %}
 (page {{ page }} of {{ page_count }})
