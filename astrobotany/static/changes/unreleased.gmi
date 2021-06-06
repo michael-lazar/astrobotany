@@ -1,0 +1,7 @@
+# Astrobotany News
+
+Unreleased
+
+## Changes
+
+* Added ability to delete posts to the message board within 24 hours of posting them.

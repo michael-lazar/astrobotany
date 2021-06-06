@@ -407,6 +407,32 @@ def message_board_submit_view(request):
     return Response(Status.REDIRECT_TEMPORARY, "/app/message-board")
 
 
+@app.auth_route("/app/message-board/delete/(?P<message_id>[0-9]+)")
+def message_board_delete_view(request, message_id: str):
+    message = Message.get_or_none(id=int(message_id))
+    if message is None:
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    if message.user != request.user:
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    if not message.can_delete():
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    if not request.query:
+        abbreviated_text = message.text.split("\n")[0]
+        if len(abbreviated_text) > 20:
+            abbreviated_text = abbreviated_text[:18] + "..."
+        msg = f'Are you sure [y/N]? Deleting "{abbreviated_text}"'
+        return Response(Status.INPUT, msg)
+
+    confirm = request.query.lower().strip() == "y"
+    if confirm:
+        message.delete_instance()
+
+    return Response(Status.REDIRECT_TEMPORARY, "/app/message-board")
+
+
 @app.auth_route("/app/settings")
 def settings_view(request):
     body = request.render_template("settings.gmi")
