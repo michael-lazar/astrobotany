@@ -4,6 +4,7 @@ Can't sleep, must write unit tests...
 import os
 import uuid
 from datetime import datetime, timedelta
+from tempfile import NamedTemporaryFile
 
 import pytest
 from freezegun import freeze_time
@@ -12,6 +13,7 @@ from astrobotany import init_db, items, sounds, tasks
 from astrobotany.art import ArtFile
 from astrobotany.constants import COLOR_MAP, COLORS, SPECIES, STAGES
 from astrobotany.models import Certificate, Plant, Song, User
+from astrobotany.cache import Cache
 
 
 @pytest.fixture(autouse=True)
@@ -464,3 +466,14 @@ def test_tasks():
         task()
     for task in tasks.schedule.hourly_tasks:
         task()
+
+
+def test_cache():
+
+    with NamedTemporaryFile() as fp:
+        cache = Cache(fp.name)
+        cache.data["hello"] = 2
+        cache.save()
+
+        cache = Cache(fp.name)
+        assert cache.data["hello"] == 2

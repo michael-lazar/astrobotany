@@ -1,4 +1,5 @@
 astrobotany.sqlite
+astrobotany.cache
 .idea/
 __pycache__/
 certs/
