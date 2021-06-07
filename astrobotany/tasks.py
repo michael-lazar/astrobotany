@@ -8,9 +8,12 @@ This script is intended to be invoked from a cron file like this...
 """
 
 import argparse
+import random
 
-from . import settings
-from .models import Plant, init_db
+from . import init_cache, init_db, settings
+from .cache import cache
+from .items import Badge
+from .models import Plant
 
 
 class Schedule:
@@ -40,6 +43,18 @@ def refresh_all_plants():
         plant.save()
 
 
+@schedule.daily
+def update_daily_badge():
+    """
+    Update the daily badge for sale in the store
+    """
+    badge_data = cache.get("daily_badge")
+    badge_data["index"] = (badge_data["index"] + 1) % len(Badge.badges)
+    badge_data["price"] = random.randint(300, 800)
+    cache.set("daily_badge", badge_data)
+    cache.save()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("type", choices=["hourly", "daily"])
@@ -47,6 +62,7 @@ def main():
     args = parser.parse_args()
 
     init_db(args.db)
+    init_cache(settings.cache)
 
     if args.type == "hourly":
         tasks = schedule.hourly_tasks
