@@ -424,6 +424,10 @@ class Plant(BaseModel):
     def all_active(cls):
         return cls.filter(cls.user_active.is_null(False)).join(User)
 
+    @classmethod
+    def all_alive(cls):
+        return cls.all_active().where(cls.dead == False)
+
     @property
     def color_str(self) -> str:
         return constants.COLORS[self.color]

@@ -48,7 +48,7 @@ class HighScore(Leaderboard):
     name = "Highest Score"
 
     def list_top_items(self):
-        plants = Plant.all_active().order_by(Plant.score.desc())
+        plants = Plant.all_alive().order_by(Plant.score.desc())
         for plant in plants.limit(self.count):
             yield plant.user.username, f"{plant.score} points"
 
@@ -57,7 +57,7 @@ class OldestPlant(Leaderboard):
     name = "Oldest Plant"
 
     def list_top_items(self):
-        query = Plant.all_active()
+        query = Plant.all_alive()
         query = query.order_by(Plant.created_at.asc())
         query = query.limit(self.count)
         for plant in query:
@@ -68,7 +68,7 @@ class PrettyFlowers(Leaderboard):
     name = "Prettiest Flowers"
 
     def list_top_items(self):
-        query = Plant.all_active()
+        query = Plant.all_alive()
         query = query.where(Plant.stage == 4)
         query = query.order_by(Plant.score.desc())
         query = query.limit(self.count)
