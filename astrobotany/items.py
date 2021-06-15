@@ -143,7 +143,7 @@ class Badge(Item):
         self.badge_number = number
         self.badge_symbol = symbol
 
-        name = f"badge #{self.badge_series}-{self.badge_number} : {self.badge_symbol}"
+        name = f"badge #{self.badge_number} (series {self.badge_series}) - {self.badge_symbol}"
         description = f"""
         A collectable badge that can be displayed next to your name.
         
@@ -151,7 +151,7 @@ class Badge(Item):
         
         Picture     : {self.badge_symbol}
         Description : "{self.badge_name}"
-        Collection  : Series {self.badge_series}, number {self.badge_number} of 100
+        Collection  : series {self.badge_series}, number {self.badge_number} of 100
         """
         super().__init__(name, description, giftable=True)
 
@@ -159,10 +159,7 @@ class Badge(Item):
             self.badges.append(self)
 
     def get_price(self, user: User) -> int:
-        if self.badge_series == self.series:
-            return cache.get("daily_badge")["price"]
-        else:
-            return 0
+        return cache.get("daily_badge")["price"]
 
     def can_buy(self, user: User) -> bool:
         if self.badge_series == self.series:
