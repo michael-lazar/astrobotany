@@ -85,9 +85,21 @@ class MostKarma(Leaderboard):
             yield user.username, f"{user.karma} karma"
 
 
+class LargeGeneration(Leaderboard):
+    name = "Largest Generation"
+
+    def list_top_items(self):
+        from .views import ordinal_format
+
+        plants = Plant.all_alive().order_by(Plant.generation.desc())
+        for plant in plants.limit(self.count):
+            yield plant.user.username, f"{ordinal_format(plant.generation)} gen"
+
+
 leaderboards = {
     "high_score": HighScore(),
     "oldest_plant": OldestPlant(),
     "pretty_flowers": PrettyFlowers(),
     "most_karma": MostKarma(),
+    "large_generation": LargeGeneration(),
 }
