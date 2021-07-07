@@ -787,6 +787,19 @@ def mailbox_message_view(request, message_id):
 
 @app.auth_route("/app/visit")
 def garden_view(request):
+    plants = (
+        Plant.all_active()
+        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8))
+        .order_by(Plant.score.desc())
+    )
+
+    garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
+    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
+@app.auth_route("/app/visit/sort_health")
+def garden_view(request):
     healthy_plants = (
         Plant.all_active()
         .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=1))
@@ -809,7 +822,7 @@ def garden_view(request):
     )
 
     garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
-    body = request.render_template("garden.gmi", healthy_plants=healthy_plants, dry_plants=dry_plants, wilting_plants=wilting_plants, dead_plants=dead_plants, garden_art=garden_art)
+    body = request.render_template("garden_by_health.gmi", healthy_plants=healthy_plants, dry_plants=dry_plants, wilting_plants=wilting_plants, dead_plants=dead_plants, garden_art=garden_art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
