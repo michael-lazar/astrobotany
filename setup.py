@@ -29,7 +29,15 @@ setup(
         "MIDIUtil",
     ],
     extras_require={
-        "test": ["pytest", "black", "isort", "mypy", "freezegun"],
+        "test": [
+            "pytest",
+            "black",
+            "isort",
+            "mypy",
+            "freezegun",
+            "types-emoji",
+            "types-freezegun",
+        ],
     },
     package_data={
         "astrobotany": [
