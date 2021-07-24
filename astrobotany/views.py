@@ -830,7 +830,10 @@ def garden_sort_health_view(request):
 
     healthy_plants = (
         Plant.all_active()
-        .filter(Plant.score > 0, Plant.watered_at >= now - timedelta(days=1))
+        .filter(
+            Plant.score > 0,
+            Plant.watered_at >= now - timedelta(days=1),
+        )
         .order_by(Plant.watered_at)
     )
     dry_plants = (
@@ -855,8 +858,8 @@ def garden_sort_health_view(request):
         Plant.all_active()
         .filter(
             Plant.score > 0,
-            Plant.watered_at >= now - timedelta(days=8),
             Plant.watered_at < now - timedelta(days=5),
+            Plant.watered_at >= now - timedelta(days=8),
         )
         .order_by(Plant.watered_at)
     )
