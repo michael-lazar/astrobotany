@@ -5,6 +5,7 @@
 ```
 
 =>/app 🚶 Go back
+=>/app/visit/sort_health 💧️ Plants sorted by health
 
 ## Plants
 
