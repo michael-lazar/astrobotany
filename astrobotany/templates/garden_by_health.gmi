@@ -6,19 +6,11 @@
 
 =>/app 🚶 Go back
 
-{% if healthy_plants -%}
-## Healthy Plants
 
-{% for plant in healthy_plants %}
-=>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
-(tended by {{ plant.user.display_name }})
+{% if dead_plants %}
+## Dead Plants
 
-{% endfor %}
-{% endif %}
-{% if dry_plants -%}
-## Dry Plants
-
-{% for plant in dry_plants %}
+{% for plant in dead_plants %}
 =>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
 (tended by {{ plant.user.display_name }})
 
@@ -33,10 +25,19 @@
 
 {% endfor %}
 {% endif %}
-{% if dead_plants %}
-## Dead Plants
+{% if dry_plants -%}
+## Dry Plants
 
-{% for plant in dead_plants %}
+{% for plant in dry_plants %}
+=>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
+(tended by {{ plant.user.display_name }})
+
+{% endfor %}
+{% endif %}
+{% if healthy_plants -%}
+## Healthy Plants
+
+{% for plant in healthy_plants %}
 =>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
 (tended by {{ plant.user.display_name }})
 
