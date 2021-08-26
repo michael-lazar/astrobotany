@@ -1,0 +1,9 @@
+# Astrobotany News
+
+2021-08-26
+
+## Changes
+
+Dry & wilting plants are now sorted at the top of the page in the community garden.
+
+=>/app/visit/sort_health
