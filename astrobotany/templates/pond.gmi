@@ -26,4 +26,4 @@ You don't currently have any petals.
 
 ## Statistics
 
-Across all of astrobotany, {{ tribute_total }} total petals have been tributed so far.
+Across all of astrobotany, {{ tribute_total | number}} petals have been tributed in total.

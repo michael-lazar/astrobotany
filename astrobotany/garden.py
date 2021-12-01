@@ -3,8 +3,9 @@ import random
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
-from astrobotany.art import ArtFile, CharacterMatrix, Tile, colorize
-from astrobotany.models import Config, Plant, User
+from .art import ArtFile, CharacterMatrix, Tile, colorize
+from .models import Config, Plant, User
+from .pond import Pond
 
 Coordinate = Tuple[int, int]
 Coordinates = List[Coordinate]
@@ -39,10 +40,10 @@ def get_plant_tile(plant: Plant) -> Tile:
         return Tile(" ", None, None)
 
     char = [".", ",", "o", "O", "@", "&"][plant.stage]
-    if plant.stage == 0:
+    if watered_delta > timedelta(days=2):
+        fg = 223  # grey (dry)
+    elif plant.stage == 0:
         fg = 205  # yellow (seed)
-    elif watered_delta > timedelta(days=3):
-        fg = 223  # grey (wilting)
     elif plant.stage == 4:
         fg = ArtFile.get_flower_color_code(plant.color_str)
     elif plant.stage == 5:
@@ -59,8 +60,10 @@ def paint_plants(matrix: CharacterMatrix, empty: Coordinates, update_users: bool
         y, x = empty.pop()
         matrix[y][x] = symbol
         if update_users:
-            user.garden_coordinates = f"{y}S, {x}E"
-            user.save()
+            new_coordinates = f"{y} South, {x} East"
+            if new_coordinates != user.garden_coordinates:
+                user.garden_coordinates = new_coordinates
+                user.save()
 
 
 def paint_pond(matrix: CharacterMatrix, empty: Coordinates, y_offset: int, x_offset: int) -> Coordinates:
@@ -77,7 +80,7 @@ def paint_pond(matrix: CharacterMatrix, empty: Coordinates, y_offset: int, x_off
 
 def paint_koi(matrix: CharacterMatrix, pond: Coordinates) -> None:
     """
-    Add a koi fish to a pond with a random location, orientation, and color.
+    Add a koi fish to a pond with a random location and orientation.
 
     ~~~~~     ~~~~~
     ~<><~  or ~><>~
@@ -91,11 +94,12 @@ def paint_koi(matrix: CharacterMatrix, pond: Coordinates) -> None:
             if (y + y_offset, x + x_offset) not in pond:
                 break
         else:
-            color = random.choice(ArtFile.RAINBOW_COLORS)
+            # Use today's "blessed" color for the koi fish
+            fg, _ = ArtFile.FLOWER_COLORS[Pond.get_blessed_color()]
             fish = random.choice(["<><", "><>"])
-            matrix[y][x] = Tile(fish[0], None, color)
-            matrix[y][x + 1] = Tile(fish[1], None, color)
-            matrix[y][x + 2] = Tile(fish[2], None, color)
+            matrix[y][x] = Tile(fish[0], None, fg)
+            matrix[y][x + 1] = Tile(fish[1], None, fg)
+            matrix[y][x + 2] = Tile(fish[2], None, fg)
             break
 
 

@@ -23,12 +23,13 @@ class Pond:
     def __init__(self, user: User):
         self.user = user
 
-    def get_blessed_color(self, ansi_enabled: bool = False) -> str:
-        index = get_date() % len(self.petal_map)
-        color = list(self.petal_map.keys())[index]
+    @classmethod
+    def get_blessed_color(cls, ansi_enabled: bool = False) -> str:
+        index = get_date() % len(cls.petal_map)
+        color = list(cls.petal_map.keys())[index]
 
         if ansi_enabled:
-            return self.color_map[color]
+            return cls.color_map[color]
         else:
             return color
 

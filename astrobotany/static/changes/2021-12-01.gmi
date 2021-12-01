@@ -1,0 +1,28 @@
+# Astrobotany News
+
+2021-12-01
+
+## Changes
+
+The community garden page now includes dynamically generated art that displays all plants and grows along with Astrobotany! You can find the location of your own plant by checking the new "coord" value in the plant details screen. Start from the top left of the picture and go down (south) X lines, and then right (east) Y spaces.
+
+Thanks to JSaxton for the idea and initial mockup of this concept!
+
+```
+&& &  && & o O      &&  &   & &     o    &          &  o.
+     &   & @     &        &.&    . O&@&&&& & &&            @
+  &    @     &@  &   &     & & O& &Oo  &.o&&& & &&&O& o&o  &
+ & && &~~~~& ,o~~~~~~ &    &    &&  &&  &&   &  &      &.
+ &  & ~~~~~~~~~~<><~~~~         &    O&        &     &&&   &
+   && &~~~~~~~~~~~~~~~~&  &    O & @ O O  &   o& & @ && @&
+&     o&~~~~~~~~~~~~~~  &      &     &  &        &.   @ &@ &
+   &      ~~~~~~~~~~&O       @@      &&    @   & & o&O&    O
+ O O&&    &  ~~~~~~ &    &    && &  & O  &&&  . @ & @o&O@&@
+ &    @@    @ @&O && &  & &O  @  &  o &  O&&&&&O&&&& @ && &O
+& .&@O &o&&&&&O   &  &&@ o@. & &. o&  @&&&@&& &,@@&&&@.  &&.
+.o &  &&.&&&o&&&&&&O& .&&&&o..&&&@o.O.&O&OO&& &@&O&&O&&O&O &
+@@@.&o&& @&&&.&@O&o&&.&&&O&&&&.&...&OO@@&&&&&&.&&&&&O&&&@&&&
+&.@.@o@@@.@@o@@@ @O.@@.&@@o@o@oO@O@OO@o@@O&O.OOOOOOo@@OOOOOO
+@@OOOOO.OOOOOOOOOO.OOOOOOoOOOo@o@oo O oo oo@ooOoo. ooooooooo
+o o.oo ooo,o.oo,,o...
+```
