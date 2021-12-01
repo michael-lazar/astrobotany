@@ -22,8 +22,8 @@ POND_TEMPLATE = """\
 
 
 def initialize_canvas(height: int, width: int) -> Tuple[CharacterMatrix, Coordinates]:
-    matrix = []
-    empty = []
+    matrix: CharacterMatrix = []
+    empty: Coordinates = []
     for y in range(height):
         matrix.append([])
         for x in range(width):
