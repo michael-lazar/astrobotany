@@ -2,6 +2,7 @@ import functools
 import itertools
 import json
 import os
+import random
 from typing import Dict, List, NamedTuple, Optional, Tuple
 
 ColorCode = Optional[int]
@@ -27,21 +28,6 @@ def colorize(text: str, fg: ColorCode = None, bg: ColorCode = None) -> str:
     if fg is not None or bg is not None:
         text = text + "\033[0m"
     return text
-
-
-def flowerize(text: str, flower_color: str):
-    """
-    Colorize a text string to match a plant's primary flower color.
-
-    Pronounced "Flower-ize", rhymes with "colorize".
-    """
-    if flower_color == "rainbow":
-        rainbow_gen = itertools.cycle(ArtFile.RAINBOW_COLORS)
-        return "".join(colorize(char, next(rainbow_gen)) for char in text)
-    elif flower_color in ArtFile.FLOWER_COLORS:
-        return colorize(text, ArtFile.FLOWER_COLORS[flower_color][0])
-    else:
-        return text
 
 
 class ArtFile:
@@ -87,11 +73,14 @@ class ArtFile:
     # Special palette for rainbow colored flowers
     RAINBOW_COLORS = [5, 145, 211, 193, 30, 198, 31]
 
+    # Making this a class-level variable has the effect of introducing some
+    # randomness to the order of colors for rainbow plants
+    rainbow_generator = itertools.cycle(RAINBOW_COLORS)
+
     def __init__(self, filename: str, flower_color: Optional[str] = None) -> None:
         self.filename = filename
         self.flower_color = flower_color
         self.character_matrix = self.load_file(filename)
-        self.rainbow_generator = itertools.cycle(self.RAINBOW_COLORS)
 
     @classmethod
     def load_file(cls, filename: str) -> CharacterMatrix:
@@ -160,21 +149,26 @@ class ArtFile:
         elif code == self.DEFAULT_SOIL:
             return self.SOIL_COLOR
         elif code == self.DEFAULT_COLOR_PRIMARY:
-            if self.flower_color == "rainbow":
-                return next(self.rainbow_generator)
-            elif self.flower_color:
-                return self.FLOWER_COLORS[self.flower_color][0]
+            if self.flower_color:
+                return self.get_flower_color_code(self.flower_color)
             else:
                 return code
         elif code == self.DEFAULT_COLOR_SECONDARY:
-            if self.flower_color == "rainbow":
-                return next(self.rainbow_generator)
-            elif self.flower_color:
-                return self.FLOWER_COLORS[self.flower_color][1]
+            if self.flower_color:
+                return self.get_flower_color_code(self.flower_color, secondary=True)
             else:
                 return code
         else:
             return code
+
+    @classmethod
+    def get_flower_color_code(cls, flower_color: str, secondary: bool = False):
+        if flower_color == "rainbow":
+            return next(cls.rainbow_generator)
+        elif secondary:
+            return cls.FLOWER_COLORS[flower_color][1]
+        else:
+            return cls.FLOWER_COLORS[flower_color][0]
 
     @classmethod
     def merge_tiles(cls, character_matrix: CharacterMatrix) -> CharacterMatrix:

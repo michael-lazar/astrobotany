@@ -14,6 +14,7 @@ from jetforce.app.base import EnvironDict, RateLimiter, RouteHandler, RoutePatte
 
 from . import items
 from .art import render_art
+from .garden import load_garden
 from .leaderboard import leaderboards
 from .models import Certificate, Inbox, ItemSlot, Message, Plant, User
 from .pond import Pond
@@ -819,7 +820,7 @@ def garden_view(request):
         .order_by(Plant.score.desc())
     )
 
-    garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
+    garden_art = load_garden(request.cert.ansi_enabled)
     body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art)
     return Response(Status.SUCCESS, "text/gemini", body)
 
@@ -864,7 +865,7 @@ def garden_sort_health_view(request):
         .order_by(Plant.watered_at)
     )
 
-    garden_art = render_art("trees.psci", ansi_enabled=request.cert.ansi_enabled)
+    garden_art = load_garden(request.cert.ansi_enabled)
     body = request.render_template(
         "garden_by_health.gmi",
         healthy_plants=healthy_plants,

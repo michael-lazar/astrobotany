@@ -85,6 +85,7 @@ class User(BaseModel):
     password = BlobField(null=True)
     badge_id: Optional[int] = IntegerField(null=True, default=None)
     karma = IntegerField(default=0)
+    garden_coordinates = TextField(null=True, default=None)
 
     @classmethod
     def admin(cls) -> User:
@@ -260,6 +261,32 @@ class Certificate(BaseModel):
     last_seen = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)
     emoji_mode = IntegerField(default=0)
+
+
+class Config(BaseModel):
+    """
+    Poor man's key-value store for global astrobotany settings.
+    """
+
+    key = TextField(primary_key=True)
+    value = BlobField(null=True)
+
+    GARDEN_ART = "garden_art"
+
+    @classmethod
+    def load(cls, key: str) -> Optional[dict]:
+        config = cls.get_or_none(key=key)
+        if config is None:
+            return None
+        else:
+            return json.loads(config.value)
+
+    @classmethod
+    def save(cls, key: str, value: Optional[dict]) -> None:
+        if value is None:
+            cls.replace(key=key, value=None).execute()
+        else:
+            cls.replace(key=key, value=json.dumps(value)).execute()
 
 
 class Message(BaseModel):
