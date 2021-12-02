@@ -66,7 +66,9 @@ def paint_plants(matrix: CharacterMatrix, empty: Coordinates, update_users: bool
                 user.save()
 
 
-def paint_pond(matrix: CharacterMatrix, empty: Coordinates, y_offset: int, x_offset: int) -> Coordinates:
+def paint_pond(
+    matrix: CharacterMatrix, empty: Coordinates, y_offset: int, x_offset: int
+) -> Coordinates:
     lines = POND_TEMPLATE.splitlines(keepends=False)
     pond = []
     for y, line in enumerate(lines, start=y_offset):
@@ -129,10 +131,7 @@ def build_matrix(update_users: bool) -> CharacterMatrix:
 
 def rebuild_garden(update_users: bool = True) -> dict:
     matrix = build_matrix(update_users)
-    data = {
-        "ansi": render(matrix, ansi_enabled=True),
-        "plain": render(matrix, ansi_enabled=False)
-    }
+    data = {"ansi": render(matrix, ansi_enabled=True), "plain": render(matrix, ansi_enabled=False)}
     Config.save(Config.GARDEN_ART, data)
     return data
 
@@ -142,4 +141,4 @@ def load_garden(ansi_enabled: bool = True, update_users: bool = True):
     if data is None:
         data = rebuild_garden(update_users)
 
-    return data['ansi'] if ansi_enabled else data['plain']
+    return data["ansi"] if ansi_enabled else data["plain"]
