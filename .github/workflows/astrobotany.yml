@@ -22,7 +22,7 @@ jobs:
         sudo apt-get install timidity
     - name: Lint with mypy
       run: |
-        mypy --ignore-missing-imports .
+        mypy --ignore-missing-imports --exclude build .
     - name: Run tests
       run: |
         pytest -v tests/

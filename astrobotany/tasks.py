@@ -10,6 +10,7 @@ This script is intended to be invoked from a cron file like this...
 import argparse
 
 from . import settings
+from .garden import rebuild_garden
 from .models import Plant, init_db
 
 
@@ -38,6 +39,16 @@ def refresh_all_plants():
     for plant in Plant.all_active():
         plant.refresh()
         plant.save()
+
+
+@schedule.hourly
+def refresh_garden_art():
+    """
+    Rebuild the generated garden art, this is computationally expensive so
+    we run it periodically and save the art to the database instead of
+    regenerating it with every gemini request.
+    """
+    rebuild_garden(update_users=True)
 
 
 def main():
