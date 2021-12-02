@@ -4,7 +4,9 @@
 
 ## Changes
 
-The community garden page now includes dynamically generated art that displays all plants and grows along with Astrobotany! You can find the location of your own plant by checking the new "coord" value in the plant details screen. Start from the top left of the picture and go down (south) X lines, and then right (east) Y spaces.
+A revamp of the community garden page adds paginated results, filtering, and the ability to search for users!
+
+The community garden page now features dynamically generated art that displays all plants and grows along with Astrobotany! You can find the location of your own plant by checking the new "coord" value in the plant details screen. Start from the top left of the picture and go down (south) X lines, and then right (east) Y spaces.
 
 Thanks to JSaxton for the idea and initial mockup of this concept!
 
