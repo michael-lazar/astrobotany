@@ -11,6 +11,7 @@ import emoji
 import jinja2
 from jetforce import JetforceApplication, Request, Response, Status
 from jetforce.app.base import EnvironDict, RateLimiter, RouteHandler, RoutePattern
+from peewee import fn
 
 from . import items
 from .art import render_art
@@ -812,66 +813,72 @@ def mailbox_message_view(request, message_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
-@app.auth_route("/app/visit")
-def garden_view(request):
-    plants = (
-        Plant.all_active()
-        .filter(Plant.score > 0, Plant.watered_at >= datetime.now() - timedelta(days=8))
-        .order_by(Plant.score.desc())
-    )
-
-    garden_art = load_garden(request.cert.ansi_enabled)
-    body = request.render_template("garden.gmi", plants=plants, garden_art=garden_art)
-    return Response(Status.SUCCESS, "text/gemini", body)
-
-
-@app.auth_route("/app/visit/sort_health")
-def garden_sort_health_view(request):
+@app.auth_route("/app/garden")
+@app.auth_route("/app/garden/(?P<filter>[a-z]+)")
+@app.auth_route("/app/garden/(?P<filter>[a-z]+)/(?P<page>[0-9]+)")
+@app.auth_route("/app/garden/(?P<filter>[a-z]+)/(?P<page>random)")
+def garden_view(request, filter="all", page=1):
     now = datetime.now()
+    base_query = Plant.all_active().order_by(Plant.score.desc()).filter(Plant.score > 0)
 
-    healthy_plants = (
-        Plant.all_active()
-        .filter(
-            Plant.score > 0,
-            Plant.watered_at >= now - timedelta(days=1),
-        )
-        .order_by(Plant.watered_at)
-    )
-    dry_plants = (
-        Plant.all_active()
-        .filter(
-            Plant.score > 0,
+    search_term = request.query
+    if filter == "search" and not search_term:
+        return Response(Status.INPUT, "Enter your search term")
+
+    filter_queries = {
+        "all": base_query.filter(Plant.watered_at >= now - timedelta(days=8)),
+        "healthy": base_query.filter(Plant.watered_at >= now - timedelta(days=1)),
+        "dry": base_query.filter(
             Plant.watered_at < now - timedelta(days=1),
             Plant.watered_at >= now - timedelta(days=3),
-        )
-        .order_by(Plant.watered_at)
-    )
-    wilting_plants = (
-        Plant.all_active()
-        .filter(
-            Plant.score > 0,
+        ),
+        "wilting": base_query.filter(
             Plant.watered_at < now - timedelta(days=3),
             Plant.watered_at >= now - timedelta(days=5),
-        )
-        .order_by(Plant.watered_at)
-    )
-    dead_plants = (
-        Plant.all_active()
-        .filter(
-            Plant.score > 0,
+        ),
+        "dead": base_query.filter(
             Plant.watered_at < now - timedelta(days=5),
             Plant.watered_at >= now - timedelta(days=8),
-        )
-        .order_by(Plant.watered_at)
-    )
+        ),
+    }
+
+    if filter == "search":
+        query = base_query.order_by(User.username).filter(User.username.contains(search_term))
+    elif filter in filter_queries:
+        query = filter_queries[filter]
+    else:
+        return Response(Status.NOT_FOUND, "Invalid filter")
+
+    if page == "random":
+        try:
+            plant = query.order_by(fn.Random()).get()
+        except Plant.DoesNotExist:
+            return Response(Status.NOT_FOUND, "Not Found")
+
+        return Response(Status.REDIRECT_TEMPORARY, f"/app/visit/{plant.user.user_id}")
+
+    plant_counts = {key: q.count() for key, q in filter_queries.items()}
+
+    page = int(page)
+    paginate_by = 20
+    total = query.count()
+    page_count = int(math.ceil(total / paginate_by))
+    page_count = max(page_count, 1)
+    if page > page_count:
+        return Response(Status.NOT_FOUND, "Invalid page number")
+
+    plants = query.paginate(page, paginate_by)
 
     garden_art = load_garden(request.cert.ansi_enabled)
     body = request.render_template(
-        "garden_by_health.gmi",
-        healthy_plants=healthy_plants,
-        dry_plants=dry_plants,
-        wilting_plants=wilting_plants,
-        dead_plants=dead_plants,
+        "garden.gmi",
+        plants=plants,
+        filter=filter,
+        plant_counts=plant_counts,
+        page=page,
+        page_count=page_count,
+        total=total,
+        search_term=search_term,
         garden_art=garden_art,
     )
     return Response(Status.SUCCESS, "text/gemini", body)

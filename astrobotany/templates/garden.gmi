@@ -5,12 +5,37 @@
 ```
 
 =>/app 🚶 Go back
-=>/app/visit/sort_health 💧️ Plants sorted by health
+
+## Filters
+
+{% if search_term %}
+Search results: "{{ search_term }}" ({{ total }} found)
+{% else %}
+Currently showing: {{ filter }}
+{% endif %}
+
+{% for name, count in plant_counts.items() %}
+=>/app/garden/{{ name }} Show {{ name }} ({{ count }})
+{% endfor %}
+
+=>/app/garden/search 🔍 Search by username
 
 ## Plants
 
+{% if not search_term and total > 1 %}
+=>/app/garden/{{ filter }}/random ☘️ I'm feeling lucky!
+
+{% endif %}
 {% for plant in plants %}
 =>/app/visit/{{ plant.user.user_id }} {{ plant.description }}
 (tended by {{ plant.user.display_name }})
 
+{% else %}
+No results found
+
 {% endfor %}
+(page {{ page }} of {{ page_count }})
+{% if page < page_count %}
+
+=>/app/garden/{{ filter }}/{{ page + 1 }} Next page
+{% endif %}

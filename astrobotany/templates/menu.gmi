@@ -13,7 +13,7 @@ The current time is {{ now | datetime }}.
 ## Garden
 
 => /app/plant 🌻 Visit your plant
-=> /app/visit ⛲ Community garden
+=> /app/garden ⛲ Community garden
 => /app/message-board 📌 Community message board
 
 ## Places

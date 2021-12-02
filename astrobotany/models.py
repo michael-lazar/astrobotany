@@ -79,7 +79,7 @@ class User(BaseModel):
     _plant: Plant
 
     user_id = TextField(unique=True, index=True, default=gen_user_id)
-    username: str = TextField()
+    username = TextField()
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)  # TODO: Delete this field
     password = BlobField(null=True)
