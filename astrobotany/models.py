@@ -35,7 +35,7 @@ def init_db(filename: str = ":memory:") -> SqliteDatabase:
     """
     Bind an SQLite database to the Peewee ORM models.
     """
-    db = SqliteDatabase(filename)
+    db = SqliteDatabase(filename, pragmas={"journal_mode": "wal"})
     db.bind(BaseModel.model_registry)
     db.create_tables(BaseModel.model_registry)
     return db
