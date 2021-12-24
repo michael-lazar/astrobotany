@@ -35,5 +35,5 @@ for user in users:
         user_to=user,
         item_id=item_id,
         subject=subject,
-        body=body.format(user=user),
+        body=body,
     )

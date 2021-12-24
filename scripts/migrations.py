@@ -104,7 +104,9 @@ def add_pond(migrator):
 
 
 def add_garden_coordinates(migrator):
-    migrate.migrate(migrator.add_column("user", "garden_coordinates", TextField(null=True, default=None)))
+    migrate.migrate(
+        migrator.add_column("user", "garden_coordinates", TextField(null=True, default=None))
+    )
 
 
 MIGRATIONS = locals()
