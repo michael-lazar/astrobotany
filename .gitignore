@@ -1,4 +1,4 @@
-astrobotany.sqlite
+astrobotany.sqlite*
 .idea/
 __pycache__/
 certs/
