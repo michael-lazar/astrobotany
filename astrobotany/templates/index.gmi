@@ -29,7 +29,6 @@ Astrobotany is free to join and requires no personal info. Simply click the foll
 ## External Links
 
 => https://github.com/michael-lazar/astrobotany 🐞 Issue Tracker (Github)
-=> gemini://gardengnome.ml/ 🗿 Garden Gnome Society
 
 ## Capsule Activity
 
