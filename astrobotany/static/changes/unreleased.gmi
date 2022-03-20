@@ -5,3 +5,4 @@
 ## Changes
 
 - Introducing badge series two! 100 new emoji badges to collect & trade.
+- Fix dead plants possibly showing up when filtering by "flowering".

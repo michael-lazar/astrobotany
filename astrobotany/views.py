@@ -827,7 +827,10 @@ def garden_view(request, filter="all", page=1):
 
     filter_queries = {
         "all": base_query.filter(Plant.watered_at >= now - timedelta(days=8)),
-        "flowering": base_query.filter(Plant.stage == "4"),
+        "flowering": base_query.filter(
+            Plant.stage == "4",
+            Plant.watered_at >= now - timedelta(days=5),
+        ),
         "healthy": base_query.filter(Plant.watered_at >= now - timedelta(days=1)),
         "dry": base_query.filter(
             Plant.watered_at < now - timedelta(days=1),
