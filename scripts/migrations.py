@@ -109,6 +109,11 @@ def add_garden_coordinates(migrator):
     )
 
 
+def add_watered_at_owner(migrator):
+    dt = datetime.now()
+    migrate.migrate(migrator.add_column("plant", "watered_at_owner", DateTimeField(default=dt)))
+
+
 MIGRATIONS = locals()
 
 

@@ -434,6 +434,7 @@ class Plant(BaseModel):
     created_at = DateTimeField(default=datetime.now)
     updated_at = DateTimeField(default=datetime.now)
     watered_at = DateTimeField(default=lambda: datetime.now() - timedelta(days=1))
+    watered_at_owner = DateTimeField(default=datetime.now)
     watered_by = ForeignKeyField(User, null=True)
     generation = IntegerField(default=1)
     score = IntegerField(default=0)
@@ -523,6 +524,23 @@ class Plant(BaseModel):
             return False
         else:
             return self.watered_at < datetime.now() - timedelta(days=3)
+
+    @property
+    def neglected_days(self) -> int:
+        """
+        The number of days since the plant was last watered by its owner.
+        """
+        self.watered_at_owner = datetime.now() - timedelta(days=8)
+        self.save()
+        return (datetime.now() - self.watered_at_owner).days
+
+    @property
+    def is_neglected(self) -> bool:
+        return self.neglected_days > 5
+
+    @property
+    def neglected_message(self) -> str:
+        return f"This plant's owner has been missing for {self.neglected_days} days."
 
     @property
     def health(self) -> str:
@@ -772,6 +790,7 @@ class Plant(BaseModel):
 
         if user is None:
             self.watered_at = datetime.now()
+            self.watered_at_owner = datetime.now()
             self.watered_by = None
             return "You sprinkle some water over your plant."
 

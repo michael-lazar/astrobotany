@@ -9,6 +9,10 @@
 {{ alert }}
 
 {% endif %}
+{% if plant.is_neglected %}
+{{ plant.neglected_message }}
+
+{% endif %}
 {% if plant.is_wilted %}
 This plant is wilting, it will die soon without water!
 

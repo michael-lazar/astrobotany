@@ -4,5 +4,7 @@
 
 ## Changes
 
-- Introducing badge series two! 100 new emoji badges to collect & trade.
-- Fix dead plants possibly showing up when filtering by "flowering".
+* Introducing badge series two! 100 new emoji badges to collect & trade.
+* Fixed dead plants possibly showing up when filtering by "flowering".
+* Visiting a plant will now display a message if it's owner has not watered it for over 5 days. The data necessary for this was not previously collected, so the clock will reset to 0 for all plants starting now.
+
