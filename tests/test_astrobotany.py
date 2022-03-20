@@ -457,10 +457,21 @@ def test_music_player_get_raw_data():
 
 
 def test_tasks():
-    _ = plant_factory()
-    _ = plant_factory()
+    plant_factory()
+    plant_factory()
 
     for task in tasks.schedule.daily_tasks:
         task()
     for task in tasks.schedule.hourly_tasks:
         task()
+
+
+def test_login_saves_last_seen(frozen_time, now):
+    user = user_factory()
+    cert = certificate_factory(user=user)
+
+    frozen_time.tick(delta=timedelta(hours=1))
+    user.login(cert.fingerprint)
+
+    cert = Certificate.get_by_id(cert.id)
+    assert cert.last_seen == now + timedelta(hours=1)

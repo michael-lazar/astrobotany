@@ -128,7 +128,7 @@ class User(BaseModel):
 
         try:
             cert = query.get()
-            cert.update(last_seen=datetime.now())
+            cert.last_seen = datetime.now()
             cert.save()
         except Certificate.DoesNotExist:
             cert = None
