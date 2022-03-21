@@ -7,6 +7,9 @@ age   : {{ plant.age }} days
 rate  : {{ plant.generation | ordinal}} generation (x{{ plant.growth_rate | round(2) }})
 score : {{ plant.score }}
 coord : {{ plant.user.garden_coordinates or "-"}}
+{% if plant.user.fence_active %}
+fence : {{ plant.get_fence_gauge(request.cert.ansi_enabled) }}
+{% endif %}
 water : {{ plant.get_water_gauge(request.cert.ansi_enabled) }}
 {% if plant.fertilizer_percent %}
 bonus : {{ plant.get_fertilizer_gauge(request.cert.ansi_enabled) }}

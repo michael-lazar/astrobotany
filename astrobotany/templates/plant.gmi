@@ -36,11 +36,16 @@ Your plant was recently watered by {{ plant.watered_by.username }}.
 {% if plant.can_search() %}
 => /app/plant/search 🌸 Pick a petal
 {% endif %}
+{% if plant.user.can_add_fence() %}
+=> /app/plant/fence/add ⛔️ Erect a fence
+{% elif plant.user.can_remove_fence() %}
+=> /app/plant/fence/remove 🔨 Destroy fence
+{% endif %}
 {% if plant.can_use_christmas_cheer() %}
 => /app/plant/xmas 🎅 Apply Christmas cheer
 {% endif %}
 {% if plant.can_play_song() %}
-=> /app/plant/song 🎷 Play a song
+=> /app/plant/song 🎷 Play synthesizer
 {% endif %}
 {% if plant.can_rename() %}
 => /app/plant/rename 🏷 Rename plant

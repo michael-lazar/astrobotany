@@ -1,10 +1,10 @@
 # Astrobotany News
 
-# TODO: Fill in release data
+# TODO: Fill in release date
 
 ## Changes
 
 * Introducing badge series two! 100 new emoji badges to collect & trade.
+* Visiting a plant will now display a message if it's owner has not watered it for over 5 days. Historical data was not collected, so the clock will reset to 0 for all plants starting now.
+* There's a new "garden fence" item in the store than can be used to restrict others from watering your plant for you.
 * Fixed dead plants possibly showing up when filtering by "flowering".
-* Visiting a plant will now display a message if it's owner has not watered it for over 5 days. The data necessary for this was not previously collected, so the clock will reset to 0 for all plants starting now.
-

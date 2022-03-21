@@ -114,6 +114,10 @@ def add_watered_at_owner(migrator):
     migrate.migrate(migrator.add_column("plant", "watered_at_owner", DateTimeField(default=dt)))
 
 
+def add_fence_active(migrator):
+    migrate.migrate(migrator.add_column("user", "fence_active", BooleanField(default=False)))
+
+
 MIGRATIONS = locals()
 
 

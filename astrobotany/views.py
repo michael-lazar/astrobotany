@@ -1344,3 +1344,40 @@ def synth_listen_view(request):
     synthesizer = Synthesizer.from_song(song)
     data = synthesizer.get_raw_data()
     return Response(Status.SUCCESS, "audio/ogg", data)
+
+
+@app.auth_route("/app/plant/fence/add")
+def add_fence_view(request):
+    if not request.user.can_add_fence():
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    if not request.query:
+        msg = f"Are you sure you want to erect a fence [y/N]?"
+        return Response(Status.INPUT, msg)
+
+    confirm = request.query.lower().strip() == "y"
+    if confirm:
+        request.user.remove_item(items.fence)
+        request.user.fence_active = True
+        request.user.save()
+        request.session["alert"] = "You build a sturdy fence around your plant."
+
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")
+
+
+@app.auth_route("/app/plant/fence/remove")
+def remove_fence_view(request):
+    if not request.user.can_remove_fence():
+        return Response(Status.BAD_REQUEST, "You shouldn't be here!")
+
+    if not request.query:
+        msg = f"Are you sure you want to remove your fence [y/N]?"
+        return Response(Status.INPUT, msg)
+
+    confirm = request.query.lower().strip() == "y"
+    if confirm:
+        request.user.fence_active = False
+        request.user.save()
+        request.session["alert"] = "You tear down the fence around your plant."
+
+    return Response(Status.REDIRECT_TEMPORARY, "/app/plant")

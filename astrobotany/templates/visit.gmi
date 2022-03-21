@@ -10,7 +10,7 @@
 
 {% endif %}
 {% if plant.is_neglected %}
-{{ plant.neglected_message }}
+This plant's owner has been missing for {{ plant.neglected_days }} days.
 
 {% endif %}
 {% if plant.is_wilted %}
@@ -19,15 +19,15 @@ This plant is wilting, it will die soon without water!
 {% endif %}
 ## Actions
 
-{% if plant.can_water() %}
+{% if plant.can_water(request.user) %}
 => /app/visit/{{ plant.user.user_id }}/water 💧 Water plant
 {% endif %}
-{% if plant.can_fertilize() %}
+{% if plant.can_fertilize(request.user) %}
 => /app/visit/{{ plant.user.user_id }}/fertilize 🍄 Apply fertilizer
 {% endif %}
 {% if plant.can_search() %}
 => /app/visit/{{ plant.user.user_id }}/search 🌸 Pick a petal
 {% endif %}
 {% if plant.can_play_song() %}
-=> /app/visit/{{ plant.user.user_id }}/song 🎷 Play a song
+=> /app/visit/{{ plant.user.user_id }}/song 🎷 Play synthesizer
 {% endif %}

@@ -484,3 +484,19 @@ badge_197 = Badge("bubble tea", series=2, number=97, symbol="🧋")
 badge_198 = Badge("swan", series=2, number=98, symbol="🦢")
 badge_199 = Badge("speaker high volume", series=2, number=99, symbol="🔊")
 badge_200 = Badge("lollipop", series=2, number=100, symbol="🍭")
+
+fence = Item(
+    name="garden fence",
+    description="""
+    A short garden fence that can be placed around your flowerbed.
+    
+    Erecting a fence will prevent visiting players from watering and fertilizing
+    your plant. You can tear it down at any time, but doing so will destroy the
+    fence.
+    
+    > "Solitary trees, if they grow at all, grow strong." - Winston Churchill
+    """,
+    price=300,
+    buyable=True,
+    giftable=True,
+)

@@ -86,6 +86,7 @@ class User(BaseModel):
     badge_id: Optional[int] = IntegerField(null=True, default=None)
     karma = IntegerField(default=0)
     garden_coordinates = TextField(null=True, default=None)
+    fence_active = BooleanField(default=False)
 
     @classmethod
     def admin(cls) -> User:
@@ -244,6 +245,17 @@ class User(BaseModel):
             setattr(self, "_christmas_mode", christmas_mode)
 
         return christmas_mode
+
+    def can_add_fence(self) -> bool:
+        if self.fence_active:
+            return False
+        elif not self.get_item_quantity(items.fence):
+            return False
+        else:
+            return True
+
+    def can_remove_fence(self):
+        return self.fence_active
 
 
 class Certificate(BaseModel):
@@ -530,17 +542,11 @@ class Plant(BaseModel):
         """
         The number of days since the plant was last watered by its owner.
         """
-        self.watered_at_owner = datetime.now() - timedelta(days=8)
-        self.save()
         return (datetime.now() - self.watered_at_owner).days
 
     @property
     def is_neglected(self) -> bool:
         return self.neglected_days > 5
-
-    @property
-    def neglected_message(self) -> str:
-        return f"This plant's owner has been missing for {self.neglected_days} days."
 
     @property
     def health(self) -> str:
@@ -576,7 +582,10 @@ class Plant(BaseModel):
         remaining_fertilizer = max(0.0, 1 - (elapsed_seconds / seconds_per_day))
         return math.ceil(remaining_fertilizer * 100)
 
-    def can_water(self) -> bool:
+    def can_water(self, user: Optional[User] = None) -> bool:
+        if user and self.user.fence_active:
+            return False
+
         return not self.dead
 
     def can_shake(self) -> bool:
@@ -594,10 +603,13 @@ class Plant(BaseModel):
     def can_play_song(self) -> bool:
         return not self.dead and self.user.get_song()
 
-    def can_fertilize(self) -> bool:
+    def can_fertilize(self, user: Optional[User] = None) -> bool:
         """
         Return if the user can apply fertilizer to the plant.
         """
+        if user and self.user.fence_active:
+            return False
+
         return not self.dead
 
     def can_use_christmas_cheer(self) -> bool:
@@ -646,6 +658,16 @@ class Plant(BaseModel):
             # Make the fertilizer purple
             bar = colorize(bar, fg=40)
         return f"|{bar}| {percent}%"
+
+    def get_fence_gauge(self, ansi_enabled: bool = False) -> str:
+        """
+        Build an ascii-art picture of a fence placed around the plant.
+        """
+        text = "t-+-t-+-t-+-t-+-t"
+        if ansi_enabled:
+            # Make the fence brown
+            text = colorize(text, fg=130)
+        return text
 
     def get_ascii_art(self, ansi_enabled: bool = False) -> str:
         """
