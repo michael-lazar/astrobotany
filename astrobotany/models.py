@@ -823,6 +823,9 @@ class Plant(BaseModel):
         if query.exists():
             return "Your watering can is empty, try again later!"
 
+        if self.user.fence_active:
+            return "The fence stops you from watering."
+
         self.watered_at = datetime.now()
         self.watered_by = user
         info = f"You water {self.user.username}'s plant for them."
@@ -916,6 +919,9 @@ class Plant(BaseModel):
         """
         if user is None:
             user = self.user
+
+        if self.user.fence_active:
+            return "The fence stops you from fertilizing."
 
         if self.fertilizer_percent:
             return "The soil is still rich with nutrients."
