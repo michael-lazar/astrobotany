@@ -1,13 +1,14 @@
 import random
 
 import emoji
+from emoji.unicode_codes import get_emoji_unicode_dict
 
 from astrobotany.items import Badge
 
-taken = {badge.badge_symbol for badge in Badge.badges}
+taken = {badge.badge_symbol for badge in Badge._badges}  # noqa
 
 choices = []
-for name, char in emoji.EMOJI_UNICODE["en"].items():
+for name, char in get_emoji_unicode_dict("en").items():
 
     # Stick to "simple" emojis
     if len(char) > 1:

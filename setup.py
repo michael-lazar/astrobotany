@@ -25,7 +25,7 @@ setup(
         "jinja2",
         "faker",
         "bcrypt",
-        "emoji @ git+https://github.com/carpedm20/emoji.git@v.1.2.1#egg=emoji-1.2.1",
+        "emoji>=2",
         "MIDIUtil",
     ],
     extras_require={
