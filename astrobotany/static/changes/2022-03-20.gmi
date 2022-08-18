@@ -1,6 +1,6 @@
 # Astrobotany News
 
-# TODO: Fill in release date
+2022-03-20
 
 ## Changes
 
