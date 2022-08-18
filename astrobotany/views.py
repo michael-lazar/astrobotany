@@ -945,7 +945,7 @@ def visit_water_view(request, user_id: str):
     plant = user.plant
     plant.refresh()
 
-    if not plant.can_water():
+    if not plant.can_water(user=request.user):
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     request.session["alert"] = plant.water(user=request.user)
@@ -979,7 +979,7 @@ def visit_fertilize_view(request, user_id: str):
     plant = user.plant
     plant.refresh()
 
-    if not plant.can_fertilize():
+    if not plant.can_fertilize(user=request.user):
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     request.session["alert"] = plant.fertilize(user=request.user)

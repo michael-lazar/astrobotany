@@ -917,11 +917,11 @@ class Plant(BaseModel):
 
         Returns: A string with a description of the resulting action.
         """
+        if user and self.user.fence_active:
+            return "The fence stops you from fertilizing."
+
         if user is None:
             user = self.user
-
-        if self.user.fence_active:
-            return "The fence stops you from fertilizing."
 
         if self.fertilizer_percent:
             return "The soil is still rich with nutrients."
