@@ -1,0 +1,34 @@
+Merry Christmas from Astrobotany - Year 3!
+
+> There's children throwing snowballs instead of throwing heads
+> They're busy building toys and absolutely no one's dead
+> There's frost on every window, oh, I can't believe my eyes
+> And in my bones I feel the warmth that's coming from inside
+> - Jack Skellington
+
+```
+            .-~~\
+           /     \ _
+           ~x   .-~_)_
+             ~x".-~   ~-.
+         _   ( /         \   _
+         ||   T  o  o     Y  ||
+       ==:l   l   <       !  I;==
+          \\   \  .__/   /  //
+           \\ ,r"-,___.-'r.//
+            }^ \.( )   _.'//.
+           /    }~Xi--~  //  \
+          Y    Y I\ \    "    Y
+          |    | |o\ \        |
+          |    l_l  Y T       |  -Row
+          l      "o l_j       !
+           \                 /
+    ___,.---^.     o       .^---.._____
+"~~~          "           ~            ~~~"
+```
+
+(Bonus ASCII art)
+
+```
+telnet astrobotany.mozz.us 1225
+```
