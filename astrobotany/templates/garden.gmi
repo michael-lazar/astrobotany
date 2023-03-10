@@ -23,7 +23,7 @@ Currently showing: {{ filter }}
 ## Plants
 
 {% if not search_term and total > 1 %}
-=>/app/garden/{{ filter }}/random ☘️ I'm feeling lucky!
+=>/app/garden/{{ filter }}/random 🍀 I'm feeling lucky!
 
 {% endif %}
 {% for plant in plants %}
