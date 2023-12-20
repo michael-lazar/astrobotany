@@ -1212,9 +1212,15 @@ def plants_api_view(request):
         response.append(
             {
                 "url": f"gemini://astrobotany.mozz.us/app/visit/{plant.user.user_id}",
+                "name": plant.name,
                 "username": plant.user.username,
                 "description": plant.description,
                 "health": plant.health,
+                "generation": plant.generation,
+                "score": plant.score,
+                "stage": plant.stage,
+                "owner_last_watered": plant.neglected_days,
+                "water_supply": plant.water_supply_percent,
             }
         )
     data = {"response": response}
