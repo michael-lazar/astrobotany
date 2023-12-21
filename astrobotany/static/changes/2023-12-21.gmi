@@ -1,0 +1,7 @@
+# Astrobotany News
+
+2023-12-21
+
+## Changes
+
+* Added some additional fields to the /api/plants/ endpoint.
