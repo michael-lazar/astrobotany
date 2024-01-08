@@ -13,13 +13,13 @@ from jetforce import JetforceApplication, Request, Response, Status
 from jetforce.app.base import EnvironDict, RateLimiter, RouteHandler, RoutePattern
 from peewee import fn
 
-from . import items
-from .art import render_art
-from .garden import load_garden
-from .leaderboard import leaderboards
-from .models import Certificate, Inbox, ItemSlot, Message, Plant, User
-from .pond import Pond
-from .sounds import Synthesizer
+from astrobotany import items
+from astrobotany.art import render_art
+from astrobotany.garden import load_garden
+from astrobotany.leaderboard import leaderboards
+from astrobotany.models import Certificate, Inbox, ItemSlot, Message, Plant, User
+from astrobotany.pond import Pond
+from astrobotany.sounds import Synthesizer
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -37,7 +37,7 @@ def datetime_format(value, fmt="%A, %B %d, %Y %-I:%M:%S %p"):
 
 
 def number_format(value):
-    return "{:,}".format(value)
+    return f"{value:,}"
 
 
 def ordinal_format(value):
@@ -446,12 +446,12 @@ def settings_password_view(request):
     new_password = request.session.pop("new_password", None)
 
     if not request.query:
-        prompt = f"Enter your new password:"
+        prompt = "Enter your new password:"
         return Response(Status.SENSITIVE_INPUT, prompt)
 
     if not new_password:
         request.session["new_password"] = request.query
-        prompt = f"Confirm your new password (enter it again):"
+        prompt = "Confirm your new password (enter it again):"
         return Response(Status.SENSITIVE_INPUT, prompt)
 
     if new_password != request.query:
@@ -467,7 +467,7 @@ def settings_password_view(request):
 @app.auth_route("/app/settings/ansi_enabled")
 def settings_ansi_enabled_view(request):
     if not request.query:
-        prompt = f"Enable ANSI support for colors? [T]rue / [F]alse"
+        prompt = "Enable ANSI support for colors? [T]rue / [F]alse"
         return Response(Status.INPUT, prompt)
 
     answer = request.query.strip().lower()
@@ -487,7 +487,7 @@ def settings_ansi_enabled_view(request):
 @app.auth_route("/app/settings/emoji_mode")
 def settings_emoji_mode_view(request):
     if not request.query:
-        prompt = f"Set emoji display mode (0/1/2): "
+        prompt = "Set emoji display mode (0/1/2): "
         return Response(Status.INPUT, prompt)
 
     answer = request.query.strip()
@@ -689,7 +689,7 @@ def mailbox_compose_to_view(request, postcard_id):
 def mailbox_compose_subject_view(request, postcard_id):
     subject = request.query
     if not subject:
-        return Response(Status.INPUT, f"Enter subject:")
+        return Response(Status.INPUT, "Enter subject:")
 
     data = PostcardData.from_request(request)
     data.subject = subject
@@ -1358,7 +1358,7 @@ def add_fence_view(request):
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     if not request.query:
-        msg = f"Are you sure you want to erect a fence [y/N]?"
+        msg = "Are you sure you want to erect a fence [y/N]?"
         return Response(Status.INPUT, msg)
 
     confirm = request.query.lower().strip() == "y"
@@ -1377,7 +1377,7 @@ def remove_fence_view(request):
         return Response(Status.BAD_REQUEST, "You shouldn't be here!")
 
     if not request.query:
-        msg = f"Are you sure you want to remove your fence [y/N]?"
+        msg = "Are you sure you want to remove your fence [y/N]?"
         return Response(Status.INPUT, msg)
 
     confirm = request.query.lower().strip() == "y"

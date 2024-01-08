@@ -1,5 +1,35 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib", "--verbose"]
+
 [tool.black]
 line-length = 100
 
-[tool.isort]
-profile = "black"
+[tool.mypy]
+python_version = "3.10"
+files = ["astrobotany", "tests", "scripts"]
+
+[tool.ruff]
+src = ["astrobotany", "tests", "scripts"]
+select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # isort
+    "PT",   # flake8-pytest-style
+    "C4",   # flake8-comprehensions
+    "ISC",  # flake8-implicit-str-concat
+    "TID",  # flake8-tidy-imports
+    "UP",   # pyupgrade
+]
+ignore = [
+    "E501",   # Line length is enforced by black
+    "PT012",  # Allow pytest.raises with context managers
+    "E712",   # == False comparison has special meaning in Peewee
+]
+line-length = 100
+
+[tool.ruff.isort]
+known-first-party = ["astrobotany"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"

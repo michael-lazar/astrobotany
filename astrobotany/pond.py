@@ -2,9 +2,9 @@ import typing
 
 from peewee import fn
 
-from .art import ArtFile, colorize
-from .items import Petal, get_date
-from .models import Event, User
+from astrobotany.art import ArtFile, colorize
+from astrobotany.items import Petal, get_date
+from astrobotany.models import Event, User
 
 
 def colorize_petal_text() -> typing.Dict[str, str]:
@@ -16,7 +16,6 @@ def colorize_petal_text() -> typing.Dict[str, str]:
 
 
 class Pond:
-
     petal_map = Petal.petals
     color_map = colorize_petal_text()
 

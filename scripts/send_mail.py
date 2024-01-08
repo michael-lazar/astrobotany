@@ -1,5 +1,4 @@
 import argparse
-import typing
 
 from astrobotany import items, settings
 from astrobotany.models import Inbox, User, init_db
@@ -18,7 +17,7 @@ users = User.select()
 
 subject, body = Inbox.load_mail_file(args.filename)
 
-item_id: typing.Optional[int]
+item_id: int | None
 
 if args.item:
     item = items.search(args.item)

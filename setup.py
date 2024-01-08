@@ -18,7 +18,7 @@ setup(
     author_email="lazar.michael22@gmail.com",
     keywords="gemini",
     packages=["astrobotany"],
-    python_requires=">=3.7, <4",
+    python_requires=">=3.10, <4",
     install_requires=[
         "jetforce",
         "peewee",
