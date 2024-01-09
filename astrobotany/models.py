@@ -6,7 +6,7 @@ import os
 import random
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Any, Iterable
+from typing import Iterable
 
 import bcrypt
 from faker import Faker
@@ -15,6 +15,7 @@ from peewee import (
     BlobField,
     BooleanField,
     DateTimeField,
+    DoesNotExist,
     ForeignKeyField,
     IntegerField,
     Model,
@@ -62,6 +63,11 @@ def gen_user_id() -> str:
 
 
 class BaseModel(Model):
+    # These attributes are dynamically attached by Peewee, but the
+    # peewee-types package isn't aware of them.
+    id: int
+    DoesNotExist: type[DoesNotExist]
+
     model_registry: list[type[BaseModel]] = []
 
     @classmethod
@@ -79,11 +85,11 @@ class User(BaseModel):
     _plant: Plant
 
     user_id = TextField(unique=True, index=True, default=gen_user_id)
-    username: Any = TextField()
+    username = TextField()
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)  # TODO: Delete this field
     password = BlobField(null=True)
-    badge_id: int | None = IntegerField(null=True, default=None)
+    badge_id = IntegerField(null=True, default=None)
     karma = IntegerField(default=0)
     garden_coordinates = TextField(null=True, default=None)
     fence_active = BooleanField(default=False)
@@ -163,7 +169,7 @@ class User(BaseModel):
     @property
     def badge(self) -> items.Badge | None:
         if self.badge_id:
-            return items.Badge.lookup(self.badge_id)
+            return items.Badge.lookup(self.badge_id)  # noqa
         else:
             return None
 
@@ -173,7 +179,7 @@ class User(BaseModel):
         if badge:
             return f"{badge.badge_symbol} {self.username}"
         else:
-            return self.username
+            return self.username  # noqa
 
     def set_password(self, password: str) -> None:
         self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
@@ -324,12 +330,12 @@ class ItemSlot(BaseModel):
     """
 
     user: User = ForeignKeyField(User, backref="inventory")
-    item_id: int = IntegerField()
-    quantity: int = IntegerField(default=0)
+    item_id = IntegerField()
+    quantity = IntegerField(default=0)
 
     @property
     def item(self) -> items.Item:
-        item = items.Item.lookup(self.item_id)
+        item = items.Item.lookup(self.item_id)  # noqa
         if item is None:
             raise ValueError("Invalid item ID")
 
@@ -370,25 +376,25 @@ class Inbox(BaseModel):
 
     user_from = ForeignKeyField(User, backref="outbox")
     user_to = ForeignKeyField(User, backref="inbox")
-    created_at: datetime = DateTimeField(default=datetime.now)
+    created_at = DateTimeField(default=datetime.now)
     subject = TextField()
     body = TextField()
     is_seen = BooleanField(default=False)
     parent = ForeignKeyField("self", null=True, backref="children")
-    item_id: int | None = IntegerField(null=True, default=None)
+    item_id = IntegerField(null=True, default=None)
 
     @property
     def date_str(self) -> str:
-        return self.created_at.strftime("%Y-%m-%d")
+        return self.created_at.strftime("%Y-%m-%d")  # noqa
 
     @property
     def datetime_str(self) -> str:
-        return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")
+        return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")  # noqa
 
     @property
     def item(self) -> items.Item | None:
         if self.item_id is not None:
-            return items.Item.lookup(self.item_id)
+            return items.Item.lookup(self.item_id)  # noqa
         else:
             return None
 

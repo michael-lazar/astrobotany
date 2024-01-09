@@ -399,7 +399,7 @@ def message_board_submit_view(request):
     if rate_limit_resp:
         return rate_limit_resp
 
-    last = Message.select().order_by(Message.id.desc()).first()
+    last = Message.select().order_by(Message.id.desc()).first()  # noqa
     if last and (last.user, last.text) == (request.user, request.query):
         # Almost definitely an accidental double-post by the user
         return Response(Status.REDIRECT_TEMPORARY, "/app/message-board")
@@ -636,7 +636,7 @@ def mailbox_view(request):
     messages = (
         Inbox.select()
         .where((Inbox.user_to == request.user) | (Inbox.user_from == request.user))
-        .order_by(Inbox.id.desc())
+        .order_by(Inbox.id.desc())  # noqa
     )
     mailbox_art = render_art("mailbox.psci", ansi_enabled=request.cert.ansi_enabled)
     body = request.render_template("mailbox.gmi", messages=messages, mailbox_art=mailbox_art)

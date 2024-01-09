@@ -10,19 +10,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
+    - name: Check out repository
+      uses: actions/checkout@v2
+    - name: Install python
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.7
-    - name: Install packages
-      run: |
-        pip install .
-        pip install .[test]
-        sudo apt-get install timidity
-    - name: Lint with mypy
-      run: |
-        mypy --ignore-missing-imports --exclude build .
-    - name: Run tests
-      run: |
-        pytest -v tests/
+        python-version: '3.10'
+    - name: Run pre-commit checks
+      uses: pre-commit/actions@v2.0.3
+    - name: Run bootstrap
+      run: tools/bootstrap
+    - name: Install timidity
+      run: sudo apt-get install timidity
+    - name: Run mypy
+      run: tools/mypy
+    - name: Run pytest
+      run: tools/pytest

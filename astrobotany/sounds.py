@@ -7,7 +7,7 @@ from tempfile import NamedTemporaryFile
 from midiutil import MIDIFile
 
 if typing.TYPE_CHECKING:
-    from models import Song
+    from astrobotany.models import Song
 
 
 class Synthesizer:

@@ -29,7 +29,7 @@ setup(
         "MIDIUtil",
     ],
     extras_require={
-        "test": [
+        "dev": [
             "pytest",
             "black",
             "isort",
