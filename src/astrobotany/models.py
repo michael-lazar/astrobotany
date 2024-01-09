@@ -5,8 +5,8 @@ import math
 import os
 import random
 import uuid
+from collections.abc import Iterable
 from datetime import date, datetime, timedelta
-from typing import Iterable
 
 import bcrypt
 from faker import Faker
@@ -856,7 +856,12 @@ class Plant(BaseModel):
 
         target = f"plant_{self.id}"
 
-        midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        midnight = datetime.now().replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
         last_event = Event.select().where(
             Event.user == user,
             Event.created_at >= midnight,
@@ -942,7 +947,11 @@ class Plant(BaseModel):
         elif not self.user.remove_item(items.christmas_cheer):
             return "You don't have any christmas cheer to apply."
 
-        Event.create(user=self.user, event_type=Event.ENABLE_CHRISTMAS, target="self")
+        Event.create(
+            user=self.user,
+            event_type=Event.ENABLE_CHRISTMAS,
+            target="self",
+        )
         return "✨ 💯 ✨"
 
     def harvest(self) -> Plant:
@@ -959,5 +968,7 @@ class Plant(BaseModel):
         self.save()
 
         return self.__class__.create(
-            user=self.user, user_active=self.user, generation=new_generation
+            user=self.user,
+            user_active=self.user,
+            generation=new_generation,
         )

@@ -16,27 +16,12 @@ from astrobotany.garden import load_garden
 from astrobotany.leaderboard import leaderboards
 from astrobotany.models import Certificate, Inbox, ItemSlot, Message, Plant, User
 from astrobotany.pond import Pond
+from astrobotany.postcards import PostcardData
 from astrobotany.sounds import Synthesizer
 
 password_failed_rate_limiter = RateLimiter("10/5m")
 new_account_rate_limiter = RateLimiter("2/4h")
 message_rate_limiter = RateLimiter("3/h")
-
-
-class PostcardData:
-    def __init__(self):
-        self.user = None
-        self.subject = None
-        self.item = None
-        self.lines = ["", "", "", ""]
-
-    @classmethod
-    def from_request(cls, request):
-        return request.session.setdefault("postcard", cls())
-
-    @classmethod
-    def delete(cls, request):
-        request.session.pop("postcard", None)
 
 
 @app.route("")
