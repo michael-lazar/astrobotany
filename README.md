@@ -40,6 +40,9 @@ pre-commit install
 tools/pytest
 tools/mypy
 tools/lint
+
+# Interact with the local database
+sqlite3 data/astrobotany.sqlite
 ```
 
 ## ASCII Art

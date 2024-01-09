@@ -2,7 +2,7 @@ import argparse
 
 from jetforce import GeminiServer
 
-from astrobotany import __version__
+from astrobotany import __version__, init_db, settings
 from astrobotany.views import app
 
 
@@ -18,6 +18,12 @@ def build_argument_parser():
         action="version",
         version="astrobotany " + __version__,
     )
+    parser.add_argument(
+        "--db",
+        help="Filepath for sqlite database",
+        default=settings.db,
+    )
+
     parser.add_argument(
         "--host",
         help="Server address to bind to",
@@ -40,6 +46,8 @@ def build_argument_parser():
 def main():
     parser = build_argument_parser()
     args = parser.parse_args()
+
+    init_db(args.db)
 
     server = GeminiServer(
         app,
