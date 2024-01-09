@@ -15,5 +15,3 @@ Send a private message to a fellow gardener.
 ## Buy a postcard
 
 =>/app/store 💳 Go to the store
-
-

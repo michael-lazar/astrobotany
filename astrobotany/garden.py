@@ -3,21 +3,21 @@ import random
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
-from .art import ArtFile, CharacterMatrix, Tile, colorize
-from .models import Config, Plant, User
-from .pond import Pond
+from astrobotany.art import ArtFile, CharacterMatrix, Tile, colorize
+from astrobotany.models import Config, Plant, User
+from astrobotany.pond import Pond
 
 Coordinate = Tuple[int, int]
 Coordinates = List[Coordinate]
 
 
 POND_TEMPLATE = """\
- ~~~~    ~~~~~~  
+ ~~~~    ~~~~~~
 ~~~~~~~~~~~~~~~~~
  ~~~~~~~~~~~~~~~~
   ~~~~~~~~~~~~~~
     ~~~~~~~~~~
-       ~~~~~~     
+       ~~~~~~
 """
 
 
@@ -132,7 +132,7 @@ def build_matrix(update_users: bool) -> CharacterMatrix:
 def rebuild_garden(update_users: bool = True) -> dict:
     matrix = build_matrix(update_users)
     data = {"ansi": render(matrix, ansi_enabled=True), "plain": render(matrix, ansi_enabled=False)}
-    Config.save(Config.GARDEN_ART, data)
+    Config.write(Config.GARDEN_ART, data)
     return data
 
 

@@ -3,23 +3,12 @@ from __future__ import annotations
 import random
 import time
 from textwrap import dedent
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Iterable, TypeVar
 
-from . import constants
+from astrobotany import constants
 
 if TYPE_CHECKING:
-    from .models import User
+    from astrobotany.models import User
 
 
 # https://stackoverflow.com/questions/44640479
@@ -36,7 +25,7 @@ def get_store_items(user: User) -> Iterable[Item]:
             yield item
 
 
-def search(name: str) -> Optional[Item]:
+def search(name: str) -> Item | None:
     for item in Item.registry.values():
         if item.name == name:
             return item
@@ -44,8 +33,7 @@ def search(name: str) -> Optional[Item]:
 
 
 class Item:
-
-    registry: Dict[int, Item] = {}
+    registry: dict[int, Item] = {}
 
     def __init__(
         self,
@@ -68,7 +56,7 @@ class Item:
         self.registry[self.item_id] = self
 
     @classmethod
-    def lookup(cls: Type[T], item_id: Union[str, int]) -> Optional[T]:
+    def lookup(cls: type[T], item_id: str | int) -> T | None:
         try:
             item = cls.registry[int(item_id)]
         except (ValueError, KeyError):
@@ -100,8 +88,7 @@ class Item:
 
 
 class Petal(Item):
-
-    petals: Dict[str, Petal] = {}
+    petals: dict[str, Petal] = {}
 
     def __init__(self, color: str):
         name = f"flower petal ({color})"
@@ -116,15 +103,14 @@ class Petal(Item):
 
 
 class Postcard(Item):
-
-    postcards: List[Postcard] = []
+    postcards: list[Postcard] = []
 
     def __init__(
         self,
         name: str,
         description: str,
         price: int,
-        border: Tuple[str, str],
+        border: tuple[str, str],
     ):
         self.border = border
         sample_letter = self.format_message(
@@ -143,11 +129,10 @@ class Postcard(Item):
 
 
 class Badge(Item):
-
     ACTIVE_SERIES = 2
 
-    _badges: List[Badge] = []
-    _cache: Dict[str, Any] = {}
+    _badges: list[Badge] = []
+    _cache: dict[str, Any] = {}
     _cache_date_offset: int = 50
 
     def __init__(self, name: str, series: int, number: int, symbol: str):
@@ -159,9 +144,9 @@ class Badge(Item):
         name = f"badge #{self.badge_number}, series {self.badge_series} - {self.badge_symbol}"
         description = f"""
         A collectable badge that can be displayed next to your name.
-        
+
         Once purchased, go to the astrobotany settings page to turn it on/off.
-        
+
         Picture     : {self.badge_symbol}
         Description : "{self.badge_name}"
         Collection  : Series {self.badge_series}, number {self.badge_number} of 100
@@ -199,9 +184,9 @@ paperclip = Item(
     name="paper clip",
     description=r"""
     A length of wire bent into flat loops that is used to hold papers together.
-    
+
     ✨ 📎 ✨
-    
+
     Origin unknown.
     """,
 )
@@ -210,8 +195,8 @@ fertilizer = Item(
     name="ez-grow fertilizer",
     description="""
     A bottle of EZ-Grow™ premium plant fertilizer.
-    
-    When applied, will increase plant growth rate by 1.5x for 3 days.    
+
+    When applied, will increase plant growth rate by 1.5x for 3 days.
     """,
     price=75,
     buyable=True,
@@ -266,9 +251,9 @@ christmas_cheer = Item(
     name="bottle of christmas cheer",
     description="""
     A bottle of distilled christmas cheer.
-    
+
     An inscription on the back reads...
-    
+
     > Instructions: Single use application only.
     > To activate, mix with water and sprinkle over plant.
     > For best results, hum along to the tune of "O Christmas Tree".
@@ -489,11 +474,11 @@ fence = Item(
     name="garden fence",
     description="""
     A short garden fence that can be placed around your flowerbed.
-    
+
     Erecting a fence will prevent visiting players from watering and fertilizing
     your plant. You can tear it down at any time, but doing so will destroy the
     fence.
-    
+
     > "Solitary trees, if they grow at all, grow strong." - Winston Churchill
     """,
     price=300,

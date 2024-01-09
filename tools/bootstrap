@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+python3 -m venv --clear venv
+source venv/bin/activate
+
+pip install -e .[dev]

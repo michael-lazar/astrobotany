@@ -3,16 +3,14 @@ from __future__ import annotations
 import subprocess
 import typing
 from tempfile import NamedTemporaryFile
-from typing import List
 
 from midiutil import MIDIFile
 
 if typing.TYPE_CHECKING:
-    from models import Song
+    from astrobotany.models import Song
 
 
 class Synthesizer:
-
     # Use stdin/stdout and generate a RIFF WAVE
     midi_command = ["timidity", "-OvM", "-o", "-"]
     midi_notes = {
@@ -37,7 +35,7 @@ class Synthesizer:
         "—",  # Hold previous note
     ] + list(midi_notes.keys())
 
-    def __init__(self, song_map: List[str], bpm):
+    def __init__(self, song_map: list[str], bpm):
         self.song_map = song_map
         self.bpm = bpm
 
@@ -48,7 +46,7 @@ class Synthesizer:
 
     def build_midi_file(self) -> MIDIFile:
         # Compress runs of the same note
-        reduces_song_map: typing.List[typing.Tuple[str, int]]
+        reduced_song_map: list[tuple[str, int]]
         reduced_song_map = [(self.song_map[0], 1)]  # [(note, duration), ...]
         for note in self.song_map[1:]:
             if note == "-":

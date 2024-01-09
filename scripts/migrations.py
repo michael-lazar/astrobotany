@@ -134,7 +134,7 @@ def main():
 
     print(f"Running migration {args.migration}...")
     MIGRATIONS[args.migration](migrator)
-    print(f"Success!")
+    print("Success!")
 
 
 if __name__ == "__main__":

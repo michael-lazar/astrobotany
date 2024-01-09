@@ -2,7 +2,7 @@ import csv
 import io
 from typing import Iterable
 
-from .models import Plant, User
+from astrobotany.models import Plant, User
 
 
 class Leaderboard:
@@ -89,7 +89,7 @@ class LargeGeneration(Leaderboard):
     name = "Largest Generation"
 
     def list_top_items(self):
-        from .views import ordinal_format
+        from astrobotany.views import ordinal_format
 
         plants = Plant.all_alive().order_by(Plant.generation.desc())
         for plant in plants.limit(self.count):

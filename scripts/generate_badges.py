@@ -9,7 +9,6 @@ taken = {badge.badge_symbol for badge in Badge._badges}  # noqa
 
 choices = []
 for name, char in get_emoji_unicode_dict("en").items():
-
     # Stick to "simple" emojis
     if len(char) > 1:
         continue

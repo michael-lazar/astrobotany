@@ -9,9 +9,9 @@ This script is intended to be invoked from a cron file like this...
 
 import argparse
 
-from . import settings
-from .garden import rebuild_garden
-from .models import Plant, init_db
+from astrobotany import settings
+from astrobotany.garden import rebuild_garden
+from astrobotany.models import Plant, init_db
 
 
 class Schedule:

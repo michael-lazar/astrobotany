@@ -6,7 +6,7 @@ import os
 import random
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Iterable, List, Optional, Tuple, Type
+from typing import Iterable
 
 import bcrypt
 from faker import Faker
@@ -15,6 +15,7 @@ from peewee import (
     BlobField,
     BooleanField,
     DateTimeField,
+    DoesNotExist,
     ForeignKeyField,
     IntegerField,
     Model,
@@ -22,8 +23,8 @@ from peewee import (
     TextField,
 )
 
-from . import constants, items
-from .art import colorize, render_art
+from astrobotany import constants, items
+from astrobotany.art import colorize, render_art
 
 fake = Faker()
 
@@ -62,7 +63,12 @@ def gen_user_id() -> str:
 
 
 class BaseModel(Model):
-    model_registry: List[Type[BaseModel]] = []
+    # These attributes are dynamically attached by Peewee, but the
+    # peewee-types package isn't aware of them.
+    id: int
+    DoesNotExist: type[DoesNotExist]
+
+    model_registry: list[type[BaseModel]] = []
 
     @classmethod
     def validate_model(cls):
@@ -83,7 +89,7 @@ class User(BaseModel):
     created_at = DateTimeField(default=datetime.now)
     ansi_enabled = BooleanField(default=False)  # TODO: Delete this field
     password = BlobField(null=True)
-    badge_id: Optional[int] = IntegerField(null=True, default=None)
+    badge_id = IntegerField(null=True, default=None)
     karma = IntegerField(default=0)
     garden_coordinates = TextField(null=True, default=None)
     fence_active = BooleanField(default=False)
@@ -113,7 +119,7 @@ class User(BaseModel):
         return user
 
     @classmethod
-    def login(cls, fingerprint: str) -> Optional[Certificate]:
+    def login(cls, fingerprint: str) -> Certificate | None:
         """
         Load a user from their certificate fingerprint.
 
@@ -151,7 +157,7 @@ class User(BaseModel):
 
         return self._plant
 
-    def get_song(self) -> Optional[Song]:
+    def get_song(self) -> Song | None:
         try:
             return self.songs.get()
         except Song.DoesNotExist:
@@ -161,9 +167,9 @@ class User(BaseModel):
                 return None
 
     @property
-    def badge(self) -> Optional[items.Badge]:
+    def badge(self) -> items.Badge | None:
         if self.badge_id:
-            return items.Badge.lookup(self.badge_id)
+            return items.Badge.lookup(self.badge_id)  # noqa
         else:
             return None
 
@@ -173,7 +179,7 @@ class User(BaseModel):
         if badge:
             return f"{badge.badge_symbol} {self.username}"
         else:
-            return self.username
+            return self.username  # noqa
 
     def set_password(self, password: str) -> None:
         self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
@@ -286,7 +292,7 @@ class Config(BaseModel):
     GARDEN_ART = "garden_art"
 
     @classmethod
-    def load(cls, key: str) -> Optional[dict]:
+    def load(cls, key: str) -> dict | None:
         config = cls.get_or_none(key=key)
         if config is None:
             return None
@@ -294,7 +300,7 @@ class Config(BaseModel):
             return json.loads(config.value)
 
     @classmethod
-    def save(cls, key: str, value: Optional[dict]) -> None:
+    def write(cls, key: str, value: dict | None) -> None:
         if value is None:
             cls.replace(key=key, value=None).execute()
         else:
@@ -324,12 +330,12 @@ class ItemSlot(BaseModel):
     """
 
     user: User = ForeignKeyField(User, backref="inventory")
-    item_id: int = IntegerField()
-    quantity: int = IntegerField(default=0)
+    item_id = IntegerField()
+    quantity = IntegerField(default=0)
 
     @property
     def item(self) -> items.Item:
-        item = items.Item.lookup(self.item_id)
+        item = items.Item.lookup(self.item_id)  # noqa
         if item is None:
             raise ValueError("Invalid item ID")
 
@@ -370,30 +376,30 @@ class Inbox(BaseModel):
 
     user_from = ForeignKeyField(User, backref="outbox")
     user_to = ForeignKeyField(User, backref="inbox")
-    created_at: datetime = DateTimeField(default=datetime.now)
+    created_at = DateTimeField(default=datetime.now)
     subject = TextField()
     body = TextField()
     is_seen = BooleanField(default=False)
     parent = ForeignKeyField("self", null=True, backref="children")
-    item_id: Optional[int] = IntegerField(null=True, default=None)
+    item_id = IntegerField(null=True, default=None)
 
     @property
     def date_str(self) -> str:
-        return self.created_at.strftime("%Y-%m-%d")
+        return self.created_at.strftime("%Y-%m-%d")  # noqa
 
     @property
     def datetime_str(self) -> str:
-        return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")
+        return self.created_at.strftime("%A, %B %d, %Y %-I:%M:%S %p (EST)")  # noqa
 
     @property
-    def item(self) -> Optional[items.Item]:
+    def item(self) -> items.Item | None:
         if self.item_id is not None:
-            return items.Item.lookup(self.item_id)
+            return items.Item.lookup(self.item_id)  # noqa
         else:
             return None
 
     @classmethod
-    def load_mail_file(cls, filename: str) -> Tuple[str, str]:
+    def load_mail_file(cls, filename: str) -> tuple[str, str]:
         with open(os.path.join(MAIL_DIR, filename)) as fp:
             subject = fp.readline().strip()
             body = fp.read().strip()
@@ -401,7 +407,6 @@ class Inbox(BaseModel):
 
 
 class Song(BaseModel):
-
     default_data = {
         "tempo": 200,
         "notes": [
@@ -485,7 +490,7 @@ class Plant(BaseModel):
         return constants.RARITIES[self.rarity]
 
     @property
-    def mutation_str(self) -> Optional[str]:
+    def mutation_str(self) -> str | None:
         if self.mutation is not None:
             return constants.MUTATIONS[self.mutation]
         else:
@@ -499,7 +504,7 @@ class Plant(BaseModel):
         if self.user.christmas_mode:
             return "christmas tree"
 
-        words: List[str] = []
+        words: list[str] = []
         if self.stage > 2:
             words.append(self.rarity_str)
         if self.mutation_str is not None:
@@ -582,7 +587,7 @@ class Plant(BaseModel):
         remaining_fertilizer = max(0.0, 1 - (elapsed_seconds / seconds_per_day))
         return math.ceil(remaining_fertilizer * 100)
 
-    def can_water(self, user: Optional[User] = None) -> bool:
+    def can_water(self, user: User | None = None) -> bool:
         if user and self.user.fence_active:
             return False
 
@@ -603,7 +608,7 @@ class Plant(BaseModel):
     def can_play_song(self) -> bool:
         return not self.dead and self.user.get_song()
 
-    def can_fertilize(self, user: Optional[User] = None) -> bool:
+    def can_fertilize(self, user: User | None = None) -> bool:
         """
         Return if the user can apply fertilizer to the plant.
         """
@@ -796,7 +801,7 @@ class Plant(BaseModel):
             else:
                 break
 
-    def water(self, user: Optional[User] = None) -> str:
+    def water(self, user: User | None = None) -> str:
         """
         Attempt to water the plant.
 
@@ -832,7 +837,7 @@ class Plant(BaseModel):
 
         return info
 
-    def pick_petal(self, user: Optional[User] = None) -> str:
+    def pick_petal(self, user: User | None = None) -> str:
         """
         Pick a petal from a flowering plant.
 
@@ -911,7 +916,7 @@ class Plant(BaseModel):
 
         return f"You shake your plant, {msg}\n(+{coins} coins)"
 
-    def fertilize(self, user: Optional[User] = None) -> str:
+    def fertilize(self, user: User | None = None) -> str:
         """
         Attempt to fertilize the plant.
 

@@ -2,10 +2,9 @@ import functools
 import itertools
 import json
 import os
-import random
-from typing import Dict, List, NamedTuple, Optional, Tuple
+from typing import Dict, List, NamedTuple, Tuple
 
-ColorCode = Optional[int]
+ColorCode = int | None
 
 
 class Tile(NamedTuple):
@@ -77,7 +76,7 @@ class ArtFile:
     # randomness to the order of colors for rainbow plants
     rainbow_generator = itertools.cycle(RAINBOW_COLORS)
 
-    def __init__(self, filename: str, flower_color: Optional[str] = None) -> None:
+    def __init__(self, filename: str, flower_color: str | None = None) -> None:
         self.filename = filename
         self.flower_color = flower_color
         self.character_matrix = self.load_file(filename)
@@ -196,7 +195,5 @@ class ArtFile:
 
 
 @functools.lru_cache(maxsize=1000)
-def render_art(
-    filename: str, flower_color: Optional[str] = None, ansi_enabled: bool = False
-) -> str:
+def render_art(filename: str, flower_color: str | None = None, ansi_enabled: bool = False) -> str:
     return ArtFile(filename, flower_color).render(ansi_enabled)
