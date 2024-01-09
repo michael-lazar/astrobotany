@@ -30,6 +30,7 @@ dev = [
 
 [project.scripts]
 astrobotany-tasks = "astrobotany.tasks:main"
+astrobotany = "astrobotany.server:main"
 
 [build-system]
 requires = ["setuptools", "wheel"]
