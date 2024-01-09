@@ -18,6 +18,7 @@ setup(
     author_email="lazar.michael22@gmail.com",
     keywords="gemini",
     packages=["astrobotany"],
+    package_dir={"astrobotany": "src/astrobotany"},
     python_requires=">=3.10, <4",
     install_requires=[
         "jetforce",
