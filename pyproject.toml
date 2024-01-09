@@ -29,8 +29,9 @@ dev = [
 ]
 
 [project.scripts]
-astrobotany-tasks = "astrobotany.tasks:main"
 astrobotany = "astrobotany.server:main"
+astrobotany-migrate = "astrobotany.migrations:main"
+astrobotany-tasks = "astrobotany.tasks:main"
 
 [build-system]
 requires = ["setuptools", "wheel"]

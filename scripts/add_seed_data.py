@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 
 import faker
 
-from astrobotany import init_db
+from astrobotany import init_db, settings
 from astrobotany.models import Plant, User
 
 parser = argparse.ArgumentParser()
 parser.add_argument("count", type=int)
-parser.add_argument("--db-file", default="astrobotany.sqlite")
+parser.add_argument("--db-file", default=settings.db)
 args = parser.parse_args()
 
 fake = faker.Faker()
