@@ -1,33 +1,13 @@
-"""
-Can't sleep, must write unit tests...
-"""
 import os
 import uuid
 from datetime import datetime, timedelta
 
 import pytest
-from freezegun import freeze_time
 
-from astrobotany import init_db, items, sounds, tasks
+from astrobotany import items, sounds, tasks
 from astrobotany.art import ArtFile
 from astrobotany.constants import COLOR_MAP, COLORS, SPECIES, STAGES
 from astrobotany.models import Certificate, Plant, Song, User
-
-
-@pytest.fixture(autouse=True)
-def db():
-    return init_db(":memory:")
-
-
-@pytest.fixture()
-def frozen_time():
-    with freeze_time() as frozen_time:
-        yield frozen_time
-
-
-@pytest.fixture()
-def now(frozen_time):
-    return datetime.now()
 
 
 def gen_id():
