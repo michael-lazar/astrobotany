@@ -3,7 +3,7 @@ import argparse
 from jetforce import GeminiServer
 
 from astrobotany import __version__, init_db, settings
-from astrobotany.views import app
+from astrobotany.app import app
 
 
 def build_argument_parser():

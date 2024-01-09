@@ -1,8 +1,9 @@
 import csv
 import io
-from typing import Iterable
+from collections.abc import Iterable
 
 from astrobotany.models import Plant, User
+from astrobotany.utils import ordinal_format
 
 
 class Leaderboard:
@@ -89,8 +90,6 @@ class LargeGeneration(Leaderboard):
     name = "Largest Generation"
 
     def list_top_items(self):
-        from astrobotany.views import ordinal_format
-
         plants = Plant.all_alive().order_by(Plant.generation.desc())
         for plant in plants.limit(self.count):
             yield plant.user.username, f"{ordinal_format(plant.generation)} gen"

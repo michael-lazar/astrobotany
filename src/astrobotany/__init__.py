@@ -1,5 +1,8 @@
-from astrobotany.models import init_db
-from astrobotany.views import app
+import mimetypes
 
-__all__ = ["init_db", "app"]
+from astrobotany.app import app  # noqa
+from astrobotany.models import init_db  # noqa
+
+mimetypes.add_type("text/gemini", ".gmi")
+
 __version__ = "0.0.1"
