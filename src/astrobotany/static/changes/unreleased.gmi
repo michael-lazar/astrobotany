@@ -1,0 +1,7 @@
+# Astrobotany News
+
+Date:
+
+## Changes
+
+* The watering delay for visiting plants has been bumped up from 30 minutes to 24 hours.

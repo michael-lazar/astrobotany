@@ -155,32 +155,31 @@ def test_plant_no_fertilizer(now):
     assert plant.fertilizer_percent == 0
 
 
-def test_plant_water_rate_limit(frozen_time, now):
+def test_plant_water_rate_limit(frozen_time):
     """
-    A user can only water one neighbor's plan every 8 hours.
+    A user can only water one neighbor's plan every 24 hours.
     """
-    user1 = user_factory()
-    user2 = user_factory()
-    user3 = user_factory()
+    user = user_factory()
 
-    plant1 = plant_factory(user=user1, watered_at=now - timedelta(hours=24))
-    plant2 = plant_factory(user=user2, watered_at=now - timedelta(hours=24))
+    plant1 = plant_factory()
+    plant2 = plant_factory()
 
-    plant1.water(user3)
+    plant1.water(user)
     plant1.save()
     assert plant1.water_supply_percent == 100
-    assert plant1.watered_by == user3
+    assert plant1.watered_by == user
 
-    plant2.water(user3)
+    plant2.water(user)
     plant2.save()
     assert plant2.water_supply_percent == 0
     assert plant2.watered_by is None
 
-    frozen_time.tick(delta=timedelta(hours=12))
-    plant2.water(user3)
+    frozen_time.tick(timedelta(hours=25))
+
+    plant2.water(user)
     plant2.save()
     assert plant2.water_supply_percent == 100
-    assert plant2.watered_by == user3
+    assert plant2.watered_by == user
 
 
 def test_plant_harvest():
