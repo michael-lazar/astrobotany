@@ -1,5 +1,3 @@
-import typing
-
 from peewee import fn
 
 from astrobotany.art import ArtFile, colorize
@@ -7,7 +5,7 @@ from astrobotany.items import Petal, get_date
 from astrobotany.models import Event, User
 
 
-def colorize_petal_text() -> typing.Dict[str, str]:
+def colorize_petal_text() -> dict[str, str]:
     color_map = {}
     for color in Petal.petals.keys():
         fg, _ = ArtFile.FLOWER_COLORS[color]
@@ -47,8 +45,16 @@ class Pond:
         self.user.karma += karma
         self.user.save()
 
-        Event.create(user=self.user, event_type=Event.TRIBUTE_PETAL, target=color, count=amount)
-        msg = f"You toss {amount} {color} petal{'s' if amount > 1 else ''} into the pond. Fate smiles upon you."
+        Event.create(
+            user=self.user,
+            event_type=Event.TRIBUTE_PETAL,
+            target=color,
+            count=amount,
+        )
+        msg = (
+            f"You toss {amount} {color} petal{'s' if amount > 1 else ''} "
+            f"into the pond. Fate smiles upon you."
+        )
         return msg
 
     def get_tribute_total(self) -> int:
@@ -59,7 +65,7 @@ class Pond:
         )
         return value or 0
 
-    def get_available_petal_data(self, ansi_enabled: bool = False) -> typing.List[dict]:
+    def get_available_petal_data(self, ansi_enabled: bool = False) -> list[dict]:
         petal_data = []
         item: Petal
         for item in Petal.petals.values():
@@ -72,7 +78,12 @@ class Pond:
             else:
                 petal_str = item.color
 
-            data = {"petal": item, "amount": quantity, "petal_str": petal_str, "color": item.color}
+            data = {
+                "petal": item,
+                "amount": quantity,
+                "petal_str": petal_str,
+                "color": item.color,
+            }
             petal_data.append(data)
 
         return petal_data

@@ -1,3 +1,55 @@
+[project]
+name = "astrobotany"
+description = "🌱 A community garden over the Gemini protocol"
+requires-python = ">=3.10"
+authors = [{name = "Michael Lazar", email = "michael@mozz.us"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+dynamic = ["version"]
+
+dependencies = [
+    "jetforce",
+    "peewee",
+    "jinja2",
+    "faker",
+    "bcrypt",
+    "emoji>=2",
+    "MIDIUtil",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "mypy",
+    "freezegun",
+    "types-emoji",
+    "types-freezegun",
+    "build",
+]
+
+[project.scripts]
+astrobotany = "astrobotany.server:main"
+astrobotany-migrate = "astrobotany.migrations:main"
+astrobotany-tasks = "astrobotany.tasks:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "astrobotany.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+astrobotany = [
+    "*.psci",
+    "*.txt",
+    "*.gmi",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["--import-mode=importlib", "--verbose"]
@@ -7,14 +59,14 @@ line-length = 100
 
 [tool.mypy]
 python_version = "3.10"
-files = ["astrobotany", "tests", "scripts"]
+files = ["src", "tests", "scripts"]
 
 [[tool.mypy.overrides]]
 module = "midiutil,playhouse,peewee"
 ignore_missing_imports = true
 
 [tool.ruff]
-src = ["astrobotany", "tests", "scripts"]
+src = ["src", "tests", "scripts"]
 select = [
     "E",    # pycodestyle
     "F",    # pyflakes

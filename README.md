@@ -18,29 +18,36 @@ A community garden over the [gemini](https://gemini.circumlunar.space/) protocol
 
 ---
 
-## Getting Started
+## Development
 
-(requires python 3.7+)
+(requires python 3.10+)
 
 ```bash
-# Setup a fresh virtual environment
+# Download the source
 git clone git@github.com:michael-lazar/astrobotany.git
-cd astrobotany
-python -m virtualenv venv
-source venv/bin/activate
+cd astrobotany/
 
-# Install astrobotany in "edit" mode
-pip install -e .
+# Initialize a virtual environment and install pip dependencies, etc.
+tools/boostrap
 
-# Launch the gemini server
-python main.py
+# Launch a local server
+tools/astrobotany
+
+# Initialize pre-commit hooks
+pre-commit install
+
+# Run the tests, linters, etc.
+tools/pytest
+tools/mypy
+tools/lint
+
+# Interact with the local database
+sqlite3 data/astrobotany.sqlite
 ```
 
-## Art
+## ASCII Art
 
-### Playscii
-
-I use a forked version of the playscii ASCII art program to generate the ``.psci`` files:
+I used a forked version of the playscii ASCII art program to generate the ``.psci`` files:
 
 https://github.com/michael-lazar/playscii
 

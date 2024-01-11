@@ -7,7 +7,14 @@ STAGE_CUTOFFS = [
     (3600 * 24) * 30,
 ]
 
-STAGES = ["seed", "seedling", "young", "mature", "flowering", "seed-bearing"]
+STAGES = [
+    "seed",
+    "seedling",
+    "young",
+    "mature",
+    "flowering",
+    "seed-bearing",
+]
 
 STAGE_DESCRIPTIONS = {
     0: [
@@ -88,7 +95,9 @@ STAGE_DESCRIPTIONS = {
         "You cry over the withered leaves of your plant.",
         "Your plant died. Maybe you need a fresh start.",
     ],
-    "christmas": ["You gaze at the twinkling lights and reflect on the meaning on christmas."],
+    "christmas": [
+        "You gaze at the twinkling lights and reflect on the meaning on christmas.",
+    ],
 }
 
 COLORS = [
@@ -134,7 +143,13 @@ SPECIES = [
     "pachypodium",
 ]
 
-RARITIES = ["common", "uncommon", "rare", "legendary", "godly"]
+RARITIES = [
+    "common",
+    "uncommon",
+    "rare",
+    "legendary",
+    "godly",
+]
 
 MUTATIONS = [
     "humming",
