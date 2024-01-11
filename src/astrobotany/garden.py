@@ -1,14 +1,13 @@
 import itertools
 import random
 from datetime import datetime, timedelta
-from typing import List, Tuple
 
 from astrobotany.art import ArtFile, CharacterMatrix, Tile, colorize
 from astrobotany.models import Config, Plant, User
 from astrobotany.pond import Pond
 
-Coordinate = Tuple[int, int]
-Coordinates = List[Coordinate]
+Coordinate = tuple[int, int]
+Coordinates = list[Coordinate]
 
 
 POND_TEMPLATE = """\
@@ -21,7 +20,7 @@ POND_TEMPLATE = """\
 """
 
 
-def initialize_canvas(height: int, width: int) -> Tuple[CharacterMatrix, Coordinates]:
+def initialize_canvas(height: int, width: int) -> tuple[CharacterMatrix, Coordinates]:
     matrix: CharacterMatrix = []
     empty: Coordinates = []
     for y in range(height):

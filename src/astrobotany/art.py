@@ -2,7 +2,7 @@ import functools
 import itertools
 import json
 import os
-from typing import Dict, List, NamedTuple, Tuple
+from typing import NamedTuple
 
 ColorCode = int | None
 
@@ -13,7 +13,7 @@ class Tile(NamedTuple):
     fg: ColorCode
 
 
-CharacterMatrix = List[List[Tile]]
+CharacterMatrix = list[list[Tile]]
 
 
 def colorize(text: str, fg: ColorCode = None, bg: ColorCode = None) -> str:
@@ -56,7 +56,7 @@ class ArtFile:
     SOIL_COLOR: ColorCode = 80
 
     # Palette mapping for flower colors: (primary, secondary)
-    FLOWER_COLORS: Dict[str, Tuple[int, int]] = {
+    FLOWER_COLORS: dict[str, tuple[int, int]] = {
         "red": (182, 189),
         "orange": (187, 199),
         "yellow": (211, 207),

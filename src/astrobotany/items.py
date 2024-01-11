@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import random
 import time
+from collections.abc import Iterable
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, Iterable, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from astrobotany import constants
 
