@@ -1,0 +1,9 @@
+# Astrobotany News
+
+2024-08-01
+
+## Changes
+
+* The watering delay for visiting plants has been bumped up from 30 minutes to 24 hours.
+* The ASCII art community garden has been split out to a separate page.
+* Did some fine-tuning on the SQLite database configuration.
