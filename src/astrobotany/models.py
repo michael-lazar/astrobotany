@@ -36,7 +36,18 @@ def init_db(filename: str = ":memory:") -> SqliteDatabase:
     """
     Bind an SQLite database to the Peewee ORM models.
     """
-    db = SqliteDatabase(filename, pragmas={"journal_mode": "wal"})
+    db = SqliteDatabase(
+        filename,
+        # https://blog.pecar.me/sqlite-django-config
+        pragmas={
+            "journal_mode": "wal",
+            "synchronous": "normal",
+            "nmap_size": 134217728,
+            "journal_size_limit": 27103364,
+            "cache_size": 10000000,
+            "busy_timeout": 5000,
+        },
+    )
     db.bind(BaseModel.model_registry)
     db.create_tables(BaseModel.model_registry)
     return db
