@@ -649,6 +649,13 @@ def mailbox_message_view(request, message_id):
     return Response(Status.SUCCESS, "text/gemini", body)
 
 
+@app.auth_route("/app/garden-art")
+def garden_art_view(request):
+    garden_art = load_garden(request.cert.ansi_enabled)
+    body = request.render_template("garden-art.gmi", garden_art=garden_art)
+    return Response(Status.SUCCESS, "text/gemini", body)
+
+
 @app.auth_route("/app/garden")
 @app.auth_route("/app/garden/(?P<filter>[a-z]+)")
 @app.auth_route("/app/garden/(?P<filter>[a-z]+)/(?P<page>[0-9]+)")
@@ -709,7 +716,6 @@ def garden_view(request, filter="all", page=1):
 
     plants = query.paginate(page, paginate_by)
 
-    garden_art = load_garden(request.cert.ansi_enabled)
     body = request.render_template(
         "garden.gmi",
         plants=plants,
@@ -719,7 +725,6 @@ def garden_view(request, filter="all", page=1):
         page_count=page_count,
         total=total,
         search_term=search_term,
-        garden_art=garden_art,
     )
     return Response(Status.SUCCESS, "text/gemini", body)
 

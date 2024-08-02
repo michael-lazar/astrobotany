@@ -1,0 +1,7 @@
+# Astrobotany - ASCII Art Garden
+
+```
+{{ garden_art }}
+```
+
+=>/app/garden 🚶 Go back
