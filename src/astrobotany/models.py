@@ -834,7 +834,7 @@ class Plant(BaseModel):
 
         query = Plant.select().where(
             Plant.watered_by == user,
-            Plant.watered_at >= datetime.now() - timedelta(hours=24),
+            Plant.watered_at >= datetime.now() - timedelta(hours=6),
         )
         if query.exists():
             return "Your watering can is empty, try again later!"
