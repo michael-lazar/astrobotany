@@ -5,3 +5,4 @@
 ## Changes
 
 * The watering delay for visiting plants has been bumped down from 24 hours to 6 hours.
+* Added badge series 3.
