@@ -1,16 +1,14 @@
-default_stages: [commit]
+default_stages: [pre-commit]
 
 default_language_version:
   python: python3.10
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
-      - id: file-contents-sorter
-        files: requirements/.*\.in
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.22
