@@ -3,6 +3,7 @@
 This is a cgi script that takes an PKCS#10 certificate signing request (csr)
 and returns a signed client certificate.
 """
+
 import cgi
 import os
 import secrets

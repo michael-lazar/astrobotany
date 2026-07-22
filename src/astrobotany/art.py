@@ -21,9 +21,9 @@ def colorize(text: str, fg: ColorCode = None, bg: ColorCode = None) -> str:
     Colorize a line of text using the ansi-240 color palette.
     """
     if fg is not None:
-        text = f"\033[38;5;{fg+15}m" + text
+        text = f"\033[38;5;{fg + 15}m" + text
     if bg is not None:
-        text = f"\033[48;5;{bg+15}m" + text
+        text = f"\033[48;5;{bg + 15}m" + text
     if fg is not None or bg is not None:
         text = text + "\033[0m"
     return text

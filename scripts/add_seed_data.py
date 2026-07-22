@@ -2,6 +2,7 @@
 """
 Generate fake plant data for testing.
 """
+
 import argparse
 import random
 from datetime import datetime, timedelta

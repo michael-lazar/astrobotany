@@ -20,7 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "black",
+    "ruff",
     "mypy",
     "freezegun",
     "types-emoji",
@@ -54,9 +54,6 @@ astrobotany = [
 testpaths = ["tests"]
 addopts = ["--import-mode=importlib", "--verbose"]
 
-[tool.black]
-line-length = 100
-
 [tool.mypy]
 python_version = "3.10"
 files = ["src", "tests", "scripts"]
@@ -67,6 +64,9 @@ ignore_missing_imports = true
 
 [tool.ruff]
 src = ["src", "tests", "scripts"]
+line-length = 100
+
+[tool.ruff.lint]
 select = [
     "E",    # pycodestyle
     "F",    # pyflakes
@@ -78,14 +78,12 @@ select = [
     "UP",   # pyupgrade
 ]
 ignore = [
-    "E501",   # Line length is enforced by black
     "PT012",  # Allow pytest.raises with context managers
     "E712",   # == False comparison has special meaning in Peewee
 ]
-line-length = 100
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["astrobotany"]
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
