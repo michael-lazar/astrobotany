@@ -20,21 +20,21 @@ A community garden over the [gemini](https://gemini.circumlunar.space/) protocol
 
 ## Development
 
-(requires python 3.10+)
+(requires [uv](https://docs.astral.sh/uv/))
 
 ```bash
 # Download the source
 git clone git@github.com:michael-lazar/astrobotany.git
 cd astrobotany/
 
-# Initialize a virtual environment and install pip dependencies, etc.
-tools/boostrap
+# Initialize a virtual environment and install dependencies, etc.
+tools/bootstrap
 
 # Launch a local server
 tools/astrobotany
 
 # Initialize pre-commit hooks
-pre-commit install
+uv run pre-commit install
 
 # Run the tests, linters, etc.
 tools/pytest

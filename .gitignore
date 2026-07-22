@@ -3,6 +3,7 @@ astrobotany.sqlite*
 __pycache__/
 certs/
 venv/
+.venv/
 .mypy_cache/
 astrobotany.egg-info/
 build/

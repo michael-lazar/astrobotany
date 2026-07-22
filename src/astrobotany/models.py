@@ -19,6 +19,7 @@ from peewee import (
     ForeignKeyField,
     IntegerField,
     Model,
+    ModelSelect,
     SqliteDatabase,
     TextField,
 )
@@ -94,6 +95,12 @@ class User(BaseModel):
     """
 
     _plant: Plant
+
+    # These attributes are dynamically attached by Peewee via backrefs
+    # defined on other models.
+    active_plants: ModelSelect[Plant]
+    songs: ModelSelect[Song]
+    inventory: ModelSelect[ItemSlot]
 
     user_id = TextField(unique=True, index=True, default=gen_user_id)
     username = TextField()
@@ -305,7 +312,7 @@ class Config(BaseModel):
     @classmethod
     def load(cls, key: str) -> dict | None:
         config = cls.get_or_none(key=key)
-        if config is None:
+        if config is None or config.value is None:
             return None
         else:
             return json.loads(config.value)
@@ -340,7 +347,7 @@ class ItemSlot(BaseModel):
     Mapping table between users and the items that they possess.
     """
 
-    user: User = ForeignKeyField(User, backref="inventory")
+    user = ForeignKeyField(User, backref="inventory")
     item_id = IntegerField()
     quantity = IntegerField(default=0)
 
@@ -391,7 +398,7 @@ class Inbox(BaseModel):
     subject = TextField()
     body = TextField()
     is_seen = BooleanField(default=False)
-    parent = ForeignKeyField("self", null=True, backref="children")
+    parent = ForeignKeyField("self", null=True, backref="children")  # type: ignore[call-overload]
     item_id = IntegerField(null=True, default=None)
 
     @property
@@ -443,7 +450,7 @@ class Song(BaseModel):
     user = ForeignKeyField(User, backref="songs")
     title = TextField(default="")
     created_at = DateTimeField(default=datetime.now)
-    data: str = TextField(default=json.dumps(default_data))
+    data = TextField(default=json.dumps(default_data))
 
     def get_data(self) -> dict:
         return json.loads(self.data)
@@ -617,7 +624,7 @@ class Plant(BaseModel):
         return not self.dead
 
     def can_play_song(self) -> bool:
-        return not self.dead and self.user.get_song()
+        return not self.dead and self.user.get_song() is not None
 
     def can_fertilize(self, user: User | None = None) -> bool:
         """

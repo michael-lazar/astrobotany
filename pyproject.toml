@@ -17,16 +17,15 @@ dependencies = [
     "MIDIUtil",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
+    "freezegun",
+    "mypy",
     "pre-commit",
     "pytest",
     "ruff",
-    "mypy",
-    "freezegun",
     "types-emoji",
     "types-freezegun",
-    "build",
 ]
 
 [project.scripts]

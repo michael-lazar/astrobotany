@@ -5,7 +5,7 @@ from functools import lru_cache
 import emoji
 import jinja2
 from jetforce import JetforceApplication, Request, Response, Status
-from jetforce.app.base import EnvironDict, RouteHandler, RoutePattern
+from jetforce.app.base import DeferredResponse, EnvironDict, RouteHandler, RoutePattern
 
 from astrobotany.models import Certificate, User
 from astrobotany.utils import ordinal_format
@@ -101,7 +101,7 @@ def authenticated_route(func: RouteHandler) -> RouteHandler:
     Wraps a route method to ensure that the request is authenticated.
     """
 
-    def wrapped(request: Request, **kwargs) -> Response:
+    def wrapped(request: Request, **kwargs) -> Response | DeferredResponse:
         if "REMOTE_USER" not in request.environ:
             msg = "Attach your client certificate to continue."
             return Response(Status.CLIENT_CERTIFICATE_REQUIRED, msg)
