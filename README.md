@@ -1,7 +1,6 @@
 # Astrobotany
 
 [![Build](https://github.com/michael-lazar/astrobotany/workflows/test/badge.svg)](https://github.com/michael-lazar/astrobotany/actions/workflows/test.yml)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 A community garden over the [gemini](https://gemini.circumlunar.space/) protocol. Fork of [jifunks/botany](https://github.com/jifunks/botany).
 
