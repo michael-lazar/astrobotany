@@ -151,6 +151,28 @@ def add_fence_active(migrator):
     )
 
 
+def prune_and_index_plants(migrator):
+    """
+    One-time cleanup for the July 2026 garden page slowness. Purges rows
+    that prune_database() now handles daily, adds the partial index from
+    the Plant model to the existing database, and refreshes the query
+    planner statistics.
+
+    Afterwards, reclaim disk space by running this against the db file:
+
+        PRAGMA page_size = 4096;
+        VACUUM;
+    """
+    from astrobotany.tasks import prune_database
+
+    prune_database()
+    migrator.database.execute_sql(
+        "CREATE INDEX IF NOT EXISTS plant_active_partial ON plant (user_active_id) "
+        "WHERE user_active_id IS NOT NULL"
+    )
+    migrator.database.execute_sql("ANALYZE")
+
+
 migrations = locals()
 
 

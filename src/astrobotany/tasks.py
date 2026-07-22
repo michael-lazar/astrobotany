@@ -8,10 +8,11 @@ This script is intended to be invoked from a cron file like this...
 """
 
 import argparse
+from datetime import datetime, timedelta
 
 from astrobotany import settings
 from astrobotany.garden import rebuild_garden
-from astrobotany.models import Plant, init_db
+from astrobotany.models import Event, Plant, init_db
 
 
 class Schedule:
@@ -49,6 +50,46 @@ def refresh_garden_art():
     regenerating it with every gemini request.
     """
     rebuild_garden(update_users=True)
+
+
+@schedule.daily
+def prune_database():
+    """
+    Delete rows that the application will never look at again, so the
+    database doesn't grow unbounded.
+
+    - Dead plants that have been harvested are unreachable; every query
+      goes through user_active or the active plant's id.
+    - Petal picks are only checked against the current day, to enforce the
+      one-pick-per-plant daily limit. Keep a 2-day buffer to be safe.
+    """
+    plant_count = (
+        Plant.delete()
+        .where(
+            Plant.user_active.is_null(),
+            Plant.dead == True,
+        )
+        .execute()
+    )
+    event_count = (
+        Event.delete()
+        .where(
+            Event.event_type == Event.PICK_PETAL,
+            Event.created_at < datetime.now() - timedelta(days=2),
+        )
+        .execute()
+    )
+    print(f"Pruned {plant_count} dead plants and {event_count} old petal picks")
+
+
+@schedule.daily
+def optimize_database():
+    """
+    Keep the query planner statistics up to date, otherwise sqlite makes
+    poor index choices. Runs after prune_database so the statistics reflect
+    the pruned tables.
+    """
+    Plant._meta.database.execute_sql("PRAGMA optimize")
 
 
 def main():

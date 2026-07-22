@@ -990,3 +990,15 @@ class Plant(BaseModel):
             user_active=self.user,
             generation=new_generation,
         )
+
+
+# Partial index covering only the ~1 plant per user that's still attached.
+# The garden page filters every query on user_active IS NOT NULL, and without
+# this index sqlite falls back to scanning the entire table.
+Plant.add_index(
+    Plant.index(
+        Plant.user_active,
+        name="plant_active_partial",
+        where=Plant.user_active.is_null(False),
+    )
+)

@@ -7,7 +7,7 @@ import pytest
 from astrobotany import items, sounds, tasks
 from astrobotany.art import ArtFile
 from astrobotany.constants import COLOR_MAP, COLORS, SPECIES, STAGES
-from astrobotany.models import Certificate, Plant, Song, User
+from astrobotany.models import Certificate, Event, Plant, Song, User
 
 
 def gen_id():
@@ -443,6 +443,40 @@ def test_tasks():
         task()
     for task in tasks.schedule.hourly_tasks:
         task()
+
+
+def test_prune_database():
+    user = user_factory()
+    active_plant = plant_factory(user=user, user_active=user)
+    harvested_plant = plant_factory(user=user, dead=True)
+
+    dead_user = user_factory()
+    dead_active_plant = plant_factory(user=dead_user, user_active=dead_user, dead=True)
+
+    old_pick = Event.create(
+        user=user,
+        event_type=Event.PICK_PETAL,
+        target="red",
+        created_at=datetime.now() - timedelta(days=3),
+    )
+    fresh_pick = Event.create(user=user, event_type=Event.PICK_PETAL, target="red")
+    old_tribute = Event.create(
+        user=user,
+        event_type=Event.TRIBUTE_PETAL,
+        target="red",
+        count=5,
+        created_at=datetime.now() - timedelta(days=30),
+    )
+
+    tasks.prune_database()
+
+    plant_ids = {plant.id for plant in Plant.select()}
+    assert plant_ids == {active_plant.id, dead_active_plant.id}
+    assert harvested_plant.id not in plant_ids
+
+    event_ids = {event.id for event in Event.select()}
+    assert event_ids == {fresh_pick.id, old_tribute.id}
+    assert old_pick.id not in event_ids
 
 
 def test_login_saves_last_seen(frozen_time, now):
