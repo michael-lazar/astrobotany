@@ -45,9 +45,12 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 astrobotany = [
-    "*.psci",
-    "*.txt",
-    "*.gmi",
+    "art/*.psci",
+    "mail/*.txt",
+    "static/*.gmi",
+    "static/changes/*.gmi",
+    "templates/*.gmi",
+    "templates/fragments/*.gmi",
 ]
 
 [tool.pytest.ini_options]
